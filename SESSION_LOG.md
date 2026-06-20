@@ -46,6 +46,10 @@
 - Performed deep research on high-temperature and high-pressure (HPHT) downhole tool components (PEEK acoustic windows, metal bellows pressure compensators, TI SM28VLT32 extreme-temperature flash memory, and Kemlon connector bulkheads).
 
 ### Decisions Made
+- Transitioned repository scope to the **Pertacoustic Study** (UGM and PT Pertamina Hulu Energi Upstream Innovation) for downhole SNL CAD/CAE development.
+- Establish wellbore target environmental parameters matching PHE's oil reservoirs (150°C max BHT, 10,000 PSI max BHP, 3,500m depth, sour service).
+
+### Proposed Design Options & Recommendations (Under Evaluation)
 - Select the **Aquarian Audio AS-1** as the primary prototyping sensor due to its 12 mm outer diameter, providing 15.5 mm radial clearance inside a 43 mm tool casing.
 - Implement high-input-impedance buffer pre-amplification (TI OPA211-HT op-amp) close to the sensor to prevent cable signal loss.
 - Choose **Stainless Steel 316 (SS316)** instead of Titanium Grade 5 for custom housing machining, keeping the total industrial HT-grade system cost under $2,000 USD (est. **$1,668 USD**).
