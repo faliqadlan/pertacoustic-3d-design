@@ -44,6 +44,7 @@
 - Evaluated COTS hydrophone elements (AS-1, TC4013, HTI-96-MIN) for custom 43 mm casing integration.
 - Analyzed pricing differences between custom prototyping and off-the-shelf marine recorders (SoundTrap), showing that custom prototyping saves over **$2,600 USD** per unit.
 - Performed deep research on high-temperature and high-pressure (HPHT) downhole tool components (PEEK acoustic windows, metal bellows pressure compensators, TI SM28VLT32 extreme-temperature flash memory, and Kemlon connector bulkheads).
+- Explored the **COSMO-Agent** (Closed-loop Optimization, Simulation, and Modeling Orchestration) research paper (*arXiv:2604.05547*) [1] for closed-loop CAD-CAE optimization.
 
 ### Decisions Made
 - Transitioned repository scope to the **Pertacoustic Study** (UGM and PT Pertamina Hulu Energi Upstream Innovation) for downhole SNL CAD/CAE development.
@@ -61,4 +62,5 @@
 - `commercial_snl_tools.md` — Comparison of commercial downhole acoustic diagnostic tools.
 - `hydrophone_recommendations.md` — COTS sensor comparison, rationale, and SoundTrap cost comparison.
 - `downhole_tool_components.md` — Auxiliary components list, specifications, pricing, and system-level budgets.
+- `.agents/skills/cosmo-agent-cad-cae-orchestration/SKILL.md` — Custom workspace agent skill for CAD-CAE closed-loop execution.
 - `SESSION_LOG.md` — Updated with this afternoon's design log.
