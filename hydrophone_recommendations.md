@@ -35,9 +35,29 @@ For the initial prototype development, the **Aquarian Audio AS-1** is the recomm
 
 ---
 
+## 4. Alternative: Integrated Memory Recorders vs. Custom Tooling
+
+Integrating a self-contained acoustic recorder (hydrophone + data logger + battery) simplifies wiring but introduces major physical and environmental constraints for downhole applications:
+
+### A. Marine Integrated Recorders (e.g., SoundTrap)
+*   **Acoustic Recorder (SoundTrap ST300/ST400)**: These systems integrate the hydrophone, battery, and flash memory into a single unit [6]. 
+*   **Feasibility Issues**:
+    1.  **Diameter Limits**: Standard SoundTrap models have outer diameters of **40 mm to 60 mm** [6]. When placed inside a protective casing, the tool will exceed the maximum cased hole logging restriction of **43 mm (1-11/16")**, meaning it cannot pass through standard $2\frac{3}{8}\text{-inch}$ production tubing.
+    2.  **Temperature Limit**: These are designed for marine applications and are only rated up to **+35°C or +40°C** [6]. The internal batteries and flash memory will immediately fail in a **150°C** PHE wellbore [5].
+
+### B. Commercial Downhole Memory Logging Tools (e.g., SLB, Baker Hughes, TGT)
+*   **Downhole Memory SNL Tools**: These tools run autonomously on slickline using high-temperature lithium batteries and internal memory boards inside a 43 mm titanium housing rated for 150°C–177°C [7].
+*   **Feasibility Issues**:
+    1.  **High Procurement Cost**: Commercial units cost tens of thousands of dollars and are typically proprietary service offerings rather than off-the-shelf research sensors [2].
+    2.  **Rigid Architecture**: The data logging frequency, telemetry interface, and DSP processing algorithms are closed-source and cannot be customized for academic research and custom CAD/CAE development.
+
+---
+
 ## References
 *   [1] [Aquarian Audio - AS-1 Hydrophone Technical Datasheet](https://www.aquarianaudio.com/as-1-hydrophone.html) (Broadband passive hydrophone specifications).
 *   [2] [Seis-Tech - Downhole Seismic Equipment and Market Pricing](https://seis-tech.com) (General commercial hydrophone pricing indicators).
 *   [3] [Teledyne Marine - RESON TC4013 Miniature Reference Hydrophone](https://www.teledynemarine.com/en-us/products/acoustic-sensors/reson-tc4013) (Miniature reference hydrophone specifications).
 *   [4] [High Tech Inc - HTI-96-MIN Hydrophone Product Specifications](https://hightechincusa.com) (Seismic and borehole hydrophone specifications).
 *   [5] [SPE - Heavy Oil Recovery and Steamflooding in Rokan Block](https://onepetro.org) (Duri field thermal profiles).
+*   [6] [Ocean Instruments - SoundTrap ST400 Specifications](https://oceaninstruments.co.nz/) (Oceanographic acoustic recorder sizing and temperature thresholds).
+*   [7] [Baker Hughes - Memory Production Logging Platform Specs](https://www.bakerhughes.com) (High-temperature downhole memory tool specifications).
