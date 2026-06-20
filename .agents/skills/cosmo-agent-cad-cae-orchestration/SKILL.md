@@ -62,7 +62,20 @@ The framework relies on four modular tools to execute the loop. Any implementati
 
 ---
 
-## 3. Iterative Optimization Loop & Constraint Checking
+## 3. Recommended Free & Open-Source Toolchain (Aesthetics & Automation)
+
+To build a fully automated, cost-free engineering loop, we use the following Python-orchestrated open-source tools:
+
+| Stage | Selected Free Tool | Function & Integration |
+| :--- | :--- | :--- |
+| **CAD (Geometry)** | **CadQuery** or **Build123d** [2] | Python-first parametric modeling engine. It generates 3D geometries as STEP files using standard python variables [2]. |
+| **Meshing** | **Gmsh** (via Python API) [2] | High-performance 3D finite element mesh generator. Takes STEP geometry and outputs a solver-compatible mesh (`.inp` or `.msh`) [2]. |
+| **Solver (CAE)** | **CalculiX (ccx)** [3] | High-performance finite element solver. Solves structural displacement and stress equations using standard input files [3]. |
+| **Post-Processing** | **ParaView** (via `ccx2paraview`) [2] | Industry-standard open-source 3D visualization. Renders color stress contours and displacement animations. |
+
+---
+
+## 4. Iterative Optimization Loop & Constraint Checking
 
 At each iteration round $t$, the agent must evaluate the current state against three coupled engineering constraints:
 
@@ -87,3 +100,5 @@ At each iteration round $t$, the agent must evaluate the current state against t
 
 ## References
 *   [1] *Deng et al. (2026). COSMO-Agent: Tool-Augmented Agent for Closed-loop Optimization, Simulation, and Modeling Orchestration.* arXiv:2604.05547.
+*   [2] *FastPreci - Open-Source CAD/CAE Automation Pipelines.* (Technical benchmarks for CadQuery and Gmsh integrations).
+*   [3] *CalculiX Solver Documentation.* (CalculiX CrunchiX manual).
