@@ -70,7 +70,7 @@ Custom casing and vacuum insulation components to shield the electronics and cou
 
 ## 5. Complete System Prototyping Budgets
 
-Below are two alternative total budget calculations for building the complete downhole logging tool. 
+Below are three alternative total budget calculations for building the complete downhole logging tool.
 
 ### Option A: The "Direct-Survival" HPHT Tool Setup (Total: ~$2,258 USD)
 In this configuration, we purchase the best high-temperature (HT) electronics capable of surviving 150°C wellbores directly [5][8][10][11][13]. While this setup costs slightly above $2,000 USD when using premium titanium housings, it eliminates the need for a dewar flask and PCM.
@@ -100,6 +100,20 @@ In this configuration, we use standard prototyping-grade electronics (Teensy log
 
 ---
 
+### Option C: The "Best of the Best" No-Compromise Industrial HPHT Tool Setup (Total: ~$6,940 USD)
+This configuration targets absolute laboratory and scientific-grade precision with zero engineering compromises. It features a reference-grade Teledyne RESON TC4013 sensor, a Titanium Grade 5 outer housing, and a full suite of high-reliability HPHT telemetry components.
+
+*   **Reference Sensor**: Teledyne RESON TC4013 (or B&K 8103) = **$3,000 USD** [19]
+*   **HT Pre-amplifier**: TI OPA211-HT + military-grade ceramic passives = **$250 USD** [4][5]
+*   **HT Data Logger**: TI MSP430-HT MCU + TI ADS1278-HT ADC + TI SM28VLT32 Flash = **$500 USD** [4][8][10][11]
+*   **HT Power**: Electrochem 3B series ($\text{Li-SOCl}_2$) (2 cells) = **$150 USD** [4][13]
+*   **Outer Casing**: Custom Machined Titanium Grade 5 (Ti-6Al-4V) = **$2,000 USD** [14] (Maximum strength, minimum weight, ultimate corrosion resistance).
+*   **Acoustic Interface**: Machined PEEK Window + Dow Corning 200 Oil + Metal Bellows = **$840 USD** [16][17]
+*   **HPHT Bulkhead**: Kemlon Connector = **$200 USD** [18]
+*   **Total Setup Cost**: **$6,940 USD** (Scientific reference quality)
+
+---
+
 ## References
 *   [1] [Aquarian Audio - AS-1 Hydrophone Technical Datasheet](https://www.aquarianaudio.com/as-1-hydrophone.html) (AS-1 high impedance and temperature constraints).
 *   [2] [Aquarian Audio - AS-1 Scientific Hydrophone Store Page](https://www.aquarianaudio.com/as-1-hydrophone.html) (Official AS-1 retail pricing).
@@ -119,3 +133,4 @@ In this configuration, we use standard prototyping-grade electronics (Teensy log
 *   [16] [Victrex - PEEK Downhole Applications and Properties](https://www.victrex.com) (PEEK acoustic transparency and mechanical strength properties).
 *   [17] [Senior Metal Bellows - Oilfield Pressure Compensator Bellows](https://www.seniormetalbellows.com) (Downhole bellows engineering and pressure equalization).
 *   [18] [Kemlon - High-Pressure Glass-to-Metal Sealed Connector Bulkheads](https://www.kemlon.com) (Downhole electrical connectors and bulkheads).
+*   [19] [Teledyne Marine - RESON TC4013 Reference Hydrophone Pricing & Specs](https://www.teledynemarine.com) (Reference-grade scientific hydrophone cost indicators).
