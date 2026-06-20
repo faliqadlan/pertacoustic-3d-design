@@ -1,54 +1,31 @@
-# Antigravity Agent Setup & Shared Memory
+# Pertacoustic Study: Spectral Noise Logging (SNL) Well Diagnostics
 
-This repository serves as the central configuration hub, shared memory, and learning journal for my personal Antigravity AI Agent setup. It ensures that my Antigravity agent remains equally "smart" and context-aware across multiple laptops (e.g., Jombang and Jogja).
+This repository contains the software configuration, design targets, and research artifacts for the **Pertacoustic Study** (Studi Pertacoustic untuk Mengatasi Permasalahan Air), a joint research and development project conducted in collaboration with **Laboratorium Geofisika FMIPA Universitas Gadjah Mada (UGM)** and **PT Pertamina Hulu Energi (PHE) Upstream Innovation**.
 
-## Core Philosophy
+---
 
-This setup adopts the **Strict Curation** approach for AI Agent Skills:
-*   We prioritize **Quality over Quantity**. Instead of mass-installing thousands of community scripts, we only use officially vetted playbooks.
-*   We use the **VoltAgent** model: The agent automatically searches the `VoltAgent/awesome-agent-skills` repository for high-quality skills when needed, but always asks for human approval before installing.
-*   We enforce the **Plan-Act-Reflect** workflow for all complex tasks to reduce hallucination and save tokens.
+## Project Overview
+The project focuses on developing hardware and software components for high-sensitivity, high-resolution **Spectral Noise Logging (SNL)** using downhole hydrophones. SNL is a passive acoustic diagnostic methodology used to detect and characterize:
+- Tubing and casing leaks
+- Behind-casing fluid migration (cement channeling)
+- Reservoir fluid inflow and production profiles
+- Cross-flow behind single or multiple concentric barriers
+
+---
 
 ## Repository Structure
+*   `2604.05547v1.pdf`: Research reference on closed-loop CAD-CAE agentic optimization (COSMO-Agent).
+*   `260619_PERTACOUSTIC_BIWEEKLY_2.pdf`: Biweekly progress report II (UGM & Pertamina Hulu Energi).
+*   `FIND-specification-flyer.pdf`: North Side Tools FIND (Flow Identifying Noise Detector) specifications.
+*   `commercial_snl_tools.md`: Comparative study of major commercial downhole SNL tools (GOWell SNT, TGT Chorus, Schlumberger HFND, etc.).
+*   `pertacoustic_tool_targets.md`: Wellbore environmental operating specifications tailored for PHE oil wells.
+*   `SESSION_LOG.md`: Session logs and progress summary.
 
-The repository is divided into two distinct scopes: Global vs. Workspace.
+---
 
-```text
-antigravity-agent-setup/
-├── global_config/                          ← Master copy of Global Rules (synced via GitHub)
-│   ├── AGENTS.md                           ← Universal rules (Web Search, Citations, Language)
-│   └── skills/                             ← Global skills available to all projects
-│       └── fetching-voltagent-skills/      ← Meta-skill for VoltAgent integration
-├── .agents/                                ← Workspace Rules (auto-loaded by Antigravity)
-│   └── AGENTS.md                           ← Project-specific rules (GitHub sync, SESSION_LOG)
-├── setup.sh                                ← Cross-platform deployment script
-├── SESSION_LOG.md                          ← Running conversation memory across laptops
-├── AI_Agents_Comprehensive_Guide.md        ← Research artifact on Agentic Design Patterns
-└── Agent_Skills_Repo_Comparison.md         ← Comparison of Top Agent Skill Repositories
-```
-
-## How to Sync a New Laptop
-
-When moving to a different laptop, follow these steps to instantly make the local Antigravity agent smart:
-
-1. Clone or pull the latest changes from this repository:
-   ```bash
-   git clone https://github.com/faliqadlan/antigravity-agent-setup.git
-   cd antigravity-agent-setup
-   # OR if already cloned:
-   git pull
-   ```
-2. Run the deployment script. This script safely copies the contents of `global_config/` into your laptop's universal `~/.gemini/config/` directory:
-   ```bash
-   chmod +x setup.sh
-   ./setup.sh
-   ```
-3. Open a new Antigravity session. The agent is now fully upgraded with the latest global rules and skills.
-
-## Agent Capabilities & Rules
-
-By running the setup script, the agent on any laptop inherits the following universal behaviors:
-*   **Web Search:** Automatically searches the web for any problem-solving or reasoning tasks before answering.
-*   **Citations:** Provides academic-style inline citations `[1]` and a references section at the bottom of knowledge-based answers.
-*   **English Language:** Always responds in grammatically perfect English to facilitate passive language learning.
-*   **Memory Sync:** Automatically tracks major milestones in `SESSION_LOG.md` and commits/pushes to GitHub so the other laptop can catch up.
+## Technical Specifications Target (PHE Oil Wells)
+- **Temperature Limits**: 150°C BHT max (supporting standard reservoirs and steamflood EOR like Duri field).
+- **Hydrostatic Pressure**: 10,000 PSI max (engineered for standard development and exploratory oil wells).
+- **Depth Limit**: 3,500 meters.
+- **Fluid Compatibility**: Heavy crude oil (17° to 22° API).
+- **Sour Service Certification**: 6% to 25% H2S, 10% CO2.
