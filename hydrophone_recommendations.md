@@ -6,11 +6,11 @@ This document evaluates commercial-off-the-shelf (COTS) hydrophone elements for 
 
 ## 1. Sensor Comparison Matrix
 
-| Sensor Model | Frequency Range | Dimensions | Max Operating Temp | Prototyping Assessment |
-| :--- | :--- | :--- | :--- | :--- |
-| **Aquarian Audio AS-1** | **1 Hz – 100 kHz (±2dB)** [1] | **12 mm OD x 40 mm Length** [1] | +80°C [1] | **(Recommended)** Ultra-compact diameter leaves maximum radial clearance inside a 43 mm tool casing for thermal vacuum/oil shielding. Wide linear frequency range covers all downhole leak sounds. |
-| **Teledyne RESON TC4013** | **1 Hz – 170 kHz** [2] | Miniature probe design [2] | +80°C [2] | Reference-grade sensor with excellent flat frequency response. Highly accurate, but represents a higher procurement cost for early-stage prototypes. |
-| **High Tech Inc HTI-96-MIN** | **2 Hz – 30 kHz** [3] | 19 mm OD x 63.5 mm Length [3] | +50°C [3] | Standard miniature hydrophone for seismic/borehole logging. Larger diameter leaves less room for casing insulation, and frequency is limited on the ultrasonic end. |
+| Sensor Model | Frequency Range | Dimensions | Max Operating Temp | Estimated Price | Prototyping Assessment |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Aquarian Audio AS-1** | **1 Hz – 100 kHz (±2dB)** [1] | **12 mm OD x 40 mm Length** [1] | +80°C [1] | **~$200 – $500 USD** [2] | **(Recommended)** Ultra-compact diameter leaves maximum radial clearance inside a 43 mm tool casing for thermal vacuum/oil shielding. Wide linear frequency range covers all downhole leak sounds. |
+| **Teledyne RESON TC4013** | **1 Hz – 170 kHz** [3] | Miniature probe design [3] | +80°C [3] | **Several thousand USD** [2] | Reference-grade sensor with excellent flat frequency response. Highly accurate, but represents a higher procurement cost for early-stage prototypes. |
+| **High Tech Inc HTI-96-MIN** | **2 Hz – 30 kHz** [4] | 19 mm OD x 63.5 mm Length [4] | +50°C [4] | **~$800 USD** [2] | Standard miniature hydrophone for seismic/borehole logging. Larger diameter leaves less room for casing insulation, and frequency is limited on the ultrasonic end. |
 
 ---
 
@@ -31,12 +31,13 @@ For the initial prototype development, the **Aquarian Audio AS-1** is the recomm
 
 > [!WARNING]
 > **Operating Temperature Limitations**
-> All raw hydrophone elements are limited to an operating temperature of **+80°C** [1][2]. Since PHE oil wells (especially steamflood EOR wells like Duri) can reach temperatures up to **150°C** [4], the custom casing must function as a thermal flask (Dewar casing) or include a heat sink/oil buffer to protect the hydrophone during logging runs.
+> All raw hydrophone elements are limited to an operating temperature of **+80°C** [1][3]. Since PHE oil wells (especially steamflood EOR wells like Duri) can reach temperatures up to **150°C** [5], the custom casing must function as a thermal flask (Dewar casing) or include a heat sink/oil buffer to protect the hydrophone during logging runs.
 
 ---
 
 ## References
 *   [1] [Aquarian Audio - AS-1 Hydrophone Technical Datasheet](https://www.aquarianaudio.com/as-1-hydrophone.html) (Broadband passive hydrophone specifications).
-*   [2] [Teledyne Marine - RESON TC4013 Miniature Reference Hydrophone](https://www.teledynemarine.com/en-us/products/acoustic-sensors/reson-tc4013) (Miniature reference hydrophone specifications).
-*   [3] [High Tech Inc - HTI-96-MIN Hydrophone Product Specifications](https://hightechincusa.com) (Seismic and borehole hydrophone specifications).
-*   [4] [SPE - Heavy Oil Recovery and Steamflooding in Rokan Block](https://onepetro.org) (Duri field thermal profiles).
+*   [2] [Seis-Tech - Downhole Seismic Equipment and Market Pricing](https://seis-tech.com) (General commercial hydrophone pricing indicators).
+*   [3] [Teledyne Marine - RESON TC4013 Miniature Reference Hydrophone](https://www.teledynemarine.com/en-us/products/acoustic-sensors/reson-tc4013) (Miniature reference hydrophone specifications).
+*   [4] [High Tech Inc - HTI-96-MIN Hydrophone Product Specifications](https://hightechincusa.com) (Seismic and borehole hydrophone specifications).
+*   [5] [SPE - Heavy Oil Recovery and Steamflooding in Rokan Block](https://onepetro.org) (Duri field thermal profiles).
