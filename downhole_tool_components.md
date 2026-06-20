@@ -70,7 +70,7 @@ Custom casing and vacuum insulation components to shield the electronics and cou
 
 ## 5. Complete System Prototyping Budgets
 
-Below are three alternative total budget calculations for building the complete downhole logging tool.
+Below are four alternative total budget calculations for building the complete downhole logging tool.
 
 ### Option A: The "Direct-Survival" HPHT Tool Setup (Total: ~$2,258 USD)
 In this configuration, we purchase the best high-temperature (HT) electronics capable of surviving 150°C wellbores directly [5][8][10][11][13]. While this setup costs slightly above $2,000 USD when using premium titanium housings, it eliminates the need for a dewar flask and PCM.
@@ -100,7 +100,21 @@ In this configuration, we use standard prototyping-grade electronics (Teensy log
 
 ---
 
-### Option C: The "Best of the Best" No-Compromise Industrial HPHT Tool Setup (Total: ~$6,940 USD)
+### Option C: The "Hybrid Premium" Casing & AS-1 Setup (Total: ~$4,353 USD)
+In this setup, we still utilize the **Aquarian Audio AS-1** as our sensing element [2], but wrap it in the absolute best mechanical, pressure-compensating, and electrical components, including custom Titanium Grade 5 casing and high-reliability feedthroughs.
+
+*   **AS-1 Sensor**: $413 USD [2]
+*   **HT Pre-amplifier**: TI OPA211-HT + HT passives = $250 USD [4][5]
+*   **HT Data Logger**: TI MSP430-HT MCU + TI ADS1278-HT ADC + TI SM28VLT32 Flash = $500 USD [4][8][10][11]
+*   **HT Batteries**: Electrochem 3B series ($\text{Li-SOCl}_2$) (2 cells) = $150 USD [4][13]
+*   **Outer Casing**: Custom Machined Titanium Grade 5 (Ti-6Al-4V) = **$2,000 USD** [14] (Maximum structural integrity, corrosion resistance, and low weight).
+*   **Acoustic Interface**: Machined PEEK Window + Dow Corning 200 Oil + Metal Bellows = $840 USD [16][17]
+*   **HPHT Bulkhead**: Kemlon Connector = $200 USD [18]
+*   **Total Setup Cost**: **$4,353 USD** (Premium hybrid assembly)
+
+---
+
+### Option D: The "Best of the Best" No-Compromise Industrial HPHT Tool Setup (Total: ~$6,940 USD)
 This configuration targets absolute laboratory and scientific-grade precision with zero engineering compromises. It features a reference-grade Teledyne RESON TC4013 sensor, a Titanium Grade 5 outer housing, and a full suite of high-reliability HPHT telemetry components.
 
 *   **Reference Sensor**: Teledyne RESON TC4013 (or B&K 8103) = **$3,000 USD** [19]
