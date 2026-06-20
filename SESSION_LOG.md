@@ -1,6 +1,6 @@
 # Session Log
 
-## Session: 2026-06-20 (Jombang Laptop)
+## Session: 2026-06-20 (Jombang Laptop - Morning)
 
 ### Topics Discussed
 - Researched AI Agent fundamentals: the four core modules (Profile, Memory, Planning, Action) from the 2024 survey paper by Lei Wang et al. ([DOI: 10.1007/s11704-024-40231-1](https://doi.org/10.1007/s11704-024-40231-1)).
@@ -32,3 +32,29 @@
 - `.agents/AGENTS.md` — Workspace rules for this repository.
 - `setup.sh` — Cross-platform deployment script.
 - `SESSION_LOG.md` — This file.
+
+---
+
+## Session: 2026-06-20 (Afternoon - Pertacoustic Tool Specifications)
+
+### Topics Discussed
+- Transitioned repository to the **Pertacoustic Study** (UGM and PT Pertamina Hulu Energi Upstream Innovation) for Spectral Noise Logging (SNL) CAD/CAE development.
+- Defined wellbore target environment matching PHE's steamflood/oil production wells (150°C bottomhole temperature, 10,000 PSI bottomhole pressure, viscous crude, sour service $\text{H}_2\text{S}/\text{CO}_2$).
+- Conducted comparative analysis of commercial downhole SNL tools (GOWell SNT, TGT Chorus, Schlumberger HFND) and their acoustic logging bandwidths (8 Hz – 60 kHz).
+- Evaluated COTS hydrophone elements (AS-1, TC4013, HTI-96-MIN) for custom 43 mm casing integration.
+- Analyzed pricing differences between custom prototyping and off-the-shelf marine recorders (SoundTrap), showing that custom prototyping saves over **$2,600 USD** per unit.
+- Performed deep research on high-temperature and high-pressure (HPHT) downhole tool components (PEEK acoustic windows, metal bellows pressure compensators, TI SM28VLT32 extreme-temperature flash memory, and Kemlon connector bulkheads).
+
+### Decisions Made
+- Select the **Aquarian Audio AS-1** as the primary prototyping sensor due to its 12 mm outer diameter, providing 15.5 mm radial clearance inside a 43 mm tool casing.
+- Implement high-input-impedance buffer pre-amplification (TI OPA211-HT op-amp) close to the sensor to prevent cable signal loss.
+- Choose **Stainless Steel 316 (SS316)** instead of Titanium Grade 5 for custom housing machining, keeping the total industrial HT-grade system cost under $2,000 USD (est. **$1,668 USD**).
+- Use **PEEK** for the acoustic window due to its excellent acoustic transparency and HPHT mechanical strength, alongside Dow Corning 200 silicone coupling oil and metal bellows for pressure equalization.
+
+### Files Created / Updated
+- `README.md` — Updated to describe the Pertacoustic study structure and tools.
+- `pertacoustic_tool_targets.md` — Wellbore targets matching PHE oil wells.
+- `commercial_snl_tools.md` — Comparison of commercial downhole acoustic diagnostic tools.
+- `hydrophone_recommendations.md` — COTS sensor comparison, rationale, and SoundTrap cost comparison.
+- `downhole_tool_components.md` — Auxiliary components list, specifications, pricing, and system-level budgets.
+- `SESSION_LOG.md` — Updated with this afternoon's design log.
