@@ -64,9 +64,40 @@ Custom casing and vacuum insulation components to shield the electronics and cou
 
 ---
 
+## 5. Complete System Prototyping Budgets
+
+Below are two alternative total budget calculations for building the complete downhole logging tool. 
+
+### Option A: The "Direct-Survival" HPHT Tool Setup (Under $2,000 USD)
+In this configuration, we purchase the best high-temperature (HT) electronics capable of surviving 150°C wellbores directly, but keep costs under $2,000 USD by machining the casing from **Stainless Steel 316 (SS316)** instead of Titanium Grade 5. SS316 is highly corrosion-resistant and easily rated for 10,000 PSI, but is significantly cheaper and easier to machine than titanium [14].
+
+*   **AS-1 Sensor**: $413 USD [2]
+*   **HT Pre-amplifier**: TI OPA211-HT + HT passives = $130 USD [4][5]
+*   **HT Data Logger**: TI MSP430-HT MCU + TI ADS1278-HT ADC + HT Flash = $375 USD [4][8][10]
+*   **HT Batteries**: Electrochem 3B series ($\text{Li-SOCl}_2$) (2 cells) = $150 USD [4][12]
+*   **Outer Casing**: Custom Machined 316 Stainless Steel = $450 USD [14]
+*   **Acoustic Window**: Viton Boot & Fluorosilicone Oil = $150 USD [4]
+*   **Total Setup Cost**: **$1,668 USD** (Well under $2,000 USD)
+
+---
+
+### Option B: The "Thermal Shielded" Prototyping Tool Setup (Under $1,000 USD)
+In this configuration, we use standard prototyping-grade electronics (Teensy logger) and protect them from the 150°C wellbore using a **modified commercial steel vacuum Dewar flask** inside standard stainless steel piping.
+
+*   **AS-1 Sensor**: $413 USD [2]
+*   **Prototyping Pre-amplifier**: TI OPA211 + standard passives = $17 USD [4]
+*   **Prototyping Logger**: Teensy 4.1 + Audio Shield + 32GB SD card = $65 USD [4][7][9]
+*   **Prototyping Battery**: Rechargeable Panasonic 18650 cell = $8 USD
+*   **Outer Casing**: Standard SS316 piping and end caps = $150 USD [14]
+*   **Thermal Protection**: Dewar flask insert + Paraffin wax PCM = $190 USD [11]
+*   **Acoustic Window**: Buna-N rubber boot & silicone oil bath = $30 USD [4]
+*   **Total Setup Cost**: **$873 USD** (Highly economical)
+
+---
+
 ## References
 *   [1] [Aquarian Audio - AS-1 Hydrophone Technical Datasheet](https://www.aquarianaudio.com/as-1-hydrophone.html) (AS-1 high impedance and temperature constraints).
-*   [2] [Etec - Aquarian AS-1 Technical Specs Sheet](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFY_P2NizF39YJdcSHOda8IIpPF5ta7qx0CEG7vwMoptwaht2whj6KQoCLS8echUIyzdTMAvBzGKQTqX1qyNM_jaC19vDB7zz00j75jMEy-kHWBXW6lANCs-JeC8A==) (High impedance buffer preamplification requirements).
+*   [2] [Aquarian Audio - AS-1 Scientific Hydrophone Store Page](https://www.aquarianaudio.com/as-1-hydrophone.html) (Official AS-1 retail pricing).
 *   [3] [Texas Instruments - OPA2107 Precision Op-Amp Datasheet](https://www.ti.com) (Precision low-noise dual op-amp).
 *   [4] [Mouser/DigiKey - Electronic Component Market Rates](https://www.mouser.com) (Current retail pricing for Teensy, OPA211, and HT batteries).
 *   [5] [Texas Instruments - OPA211-HT High-Temperature Op-Amp Datasheet](https://www.ti.com) (210°C rated operational amplifier specs).
@@ -78,3 +109,4 @@ Custom casing and vacuum insulation components to shield the electronics and cou
 *   [11] [ICDP - Downhole Memory Tool Thermal Insulation Reference](http://www.icdp-online.org) (Passive thermal engineering using Dewar flasks).
 *   [12] [Electrochem - High-Temperature Lithium Cells Datasheet](https://www.electrochem-solutions.com) (Downhole lithium battery specifications and safety ratings).
 *   [13] [pertacoustic_tool_targets.md](file:///C:/Users/faliq/Desktop/project-user/antigravity-pertacoustic/pertacoustic_tool_targets.md) (PT Pertamina Hulu Energi wellbore environmental target parameters).
+*   [14] [FastPreci - Titanium vs Stainless Steel Machining Costs](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGKSC_z_OzIAcfoEo2OtbqmiWoGQr_0EvoTjlij0tTdRVFS8QahyrViDZf-MW5X_wdjXec3cRh50PXSa5Jr1eKy7MYueFYpN5gSf8-dNvD9WEdPUCS1Pp9CINQhz8lV5Ywn9UVX0ZcALBqq717P0w7fXA==) (Detailed comparison of machining times and raw material premiums).
