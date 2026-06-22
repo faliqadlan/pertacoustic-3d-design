@@ -31,6 +31,23 @@ The tool housing and internal electronics are designed to meet standard-to-mid H
 
 ---
 
+## 2. Sensor Module & OEM Sourcing Targets
+
+Based on procurement constraints (budget < 250M IDR) and design flexibility, the project targets the following sourcing strategies for the acoustic sensor:
+
+### A. Sourcing Strategy
+*   **Target:** Procurement from Tier-1 Chinese OEMs (e.g., WELL-SUN, SITAN, Geo-Vista).
+*   **Scope:** The project is evaluating both **complete factory-cased tools** and **bare internal sensor/electronics modules** that require custom housing.
+
+### B. Telemetry & Deployment
+*   **Target Spec:** Support for **Hybrid Telemetry**. The OEM module should ideally support both **Memory Mode** (running on internal flash memory and HT batteries for slickline deployment) and **Real-Time Wireline Mode** (surface read-out via electrical cable).
+
+### C. Internal Chassis Dimension Constraints
+*   **Target Spec:** Maximum internal electronics chassis diameter of **25.4 mm (1.0-inch) slim-hole**.
+*   **Rationale:** The final assembled downhole tool must not exceed a **43 mm (1-11/16")** outer diameter to pass through PHE production tubing restrictions. Selecting a 25.4 mm internal chassis guarantees an **8.8 mm radial clearance**, which is strictly required to accommodate the high-pressure structural housing walls and the thermal flask (vacuum/oil) insulation needed to protect the electronics at 150°C.
+
+---
+
 ## References
 *   [1] [GOWell - SNT (Stationary Noise Tool) Technical Datasheet](https://gowell.energy/stationary-noise-tool/) (Downhole acoustic logging specifications).
 *   [2] [TGT Diagnostics - Chorus Acoustic Diagnostics Specs](https://tgtdiagnostics.com/technology/chorus) (Flow diagnostics and frequency ranges).

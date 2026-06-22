@@ -64,3 +64,22 @@
 - `downhole_tool_components.md` — Auxiliary components list, specifications, pricing, and system-level budgets.
 - `.agents/skills/cosmo-agent-cad-cae-orchestration/SKILL.md` — Custom workspace agent skill for CAD-CAE closed-loop execution.
 - `SESSION_LOG.md` — Updated with this afternoon's design log.
+
+---
+
+## Session: 2026-06-22/23 (Acoustic Logging Tools & FIND Sourcing)
+
+### Topics Discussed
+- Researched and identified downhole acoustic logging tools manufactured by Wellsun and Sitan supporting operating frequencies between 10 kHz and 60 kHz.
+- Investigated the Flow Identifying Noise Detector (FIND) tool by North Side FZC, confirming it uses a proprietary B2B pricing model.
+- Analyzed general industry price estimates: direct tool purchase (CapEx) at $15,000–$30,000 USD (Memory) and $30,000–$60,000+ USD (SRO); operational service runs (OpEx) at $5,000–$12,000 USD per run (up to $15,000–$30,000+ USD for advanced analytics).
+- Defined constraints in [pertacoustic_tool_targets.md](file:///c:/Users/ASUS/Desktop/project/antigravity-pertacoustic/pertacoustic_tool_targets.md) including target selection of Chinese OEMs (Wellsun, Sitan, Geo-Vista), hybrid telemetry support, and a 25.4 mm (1.0-inch) internal chassis diameter to fit the 43 mm outer diameter limitation.
+
+### Decisions Made
+- Prioritize tier-1 Chinese OEMs for sourcing bare sensor/electronics modules or cased tools matching the budget (< 250M IDR / ~$15.5k USD).
+- Maintain strict 25.4 mm (1-inch) limit for the internal electronics chassis to allow necessary clearance for casing wall and insulation.
+
+### Files Created / Updated
+- [pertacoustic_tool_targets.md](file:///c:/Users/ASUS/Desktop/project/antigravity-pertacoustic/pertacoustic_tool_targets.md) — Updated with sensor module OEM sourcing targets and mechanical constraints.
+- [SESSION_LOG.md](file:///c:/Users/ASUS/Desktop/project/antigravity-pertacoustic/SESSION_LOG.md) — Updated with this session's progress.
+
