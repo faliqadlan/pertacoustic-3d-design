@@ -68,5 +68,25 @@
     "datasheet_url": "https://www.azom.com/article.aspx?ArticleID=1277",
     "used_by": ["General oilfield seals and gaskets", "Backup rings in downhole tools"],
     "justification": "Universally used in oilfield for seals due to extreme chemical inertness. Service temperature up to 260C. Poor acoustic coupling limits use in acoustic tool designs."
+  },
+  "Vacuum_Gap": {
+    "density": 0.001,
+    "conductivity": 0.005,
+    "specific_heat": 1000,
+    "notes": "Approximated vacuum gap for Dewar flask (effective conductivity accounts for thermal radiation).",
+    "standard": "Industry standard for HPHT thermal flasks",
+    "datasheet_url": "N/A",
+    "used_by": ["All HPHT logging tools"],
+    "justification": "Primary thermal barrier for >150C environments."
+  },
+  "Thermal_Mass_CuBe": {
+    "density": 8250,
+    "conductivity": 130,
+    "specific_heat": 420,
+    "notes": "Copper-Beryllium alloy. High thermal mass buffer to absorb heat leakage.",
+    "standard": "UNS C17200",
+    "datasheet_url": "N/A",
+    "used_by": ["HPHT internal chassis"],
+    "justification": "Provides immense thermal inertia compared to PEEK, delaying internal temperature rise."
   }
 }

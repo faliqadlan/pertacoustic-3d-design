@@ -83,18 +83,21 @@ def plot_all_results(results_dir="results"):
                 "Max_Inner_Temp_C": round(max_t, 4)
             })
             
-        label = "Iter " + str(iter_num) + ": " + " + ".join([l['material'] for l in layers])
-        linestyle = '-' if iter_num == 1 else '--'
-        marker = 'o' if iter_num == 1 else 's'
+        label = "Iter " + str(iter_num) + ": " + " + ".join([f"{l['material']} ({l['thickness']}mm)" for l in layers])
+        
+        linestyles = ['-', '--', '-.', ':']
+        markers = ['o', 's', '^', 'D', 'v', 'x']
+        linestyle = linestyles[(iter_num - 1) % len(linestyles)]
+        marker = markers[(iter_num - 1) % len(markers)]
+        
         plt.plot(times, temps, marker=marker, linestyle=linestyle, label=label, alpha=0.8)
         
     plt.title("Internal Electronics Temperature over 4 Hours (150°C Ambient)")
     plt.xlabel("Time (Hours)")
     plt.ylabel("Maximum Internal Temperature (°C)")
     plt.axhline(y=40, color='r', linestyle='--', label='Critical Threshold (40°C)')
-    plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=1)
     plt.grid(True)
-    plt.tight_layout()
     
     # Save PNG
     plt.savefig("temperature_plot.png", dpi=300, bbox_inches='tight')

@@ -9,16 +9,12 @@ def run_automated_optimization():
     
     os.makedirs("results", exist_ok=True)
     
-    configs = [
-        # Config 1: Inconel 718 outer, Microporous insulation, PEEK inner
-        [{'name': 'Outer', 'material': 'Inconel718', 'thickness': 5.0},
-         {'name': 'Insulation', 'material': 'Microporous', 'thickness': 5.0},
-         {'name': 'Inner', 'material': 'PEEK', 'thickness': 3.0}],
-         
-        # Config 2: Titanium outer, Microporous insulation, PEEK inner
-        [{'name': 'Outer', 'material': 'Titanium', 'thickness': 5.0},
-         {'name': 'Insulation', 'material': 'Microporous', 'thickness': 5.0},
-         {'name': 'Inner', 'material': 'PEEK', 'thickness': 3.0}]
+    config = [
+        # Iteration 5: Thinner Outer Casing, Thicker Vacuum Gap
+        {'name': 'Outer', 'material': 'Inconel718', 'thickness': 4.0},
+        {'name': 'Vacuum', 'material': 'Vacuum_Gap', 'thickness': 8.0},
+        {'name': 'InnerWall', 'material': 'Titanium', 'thickness': 2.0},
+        {'name': 'Chassis', 'material': 'Thermal_Mass_CuBe', 'thickness': 6.0}
     ]
     
     od = 70.0
@@ -26,24 +22,31 @@ def run_automated_optimization():
     bht = 150.0
     time_seconds = 3600 # 1 hour
     
-    for i, layers in enumerate(configs, 1):
-        # Animate every iteration
-        max_temp = run_cosmo_iteration(i, od, length, layers, bht=bht, time_seconds=time_seconds, animate=True)
+    # Determine the next iteration number
+    existing_iters = [d for d in os.listdir("results") if d.startswith("iteration_")]
+    next_i = 1
+    if existing_iters:
+        next_i = max([int(d.split("_")[1]) for d in existing_iters]) + 1
         
-        if max_temp is not None:
-            # Save summary
-            iter_dir = os.path.join("results", f"iteration_{i:02d}")
-            os.makedirs(iter_dir, exist_ok=True)
-            
-            summary = {
-                'iteration': i,
-                'layers': layers,
-                'od': od,
-                'length': length,
-                'max_temp': max_temp
-            }
-            with open(os.path.join(iter_dir, "summary.json"), "w") as f:
-                json.dump(summary, f, indent=2)
+    print(f"Running Iteration {next_i}...")
+    
+    # Run the single iteration
+    max_temp = run_cosmo_iteration(next_i, od, length, config, bht=bht, time_seconds=time_seconds, animate=True)
+    
+    if max_temp is not None:
+        # Save summary
+        iter_dir = os.path.join("results", f"iteration_{next_i:02d}")
+        os.makedirs(iter_dir, exist_ok=True)
+        
+        summary = {
+            'iteration': next_i,
+            'layers': config,
+            'od': od,
+            'length': length,
+            'max_temp': max_temp
+        }
+        with open(os.path.join(iter_dir, "summary.json"), "w") as f:
+            json.dump(summary, f, indent=2)
                 
     # Run compiler
     from results_compiler import compile_results

@@ -3,7 +3,7 @@
   "layers": [
     {
       "name": "Outer",
-      "material": "Inconel718",
+      "material": "Titanium",
       "thickness": 5.0
     },
     {
@@ -19,5 +19,5 @@
   ],
   "od": 70.0,
   "length": 100.0,
-  "max_temp": 127.09
+  "max_temp": 127.038
 }

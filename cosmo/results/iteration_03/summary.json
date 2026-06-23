@@ -1,5 +1,5 @@
 {
-  "iteration": 2,
+  "iteration": 3,
   "layers": [
     {
       "name": "Outer",
@@ -9,7 +9,7 @@
     {
       "name": "Vacuum",
       "material": "Vacuum_Gap",
-      "thickness": 5.0
+      "thickness": 7.0
     },
     {
       "name": "InnerWall",
@@ -19,10 +19,10 @@
     {
       "name": "Chassis",
       "material": "Thermal_Mass_CuBe",
-      "thickness": 8.0
+      "thickness": 6.0
     }
   ],
   "od": 70.0,
   "length": 100.0,
-  "max_temp": 42.7104
+  "max_temp": 41.3909
 }
