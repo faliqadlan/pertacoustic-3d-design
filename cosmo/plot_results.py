@@ -84,7 +84,9 @@ def plot_all_results(results_dir="results"):
             })
             
         label = "Iter " + str(iter_num) + ": " + " + ".join([l['material'] for l in layers])
-        plt.plot(times, temps, marker='o', label=label)
+        linestyle = '-' if iter_num == 1 else '--'
+        marker = 'o' if iter_num == 1 else 's'
+        plt.plot(times, temps, marker=marker, linestyle=linestyle, label=label, alpha=0.8)
         
     plt.title("Internal Electronics Temperature over 4 Hours (150°C Ambient)")
     plt.xlabel("Time (Hours)")
