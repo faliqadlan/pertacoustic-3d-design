@@ -8,16 +8,16 @@
     },
     {
       "name": "Insulation",
-      "material": "PTFE",
-      "thickness": 3.0
+      "material": "Vacuum",
+      "thickness": 5.0
     },
     {
       "name": "Inner",
       "material": "PEEK",
-      "thickness": 2.0
+      "thickness": 3.0
     }
   ],
   "od": 70.0,
   "length": 100.0,
-  "max_temp": 150.0
+  "max_temp": 90.8071
 }

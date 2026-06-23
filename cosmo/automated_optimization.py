@@ -10,15 +10,15 @@ def run_automated_optimization():
     os.makedirs("results", exist_ok=True)
     
     configs = [
-        # Config 1: Titanium outer, Air insulation, PEEK inner
+        # Config 1: Titanium outer, Aerogel insulation, PEEK inner
         [{'name': 'Outer', 'material': 'Titanium', 'thickness': 5.0},
-         {'name': 'Insulation', 'material': 'Air', 'thickness': 3.0},
-         {'name': 'Inner', 'material': 'PEEK', 'thickness': 2.0}],
+         {'name': 'Insulation', 'material': 'Aerogel', 'thickness': 5.0},
+         {'name': 'Inner', 'material': 'PEEK', 'thickness': 3.0}],
          
-        # Config 2: Stainless Steel outer, Teflon insulation, PEEK inner
+        # Config 2: SS316 outer, Vacuum insulation, PEEK inner
         [{'name': 'Outer', 'material': 'SS316', 'thickness': 5.0},
-         {'name': 'Insulation', 'material': 'PTFE', 'thickness': 3.0},
-         {'name': 'Inner', 'material': 'PEEK', 'thickness': 2.0}]
+         {'name': 'Insulation', 'material': 'Vacuum', 'thickness': 5.0},
+         {'name': 'Inner', 'material': 'PEEK', 'thickness': 3.0}]
     ]
     
     od = 70.0
@@ -27,10 +27,8 @@ def run_automated_optimization():
     time_seconds = 3600 # 1 hour
     
     for i, layers in enumerate(configs, 1):
-        # We will only animate the final iteration
-        do_animate = (i == len(configs))
-        
-        max_temp = run_cosmo_iteration(i, od, length, layers, bht=bht, time_seconds=time_seconds, animate=do_animate)
+        # Animate every iteration
+        max_temp = run_cosmo_iteration(i, od, length, layers, bht=bht, time_seconds=time_seconds, animate=True)
         
         if max_temp is not None:
             # Save summary
@@ -50,6 +48,10 @@ def run_automated_optimization():
     # Run compiler
     from results_compiler import compile_results
     compile_results(results_dir="results", output_md="comparison_table.md")
+    
+    # Generate numerical data and plots
+    from plot_results import plot_all_results
+    plot_all_results(results_dir="results")
 
 if __name__ == "__main__":
     run_automated_optimization()
