@@ -1,0 +1,23 @@
+{
+  "iteration": 1,
+  "layers": [
+    {
+      "name": "Outer",
+      "material": "Titanium",
+      "thickness": 5.0
+    },
+    {
+      "name": "Insulation",
+      "material": "Air",
+      "thickness": 3.0
+    },
+    {
+      "name": "Inner",
+      "material": "PEEK",
+      "thickness": 2.0
+    }
+  ],
+  "od": 70.0,
+  "length": 100.0,
+  "max_temp": 149.712
+}

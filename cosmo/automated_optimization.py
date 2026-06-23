@@ -24,7 +24,7 @@ def run_automated_optimization():
     od = 70.0
     length = 100.0
     bht = 150.0
-    time_seconds = 14400 # 4 hours
+    time_seconds = 3600 # 1 hour
     
     for i, layers in enumerate(configs, 1):
         # We will only animate the final iteration
