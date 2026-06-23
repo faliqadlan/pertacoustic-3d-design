@@ -3,12 +3,12 @@
   "layers": [
     {
       "name": "Outer",
-      "material": "SS316",
+      "material": "Titanium",
       "thickness": 5.0
     },
     {
       "name": "Insulation",
-      "material": "Vacuum",
+      "material": "Microporous",
       "thickness": 5.0
     },
     {
@@ -19,5 +19,5 @@
   ],
   "od": 70.0,
   "length": 100.0,
-  "max_temp": 90.8071
+  "max_temp": 140.025
 }

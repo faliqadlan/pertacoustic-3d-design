@@ -10,14 +10,14 @@ def run_automated_optimization():
     os.makedirs("results", exist_ok=True)
     
     configs = [
-        # Config 1: Titanium outer, Aerogel insulation, PEEK inner
-        [{'name': 'Outer', 'material': 'Titanium', 'thickness': 5.0},
-         {'name': 'Insulation', 'material': 'Aerogel', 'thickness': 5.0},
+        # Config 1: Inconel 718 outer, Microporous insulation, PEEK inner
+        [{'name': 'Outer', 'material': 'Inconel718', 'thickness': 5.0},
+         {'name': 'Insulation', 'material': 'Microporous', 'thickness': 5.0},
          {'name': 'Inner', 'material': 'PEEK', 'thickness': 3.0}],
          
-        # Config 2: SS316 outer, Vacuum insulation, PEEK inner
-        [{'name': 'Outer', 'material': 'SS316', 'thickness': 5.0},
-         {'name': 'Insulation', 'material': 'Vacuum', 'thickness': 5.0},
+        # Config 2: Titanium outer, Microporous insulation, PEEK inner
+        [{'name': 'Outer', 'material': 'Titanium', 'thickness': 5.0},
+         {'name': 'Insulation', 'material': 'Microporous', 'thickness': 5.0},
          {'name': 'Inner', 'material': 'PEEK', 'thickness': 3.0}]
     ]
     

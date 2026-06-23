@@ -1,56 +1,72 @@
 {
+  "Inconel718": {
+    "density": 8190,
+    "conductivity": 12.6,
+    "specific_heat": 462,
+    "notes": "Inconel 718 (UNS N07718). Industry standard for sour-service downhole tool housings. Resistant to H2S/CO2 at 150C.",
+    "standard": "NACE MR0175 / ISO 15156-3, ASTM B637, AMS 5662/5663",
+    "datasheet_url": "https://www.specialmetals.com/documents/technical-bulletins/inconel/inconel-alloy-718.pdf",
+    "used_by": ["Sitan (SS3100 series)", "GoWell (Pegasus sour-service tools)", "Schlumberger", "Halliburton"],
+    "justification": "Pre-qualified under NACE MR0175/ISO 15156-3 Annex for CRA use in sour environments. Non-magnetic, maintains yield strength at 150C, immune to SSC/HIC in H2S up to 25%."
+  },
   "SS316": {
     "density": 7990,
     "conductivity": 16.2,
     "specific_heat": 500,
-    "notes": "Stainless Steel 316. High density, high conductivity, structural outer casing."
+    "notes": "Stainless Steel 316L (UNS S31603). Budget structural casing for mild environments only.",
+    "standard": "NACE MR0175 / ISO 15156-3 (limited to low H2S partial pressure, solution annealed, max 22 HRC)",
+    "datasheet_url": "https://www.azom.com/article.aspx?ArticleID=863",
+    "used_by": ["GoWell (standard-service tools)", "General oilfield equipment"],
+    "justification": "Conditionally compliant under NACE MR0175 only when solution-annealed and hardness-controlled. NOT recommended for >3% H2S environments."
+  },
+  "Titanium": {
+    "density": 4430,
+    "conductivity": 6.7,
+    "specific_heat": 526,
+    "notes": "Titanium alloy Ti-6Al-4V (UNS R56400, Grade 5). Lightweight, high strength-to-weight, non-magnetic.",
+    "standard": "NACE MR0175 / ISO 15156-3, ASTM B265, AMS 4928",
+    "datasheet_url": "https://www.azom.com/article.aspx?ArticleID=1547",
+    "used_by": ["Well Sun (density logging tools)", "Sitan (selected models)", "Baker Hughes"],
+    "justification": "Listed in NACE MR0175/ISO 15156-3 for sour service. Preferred for acoustic tools due to favorable acoustic impedance and lightweight construction."
   },
   "PEEK": {
-    "density": 1320,
-    "conductivity": 0.25,
-    "specific_heat": 1340,
-    "notes": "Polyether ether ketone. Excellent structural and acoustic properties. Moderate thermal insulation."
+    "density": 1300,
+    "conductivity": 0.29,
+    "specific_heat": 2200,
+    "notes": "Polyether ether ketone (Victrex PEEK 450G). Industry standard for downhole electronics chassis, connectors, and sensor housings.",
+    "standard": "ISO 1183 (density), ISO 22007-4 (thermal conductivity). No NACE requirement (non-metallic).",
+    "datasheet_url": "https://www.victrex.com/en/products/polymers/peek-polymer",
+    "used_by": ["Sitan (internal electronics modules)", "GoWell (sensor housings)", "Well Sun (electrical connectors)", "Schlumberger", "Halliburton"],
+    "justification": "De facto industry standard thermoplastic for downhole electronics. Continuous service temperature 260C, excellent chemical resistance to drilling fluids, electrical isolation properties."
   },
-  "PTFE": {
-    "density": 2200,
-    "conductivity": 0.25,
-    "specific_heat": 1050,
-    "notes": "Polytetrafluoroethylene (Teflon). Good thermal insulation, heavier, poor acoustics."
-  },
-  "Silicone": {
-    "density": 1400,
-    "conductivity": 0.4,
-    "specific_heat": 1200,
-    "notes": "High-Temp Silicone Potting. Good acoustic matching, mediocre thermal insulation."
+  "Microporous": {
+    "density": 240,
+    "conductivity": 0.021,
+    "specific_heat": 900,
+    "notes": "Microporous insulation (Promat Microtherm 1000R). Industry standard for space-constrained high-temp thermal barriers in downhole tools.",
+    "standard": "EN 14303 (thermal insulation products), manufacturer TDS",
+    "datasheet_url": "https://www.promat.com/en/industry/solutions-by-market/oil-gas/",
+    "used_by": ["Downhole thermal flask designs", "Schlumberger HPHT tools", "General oilfield thermal management"],
+    "justification": "Thermal conductivity 4x lower than conventional insulation at equivalent thickness. Rigid panel form ideal for annular gaps in cylindrical tool housings."
   },
   "Aerogel": {
     "density": 150,
     "conductivity": 0.015,
     "specific_heat": 1000,
-    "notes": "Silica Aerogel Composite. Extreme thermal insulation, extremely poor acoustic coupling."
+    "notes": "Silica Aerogel Composite (e.g., Aspen Aerogels Pyrogel). Extreme thermal insulation in flexible blanket form.",
+    "standard": "ASTM C1728 (aerogel blanket insulation)",
+    "datasheet_url": "https://www.aerogel.com/products-and-solutions/pyrogel-hps/",
+    "used_by": ["Subsea pipeline insulation", "HPHT well completions", "Specialized downhole thermal flasks"],
+    "justification": "Lowest thermal conductivity of any commercially available solid insulation. Hydrophobic. Flexible blanket form conforms to complex geometries."
   },
-  "Air": {
-    "density": 1.225,
-    "conductivity": 0.025,
-    "specific_heat": 1005,
-    "notes": "Dry air gap at 1 atm."
-  },
-  "Vacuum": {
-    "density": 0.001,
-    "conductivity": 0.005,
-    "specific_heat": 1000,
-    "notes": "Approximated vacuum gap (effective conductivity accounting for radiation)."
-  },
-  "Titanium": {
-    "density": 4500,
-    "conductivity": 21.9,
-    "specific_heat": 520,
-    "notes": "Titanium alloy. High strength-to-weight ratio, moderate thermal conductivity."
-  },
-  "PCM_100C": {
-    "density": 1500,
-    "conductivity": 0.5,
-    "specific_heat": 2000,
-    "notes": "Generic Phase Change Material melting at 100C. High thermal mass buffer."
+  "PTFE": {
+    "density": 2200,
+    "conductivity": 0.25,
+    "specific_heat": 1050,
+    "notes": "Polytetrafluoroethylene (Teflon, DuPont). Chemically inert, easy to machine. Good thermal insulation.",
+    "standard": "ASTM D4894 / D4895 (PTFE molding and extrusion materials)",
+    "datasheet_url": "https://www.azom.com/article.aspx?ArticleID=1277",
+    "used_by": ["General oilfield seals and gaskets", "Backup rings in downhole tools"],
+    "justification": "Universally used in oilfield for seals due to extreme chemical inertness. Service temperature up to 260C. Poor acoustic coupling limits use in acoustic tool designs."
   }
 }
