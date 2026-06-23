@@ -1,0 +1,56 @@
+{
+  "SS316": {
+    "density": 7990,
+    "conductivity": 16.2,
+    "specific_heat": 500,
+    "notes": "Stainless Steel 316. High density, high conductivity, structural outer casing."
+  },
+  "PEEK": {
+    "density": 1320,
+    "conductivity": 0.25,
+    "specific_heat": 1340,
+    "notes": "Polyether ether ketone. Excellent structural and acoustic properties. Moderate thermal insulation."
+  },
+  "PTFE": {
+    "density": 2200,
+    "conductivity": 0.25,
+    "specific_heat": 1050,
+    "notes": "Polytetrafluoroethylene (Teflon). Good thermal insulation, heavier, poor acoustics."
+  },
+  "Silicone": {
+    "density": 1400,
+    "conductivity": 0.4,
+    "specific_heat": 1200,
+    "notes": "High-Temp Silicone Potting. Good acoustic matching, mediocre thermal insulation."
+  },
+  "Aerogel": {
+    "density": 150,
+    "conductivity": 0.015,
+    "specific_heat": 1000,
+    "notes": "Silica Aerogel Composite. Extreme thermal insulation, extremely poor acoustic coupling."
+  },
+  "Air": {
+    "density": 1.225,
+    "conductivity": 0.025,
+    "specific_heat": 1005,
+    "notes": "Dry air gap at 1 atm."
+  },
+  "Vacuum": {
+    "density": 0.001,
+    "conductivity": 0.005,
+    "specific_heat": 1000,
+    "notes": "Approximated vacuum gap (effective conductivity accounting for radiation)."
+  },
+  "Titanium": {
+    "density": 4500,
+    "conductivity": 21.9,
+    "specific_heat": 520,
+    "notes": "Titanium alloy. High strength-to-weight ratio, moderate thermal conductivity."
+  },
+  "PCM_100C": {
+    "density": 1500,
+    "conductivity": 0.5,
+    "specific_heat": 2000,
+    "notes": "Generic Phase Change Material melting at 100C. High thermal mass buffer."
+  }
+}

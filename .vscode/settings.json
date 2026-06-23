@@ -1,0 +1,5 @@
+{
+    "files.exclude": {
+        "**/cosmo/python_portable": true
+    }
+}
