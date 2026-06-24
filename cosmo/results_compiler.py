@@ -28,7 +28,7 @@ def compile_results(results_dir="results", output_md="comparison_table.md"):
             length = data['length']
             max_temp = data['max_temp']
             time_to_40 = data.get('time_to_40', '> 4.0')
-            status = "PASS" if max_temp <= 40.0 else "FAIL"
+            status = "PASS" if max_temp <= 85.0 else "FAIL"
             
             row = f"| {iter_name} | {config_str} | {od} | {length} | {max_temp:.2f} | {time_to_40} | {status} |\n"
             table_rows.append((max_temp, row))

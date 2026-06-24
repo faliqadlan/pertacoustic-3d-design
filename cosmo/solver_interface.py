@@ -55,6 +55,7 @@ def setup_and_run_calculix(inp_file, layers, od_mm, ccx_path="ccx\\calculix_2.22
     outer_r = od_mm / 2.0
     tol = 0.5
     
+    all_discovered_nodes = set()
     with open(inp_file, "r") as f:
         in_node = False
         for line in f:
@@ -69,6 +70,7 @@ def setup_and_run_calculix(inp_file, layers, od_mm, ccx_path="ccx\\calculix_2.22
                     parts = line.split(",")
                     nid = int(parts[0])
                     x, y = float(parts[1]), float(parts[2])
+                    all_discovered_nodes.add(nid)
                     if nid > max_node:
                         max_node = nid
                     r = (x**2 + y**2)**0.5
@@ -77,7 +79,13 @@ def setup_and_run_calculix(inp_file, layers, od_mm, ccx_path="ccx\\calculix_2.22
                 except:
                     pass
                     
-    append_str += f"*NSET, NSET=NALL, GENERATE\n1, {max_node}, 1\n"
+    # Enumerate all discovered nodes explicitly to handle non-contiguous IDs
+    all_node_ids = sorted(list(all_discovered_nodes))
+    append_str += f"*NSET, NSET=NALL\n"
+    for i in range(0, len(all_node_ids), 10):
+        chunk = all_node_ids[i:i+10]
+        append_str += ", ".join(map(str, chunk)) + "\n"
+        
     append_str += f"*INITIAL CONDITIONS, TYPE=TEMPERATURE\nNALL, 25.0\n"
     
     # Add OuterBoundary NSET
@@ -125,7 +133,7 @@ def setup_and_run_calculix(inp_file, layers, od_mm, ccx_path="ccx\\calculix_2.22
         # ccx is in the ccx/ dir
         process = subprocess.run([ccx_path, "-i", job_name], 
                                  cwd=os.path.dirname(os.path.abspath(inp_file)),
-                                 capture_output=True, text=True, check=True)
+                                 capture_output=True, text=True, check=True, env=env)
         print("CalculiX finished successfully.")
         return True
     except subprocess.CalledProcessError as e:

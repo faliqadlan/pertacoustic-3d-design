@@ -33,7 +33,7 @@
     "density": 1300,
     "conductivity": 0.29,
     "specific_heat": 2200,
-    "notes": "Polyether ether ketone (Victrex PEEK 450G). Industry standard for downhole electronics chassis, connectors, and sensor housings.",
+    "notes": "Polyether ether ketone (Victrex PEEK 450G). Cp=2200 is the room-temperature (23°C) DSC value; at 100°C it drops to ~1340 J/kg·K. Using room-temp value is conservative (overestimates thermal mass).",
     "standard": "ISO 1183 (density), ISO 22007-4 (thermal conductivity). No NACE requirement (non-metallic).",
     "datasheet_url": "https://www.victrex.com/en/products/polymers/peek-polymer",
     "used_by": ["Sitan (internal electronics modules)", "GoWell (sensor housings)", "Well Sun (electrical connectors)", "Schlumberger", "Halliburton"],

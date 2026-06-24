@@ -34,19 +34,16 @@ def generate_casing(od_mm, length_mm, layers, output_file="casing.step"):
         if current_id < 0:
             raise ValueError(f"Layer {name} thickness {thickness} is too large for remaining OD {current_od}")
             
-        # Create the cylindrical shell
-        # A cylinder of radius = current_od/2, with a hole of radius = current_id/2
-        solid = (
-            cq.Workplane("XY")
-            .circle(current_od / 2.0)
-            .circle(current_id / 2.0)
-            .extrude(length_mm)
-        )
-        
-        # In case the ID is exactly 0 (solid core), cadquery .circle().circle() might fail.
-        # Handle solid core:
+        # Handle solid core (ID == 0) first
         if current_id == 0:
             solid = cq.Workplane("XY").circle(current_od / 2.0).extrude(length_mm)
+        else:
+            solid = (
+                cq.Workplane("XY")
+                .circle(current_od / 2.0)
+                .circle(current_id / 2.0)
+                .extrude(length_mm)
+            )
             
         solids.append(solid)
         assembly.add(solid, name=name, color=cq.Color(0.5, 0.5, 0.5, 0.5)) # Just a default color
