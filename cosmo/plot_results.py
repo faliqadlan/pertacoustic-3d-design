@@ -92,7 +92,7 @@ def plot_all_results(results_dir="results"):
         
         plt.plot(times, temps, marker=marker, linestyle=linestyle, label=label, alpha=0.8)
         
-    plt.title("Internal Electronics Temperature over 4 Hours (150°C Ambient)")
+    plt.title("Internal Electronics Temperature over 1 Hours (150°C Ambient)")
     plt.xlabel("Time (Hours)")
     plt.ylabel("Maximum Internal Temperature (°C)")
     plt.axhline(y=40, color='r', linestyle='--', label='Critical Threshold (40°C)')
