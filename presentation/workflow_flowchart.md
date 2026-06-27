@@ -1,13 +1,13 @@
 sequenceDiagram
-    actor User as User Context
+    actor User as Konteks Pengguna
     participant Agent as Agentic Loop
 
-    User->>+Agent: Specifies constraints (temp & time duration)
+    User->>+Agent: Menentukan batasan (suhu & durasi waktu)
     
-    loop Agentic Loop (Until Target is Met)
-        Agent->>Agent: Generates CAD Model
-        Agent->>Agent: Runs CAE Simulation (using STEP File)
-        Agent->>Agent: Reasoning and Evaluate (Simulation Data)
+    loop Agentic Loop (Hingga Target Tercapai)
+        Agent->>Agent: Membuat Model CAD
+        Agent->>Agent: Menjalankan Simulasi CAE (menggunakan File STEP)
+        Agent->>Agent: Penalaran dan Evaluasi (Data Simulasi)
     end
     
-    Agent-->>-User: Delivers Final Report and Supplementary Files
+    Agent-->>-User: Menyerahkan Laporan Akhir dan File Pendukung
