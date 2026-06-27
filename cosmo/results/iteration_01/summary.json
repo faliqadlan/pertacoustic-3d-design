@@ -1,0 +1,16 @@
+{
+    "od": 43.0,
+    "length": 100.0,
+    "max_temp": 150.0,
+    "layers": [
+        {
+            "material": "Titanium",
+            "thickness": 5.0
+        },
+        {
+            "material": "PEEK",
+            "thickness": 5.0
+        }
+    ],
+    "iteration": 1
+}

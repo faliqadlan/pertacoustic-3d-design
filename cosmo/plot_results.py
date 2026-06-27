@@ -41,7 +41,7 @@ def plot_all_results(results_dir="results"):
         
         inner_radius = (od / 2.0) - sum(l['thickness'] for l in layers)
         
-        frd_file = f"casing_iter{iter_num}.frd"
+        frd_file = os.path.join(iter_dir, f"casing_iter{iter_num}.frd")
         if not os.path.exists(frd_file):
             print(f"Skipping {iter_name}: {frd_file} not found.")
             continue
@@ -90,12 +90,20 @@ def plot_all_results(results_dir="results"):
         linestyle = linestyles[(iter_num - 1) % len(linestyles)]
         marker = markers[(iter_num - 1) % len(markers)]
         
-        plt.plot(times, temps, marker=marker, linestyle=linestyle, label=label, alpha=0.8)
+        cut_times = []
+        cut_temps = []
+        for time_h, t in zip(times, temps):
+            cut_times.append(time_h)
+            cut_temps.append(t)
+            if iter_num == 1 and t >= 149.9:
+                break
+        
+        plt.plot(cut_times, cut_temps, marker=marker, linestyle=linestyle, label=label, alpha=0.8)
         
     plt.title("Internal Electronics Temperature over 1 Hours (150°C Ambient)")
     plt.xlabel("Time (Hours)")
     plt.ylabel("Maximum Internal Temperature (°C)")
-    plt.axhline(y=40, color='r', linestyle='--', label='Critical Threshold (40°C)')
+    # plt.axhline(y=40, color='r', linestyle='--', label='Critical Threshold (40°C)')
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=1)
     plt.grid(True)
     

@@ -1,0 +1,20 @@
+{
+    "od": 68.0,
+    "length": 100.0,
+    "max_temp": 70.53,
+    "layers": [
+        {
+            "material": "Titanium",
+            "thickness": 3.0
+        },
+        {
+            "material": "Aerogel",
+            "thickness": 18.0
+        },
+        {
+            "material": "PEEK",
+            "thickness": 3.0
+        }
+    ],
+    "iteration": 5
+}

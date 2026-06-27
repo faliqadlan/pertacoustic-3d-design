@@ -1,0 +1,174 @@
+{
+    "iterations": [
+        {
+            "iteration": 1,
+            "config": {
+                "od": 43.0,
+                "layers": [
+                    {
+                        "material": "Titanium",
+                        "thickness": 5.0
+                    },
+                    {
+                        "material": "PEEK",
+                        "thickness": 5.0
+                    }
+                ]
+            },
+            "result": {
+                "max_temp": 150.0
+            },
+            "constraints": {
+                "thermal": {
+                    "threshold": 70.0,
+                    "satisfied": false
+                }
+            }
+        },
+        {
+            "iteration": 2,
+            "config": {
+                "od": 43.0,
+                "layers": [
+                    {
+                        "material": "Titanium",
+                        "thickness": 3.0
+                    },
+                    {
+                        "material": "Aerogel",
+                        "thickness": 8.0
+                    },
+                    {
+                        "material": "PEEK",
+                        "thickness": 3.0
+                    }
+                ]
+            },
+            "result": {
+                "max_temp": 105.87
+            },
+            "constraints": {
+                "thermal": {
+                    "threshold": 70.0,
+                    "satisfied": false
+                }
+            }
+        },
+        {
+            "iteration": 3,
+            "config": {
+                "od": 60.0,
+                "layers": [
+                    {
+                        "material": "Titanium",
+                        "thickness": 3.0
+                    },
+                    {
+                        "material": "Aerogel",
+                        "thickness": 14.0
+                    },
+                    {
+                        "material": "PEEK",
+                        "thickness": 3.0
+                    }
+                ]
+            },
+            "result": {
+                "max_temp": 80.51
+            },
+            "constraints": {
+                "thermal": {
+                    "threshold": 70.0,
+                    "satisfied": false
+                }
+            }
+        },
+        {
+            "iteration": 4,
+            "config": {
+                "od": 66.0,
+                "layers": [
+                    {
+                        "material": "Titanium",
+                        "thickness": 3.0
+                    },
+                    {
+                        "material": "Aerogel",
+                        "thickness": 17.0
+                    },
+                    {
+                        "material": "PEEK",
+                        "thickness": 3.0
+                    }
+                ]
+            },
+            "result": {
+                "max_temp": 72.81
+            },
+            "constraints": {
+                "thermal": {
+                    "threshold": 70.0,
+                    "satisfied": false
+                }
+            }
+        },
+        {
+            "iteration": 5,
+            "config": {
+                "od": 68.0,
+                "layers": [
+                    {
+                        "material": "Titanium",
+                        "thickness": 3.0
+                    },
+                    {
+                        "material": "Aerogel",
+                        "thickness": 18.0
+                    },
+                    {
+                        "material": "PEEK",
+                        "thickness": 3.0
+                    }
+                ]
+            },
+            "result": {
+                "max_temp": 70.53
+            },
+            "constraints": {
+                "thermal": {
+                    "threshold": 70.0,
+                    "satisfied": false
+                }
+            }
+        },
+        {
+            "iteration": 6,
+            "config": {
+                "od": 70.0,
+                "layers": [
+                    {
+                        "material": "Titanium",
+                        "thickness": 3.0
+                    },
+                    {
+                        "material": "Aerogel",
+                        "thickness": 19.0
+                    },
+                    {
+                        "material": "PEEK",
+                        "thickness": 3.0
+                    }
+                ]
+            },
+            "result": {
+                "max_temp": 68.36
+            },
+            "constraints": {
+                "thermal": {
+                    "threshold": 70.0,
+                    "satisfied": true
+                }
+            }
+        }
+    ]
+}
