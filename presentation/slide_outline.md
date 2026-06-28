@@ -1,6 +1,6 @@
 # Kerangka Presentasi: Automated Generative Design using Agentic Loop
 
-> **Total Slide:** 7  
+> **Total Slide:** 6  
 > **Audiens:** Campuran (Akademisi + Pemangku kepentingan industri)  
 > **Pesan Utama:** Memperkenalkan metodologi agentic loop DAN menunjukkan bahwa metodologi tersebut menghasilkan hasil rekayasa yang valid
 
@@ -93,59 +93,30 @@ sequenceDiagram
 **Judul:** Hasil Analisis Termal
 
 **Poin-poin utama:**
-- Tampilkan **plot distribusi suhu** dari simulasi FEA
-  - Sumbu-X: waktu atau posisi, Sumbu-Y: suhu (°C)
-  - Sorot suhu maksimum pada komponen kritis (sensor, elektronik)
-- Tampilkan **video visualisasi termal 3D** (di-render dari hasil CalculiX)
-  - Gradien suhu dengan pemetaan warna pada penampang enclosure
-- Soroti hasil utama:
-  - Suhu maksimum yang tercapai di lokasi sensor: **XX°C**
-  - Apakah memenuhi batasan desain (≤ suhu target)
-  - Jumlah iterasi yang dibutuhkan agentic loop untuk konvergen
+- **Plot Konvergensi Suhu:** Menampilkan riwayat simulasi dari 6 iterasi (`temperature_plot.png`). Terlihat jelas suhu berhasil ditekan dari 150°C menjadi 68.36°C.
+- **Visualisasi Termal 3D:** Animasi distribusi panas pada enclosure (`thermal_anim_final.mp4`).
+- **Hasil Akhir:** Suhu maksimum internal yang tercapai adalah **68.36°C** (memenuhi batas maksimal 70°C).
+- Agentic loop membutuhkan **6 iterasi** untuk secara otonom menemukan konfigurasi ketebalan yang tepat.
 
 **Saran visual:**
-- Sisi kiri: Plot suhu (gambar statis)
-- Sisi kanan: Screenshot dari animasi termal 3D (atau sisipkan video jika format presentasi mendukung)
+- Kiri: Sisipkan gambar `temperature_plot.png`
+- Kanan: Sisipkan video animasi 3D `thermal_anim_final.mp4`
 
 ---
 
-## Slide 6 — Rekomendasi Desain Enclosure
+## Slide 6 — Kesimpulan Desain Enclosure
 
-**Judul:** Desain Enclosure
+**Judul:** Kesimpulan & Kelayakan Desain
 
 **Poin-poin utama:**
-- Berdasarkan analisis termal, pemilihan material dapat menggunakan **BUTH (Buna-N / Nitrile)** yang dirating untuk **70°C**
-- Hal ini dimungkinkan karena agentic loop menunjukkan bahwa desain enclosure menjaga suhu internal di bawah ambang batas 70°C
-- Ini **menyederhanakan desain casing** — tidak perlu material suhu tinggi eksotis (misal, PEEK, Viton) yang lebih mahal dan lebih sulit diproduksi
-- Tampilkan desain enclosure akhir:
-  - Rendering CAD atau penampang
-  - Dimensi utama (OD: 43 mm, chassis internal: 25,4 mm)
-  - Keterangan material
+- Berdasarkan hasil iterasi Agentic Loop, kombinasi **Titanium (Casing Luar), Aerogel (Insulator), dan PEEK (Sasis Internal)** terbukti **sangat layak (highly viable)**.
+- Desain ini berhasil menjaga suhu elektronik internal di angka **68.36°C** (di bawah batas 70°C) selama 1 jam pada suhu lingkungan ekstrem 150°C tanpa menggunakan sistem vakum.
+- **Trade-off Dimensi:** Untuk mencapai isolasi termal tanpa vakum ini, ketebalan Aerogel harus dinaikkan menjadi 19 mm, yang menghasilkan **Outer Diameter (OD) akhir sebesar 70 mm**.
+- **Ringkasan:** Metodologi Agentic Loop sukses mengotomatisasi penemuan desain yang valid secara fisik dalam waktu singkat.
 
 **Saran visual:**
-- Penampang CAD atau rendering 3D dari enclosure akhir
-- Kotak keterangan: "Material: BUTH @ 70°C → Desain lebih sederhana, biaya lebih rendah"
-
----
-
-## Slide 7 — Ringkasan & Langkah Selanjutnya
-
-**Judul:** Ringkasan & Langkah Selanjutnya
-
-**Ringkasan (apa yang telah dicapai):**
-- Mengimplementasikan **agentic loop** yang secara otonom menghasilkan dan memvalidasi desain enclosure downhole
-- Sistem menutup loop antara **CAD generation → simulasi FEA → evaluasi AI**
-- Analisis termal mengonfirmasi bahwa desain memenuhi batasan operasional, memungkinkan **pilihan material yang lebih sederhana dan hemat biaya**
-
-**Langkah Selanjutnya (sesuaikan dengan roadmap aktual Anda):**
-- Validasi dengan pengujian prototipe fisik
-- Perluas agentic loop untuk mencakup **analisis struktural/tekanan** (tidak hanya termal)
-- Integrasikan parameter desain tambahan (acoustic window, pressure compensator)
-- Publikasi temuan / presentasi di konferensi
-
-**Saran visual:**
-- Daftar poin ringkas (tidak lebih dari 3–4 per bagian)
-- Opsional: grafik timeline atau roadmap untuk langkah selanjutnya
+- Rendering CAD final dari enclosure.
+- Teks penekanan (Highlight): "Suhu Aman: 68.36°C | OD Akhir: 70 mm"
 
 ---
 
