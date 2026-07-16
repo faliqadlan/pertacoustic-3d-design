@@ -1,0 +1,40 @@
+{
+  "iterations": [
+    {
+      "iteration": 1,
+      "config": {
+        "od": 43.0,
+        "layers": [
+          {
+            "name": "Outer",
+            "material": "SS316",
+            "thickness": 3.0
+          },
+          {
+            "name": "Insulation",
+            "material": "Aerogel",
+            "thickness": 5.0
+          },
+          {
+            "name": "Chassis",
+            "material": "PEEK",
+            "thickness": 3.0
+          }
+        ]
+      },
+      "result": {
+        "max_temp": 25.0177,
+        "converged": true
+      },
+      "constraints": {
+        "thermal": {
+          "threshold": 50.0,
+          "satisfied": true,
+          "overshoot_pct": 0
+        }
+      },
+      "reasoning": "Temperature 25.02C satisfies the 50.0C threshold. Optimization complete.",
+      "proposed_next": null
+    }
+  ]
+}
