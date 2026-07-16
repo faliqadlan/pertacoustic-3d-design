@@ -2,11 +2,11 @@ import os
 import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from cad_generator import generate_casing
-from mesh_generator import generate_mesh
-from solver_interface import setup_and_run_calculix
-from result_extractor import extract_max_internal_temperature
-from thermal_animator import animate_results
+from core.cad_generator import generate_casing
+from core.mesh_generator import generate_mesh
+from core.solver_interface import setup_and_run_calculix
+from core.result_extractor import extract_max_internal_temperature
+from core.thermal_animator import animate_results
 
 def run_cosmo_iteration(iteration_num, od_mm, length_mm, layers, bht=150.0, time_seconds=14400, animate=False):
     """

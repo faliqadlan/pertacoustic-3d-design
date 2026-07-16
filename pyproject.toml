@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cosmo"
+version = "0.2.0"
+description = "COSMO HTI-02-DHPC/D Integrated CAD-CAE Design"
+authors = [
+    { name = "Antigravity Agent" }
+]
+dependencies = [
+    "cadquery",
+    "gmsh",
+    "numpy",
+    "matplotlib",
+    "pyvista"
+]
+
+[tool.setuptools]
+packages = ["cosmo", "cosmo.core", "cosmo.hydrophone", "cosmo.optimization"]

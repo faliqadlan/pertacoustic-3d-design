@@ -1,3 +1,28 @@
+# Virtual Environments
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDEs
+.vscode/
+.idea/
+
+# Portable Python
 cosmo/python_portable
+
+# Solver Outputs & CAD (CalculiX/FreeCAD)
 *.frd
 *.inp
+*.12d
+*.cvg
+*.dat
+*.sta
+*.step
+*.msg
+*.rout
+*.nam
