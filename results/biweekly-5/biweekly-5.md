@@ -9,20 +9,20 @@ Dokumen ini mencatat desain awal dan pemeriksaan menggunakan perhitungan serta s
 
 ## 1. Rencana dan realisasi pekerjaan
 
-Telah dilakukan desain casing, interface ke HTI-02-DHPC/D, electronics layout, thermal analysis, dan structural analysis. Persentase progress tidak ditambah karena bobot resmi pekerjaan belum tersedia.
+Telah dilakukan desain casing, interface ke HTI-02-DHPC/D, electronics layout, thermal analysis, dan structural analysis.
 
 ## 2. Ringkasan kemajuan
 
 - Casing dirancang dengan diameter luar (OD) 200 mm, panjang 425 mm, dinding Inconel 35 mm, tutup depan/belakang 50 mm, aerogel radial 42.5 mm, dan PEEK 2 mm.
 - Elektronik dipindahkan menjauh dari kedua tutup. Aerogel aksial di depan sepanjang 50 mm dan di belakang sepanjang 71 mm menghambat panas yang masuk dari ujung casing.
 - Model CAD memuat tiga jalur konduktor, bagian analog depan, PCM1808, STM32F411, serta ruang RTC/SD/daya.
-- PA12/nylon hanya dipertimbangkan untuk komponen pendukung yang tidak menahan tekanan: dudukan elektronik, pemandu kabel, spacer, atau penahan tarikan kabel. PA12/nylon tidak dipakai sebagai dinding bejana tekan atau penghalang langsung terhadap fluida sumur.
+- PA12/nylon hanya dipertimbangkan untuk komponen pendukung yang tidak menahan tekanan: dudukan elektronik, pengarah kabel, pengganjal, atau penahan tarikan kabel. PA12/nylon tidak dipakai sebagai penghalang langsung terhadap fluida sumur.
 
 ## 3. Dasar desain dan istilah mekanik
 
-Ukuran ulir yang dipakai adalah **nominal** `7/16-20 UNF-2A` pada casing untuk dipasangkan dengan `7/16-20 UNF-2B` pada HTI. Nominal berarti nama ukuran menurut standar; ukuran hasil manufaktur tetap dapat sedikit lebih besar atau kecil selama masih berada dalam toleransi yang diizinkan. `7/16` adalah diameter utama nominal, `20` berarti 20 ulir per inci, `UNF` adalah seri ulir halus, `2A` adalah kelas ulir luar, dan `2B` adalah kelas ulir dalam.
+Ukuran nominal ulir yang dipakai adalah `7/16-20 UNF-2A` pada casing untuk dipasangkan dengan `7/16-20 UNF-2B` pada HTI. Nominal berarti nama ukuran menurut standar; ukuran hasil manufaktur tetap dapat sedikit lebih besar atau kecil selama masih berada dalam toleransi yang diizinkan. `7/16` adalah diameter utama nominal, `20` berarti 20 ulir per inci, `UNF` adalah seri ulir halus, `2A` adalah kelas ulir luar, dan `2B` adalah kelas ulir dalam.
 
-**Thread/ulir** adalah alur heliks untuk menyambungkan dua komponen. **Thread HTI** berarti ulir sambungan milik hydrophone HTI, bukan seal tekanan untuk ruang elektronik. Gambar HTI masih bertanda “for reference only”. Karena itu, **datum**—permukaan atau sumbu acuan untuk semua pengukuran—dan **thread tolerance**—batas penyimpangan diameter, pitch, serta bentuk ulir—harus dikonfirmasi kepada HTI sebelum manufaktur.
+**Thread/ulir** adalah alur heliks untuk menyambungkan dua komponen. **Thread HTI** berarti ulir sambungan milik hydrophone HTI, bukan seal tekanan untuk ruang elektronik. Gambar HTI masih bertanda “for reference only”. Karena itu, **datum** (acuan pengukuran)—permukaan atau sumbu acuan untuk semua pengukuran—dan **thread tolerance** (toleransi ulir)—batas penyimpangan diameter, pitch, serta bentuk ulir—harus dikonfirmasi kepada HTI sebelum manufaktur.
 
 **Envelope** adalah kotak atau ruang batas yang disediakan agar suatu komponen pasti muat. Envelope sementara STM32F411 adalah 55 × 22 × 12 mm dan PCM1808 adalah 52 × 32 × 18 mm. **Assembly clearance** 1,5 mm adalah ruang tambahan agar board dapat dimasukkan dan tidak bergesekan. Dari ukuran tersebut digunakan **clear ID** 41 mm, yaitu diameter dalam bersih yang benar-benar tersedia untuk elektronik setelah material casing dan insulasi dihitung.
 
@@ -32,7 +32,7 @@ Adapter depan terdiri dari ulir nominal, **shoulder** atau bidang bertingkat yan
 
 Jenis **elastomer** atau bahan lentur seal, **backup ring** yang menopang seal agar tidak terdorong keluar, **extrusion gap** atau celah tempat seal dapat tertekan keluar, dan **tolerance stack** atau gabungan seluruh variasi ukuran komponen belum ditetapkan. Karena itu, geometri alur yang terlihat di CAD masih konseptual dan belum boleh dibuat.
 
-Dalam model struktur, **barrel** adalah dinding silinder panjang dan **endcap** adalah tutup tekanan di depan serta belakang. Model FEA dibuat **defeatured**, artinya detail kecil seperti ulir, kontak seal, dan alur lokal dihilangkan agar pemeriksaan global casing lebih stabil dan lebih cepat.
+Dalam model struktur, **barrel** adalah dinding silinder panjang dan **endcap** adalah tutup tekanan di depan serta belakang. Model FEA (Finite Element Analysis) dibuat **defeatured**, artinya detail kecil seperti ulir, kontak seal, dan alur lokal dihilangkan agar pemeriksaan global casing lebih stabil dan lebih cepat.
 
 ## 4. Susunan elektronik
 
@@ -69,11 +69,7 @@ FEA menghitung seluruh barrel dan kedua endcap. Tegangan coarse, medium, dan fin
 
 ![Riwayat temperatur](figures/thermal_history.png)
 
-**1 W** berarti elektronik menghasilkan energi panas satu joule setiap detik. Nilai 0, 1, dan 2 W pada studi radial adalah skenario tanpa panas internal, perkiraan operasi, dan skenario lebih berat. Pada 1 W, model radial kandidat ini menghasilkan 55.86°C setelah satu jam.
-
-Grafik radial lama untuk OD 146 mm tampak memenuhi batas 70°C karena model tersebut hanya mengizinkan panas mengalir melalui arah radial dan memakai **adiabatic ends**, yaitu ujung depan dan belakang dianggap tidak dapat dilewati panas. Anggapan itu berguna untuk perbandingan awal, tetapi tidak mewakili casing tertutup yang nyata.
-
-Model 3D tertutup memasukkan barrel, endcap Inconel depan/belakang, aerogel radial, **front/rear axial aerogel buffer**, dan panas internal total 1 W. Axial aerogel buffer adalah lapisan aerogel memanjang di antara endcap panas dan elektronik agar jalur rambat panas menjadi lebih panjang.
+Simulasi termal 3D casing tertutup memperhitungkan barrel, endcap Inconel depan/belakang, aerogel radial, **front/rear axial aerogel buffer**, serta daya panas internal elektronik sebesar **1 W** (1 joule per detik). **Axial aerogel buffer** adalah lapisan aerogel memanjang di antara endcap dan ruang elektronik untuk menghambat aliran panas aksial dari ujung casing.
 
 | Pemeriksaan input model | Nilai |
 |---|---|

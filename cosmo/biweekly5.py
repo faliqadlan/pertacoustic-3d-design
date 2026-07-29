@@ -532,36 +532,43 @@ def build_detailed_cad(geometry: dict[str, float]) -> list[tuple[cq.Workplane, s
 
 
 def render_cad(parts: list[tuple[cq.Workplane, str, tuple]]) -> None:
-    fig = plt.figure(figsize=(13, 7))
+    fig = plt.figure(figsize=(14, 8), dpi=200)
     full = fig.add_subplot(121, projection="3d")
     detail = fig.add_subplot(122, projection="3d")
 
-    def draw(ax, selected_parts):
+    def draw(ax, selected_parts, shell_alpha=0.15):
         for solid, name, color in selected_parts:
             if name in {"Sealed_aerogel", "PEEK_carrier"}:
                 continue
             vertices, triangles = solid.val().tessellate(0.8)
             xyz = np.array([(v.x, v.y, v.z) for v in vertices])
             faces = [[xyz[i] for i in triangle] for triangle in triangles]
-            alpha = 0.18 if name == "Inconel718_pressure_shell" else 0.88
+            is_shell = name in {"Inconel718_pressure_shell", "Threaded_front_adapter", "Rear_pressure_endcap"}
+            alpha = shell_alpha if is_shell else 0.90
+            edgecolor = (0.3, 0.35, 0.4, 0.15) if is_shell else "none"
             collection = Poly3DCollection(
                 faces,
                 facecolor=color,
-                edgecolor="none",
+                edgecolor=edgecolor,
+                linewidths=0.2 if is_shell else 0,
                 alpha=alpha,
             )
             ax.add_collection3d(collection)
-        ax.view_init(elev=18, azim=-55)
-        ax.set_xlabel("X (mm)")
-        ax.set_ylabel("Y (mm)")
-        ax.set_zlabel("Axial (mm)")
+        ax.view_init(elev=20, azim=-55)
+        ax.set_xlabel("X (mm)", labelpad=8, fontsize=9)
+        ax.set_ylabel("Y (mm)", labelpad=8, fontsize=9)
+        ax.set_zlabel("Axial Z (mm)", labelpad=8, fontsize=9)
+        ax.tick_params(labelsize=8)
 
-    draw(full, parts)
-    full.set_xlim(-40, 40)
-    full.set_ylim(-40, 40)
-    full.set_zlim(-95, 470)
-    full.set_box_aspect((200, 200, 565))
-    full.set_title("Full assembly")
+    draw(full, parts, shell_alpha=0.12)
+    # The casing has an Outer Diameter (OD) of 200 mm (radius = 100 mm).
+    # Setting limits to (-120, 120) spans 240 mm, showing the 200 mm OD cylinder without clipping.
+    full.set_xlim(-120, 120)
+    full.set_ylim(-120, 120)
+    full.set_zlim(-100, 480)
+    # Physical aspect ratio: 240 mm width/depth vs 580 mm height
+    full.set_box_aspect((240, 240, 580))
+    full.set_title("Full Assembly (Sleek Proportional View)", fontsize=11, pad=12, fontweight="bold")
 
     detail_parts = [
         (_thread_solid(), "Nominal_7_16_20_UNF_2A_thread", (0.60, 0.62, 0.66))
@@ -570,17 +577,19 @@ def render_cad(parts: list[tuple[cq.Workplane, str, tuple]]) -> None:
         for part in parts
         if part[1].startswith("HTI_pin_") or part[1].startswith("Wire_")
     ]
-    draw(detail, detail_parts)
+    draw(detail, detail_parts, shell_alpha=0.5)
     detail.set_xlim(-7, 7)
     detail.set_ylim(-7, 7)
     detail.set_zlim(-4, 15)
     detail.set_box_aspect((14, 14, 19))
-    detail.set_title("Nominal HTI thread and three-wire feedthrough")
+    detail.set_title("Nominal HTI Thread & Three-Wire Feedthrough", fontsize=11, pad=12, fontweight="bold")
 
-    fig.suptitle("Preliminary HTI-connected PertAcoustic casing")
+    fig.suptitle("Preliminary HTI-Connected PertAcoustic Casing Design", fontsize=13, fontweight="bold", y=0.97)
     fig.tight_layout()
-    fig.savefig(FIG_DIR / "cad_assembly.png", dpi=180)
+    fig.subplots_adjust(top=0.90)
+    fig.savefig(FIG_DIR / "cad_assembly.png", dpi=200)
     plt.close(fig)
+
 
 
 def render_section(geometry: dict[str, float]) -> None:
