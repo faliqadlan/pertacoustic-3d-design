@@ -1,19 +1,10 @@
 import os
-import sys
 import json
 import csv
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import matplotlib.pyplot as plt
 
-try:
-    import matplotlib.pyplot as plt
-except ImportError:
-    print("matplotlib not found, installing...")
-    import subprocess
-    subprocess.check_call([os.sys.executable, "-m", "pip", "install", "matplotlib"])
-    import matplotlib.pyplot as plt
-
-from result_extractor import parse_frd_temperatures
+from .result_extractor import parse_frd_temperatures
 
 def plot_all_results(results_dir="results"):
     print("Generating Temperature-Time Plots and CSV Data...")
@@ -100,7 +91,7 @@ def plot_all_results(results_dir="results"):
         
         plt.plot(cut_times, cut_temps, marker=marker, linestyle=linestyle, label=label, alpha=0.8)
         
-    plt.title("Internal Electronics Temperature over 1 Hours (150°C Ambient)")
+    plt.title("Internal Electronics Temperature over 1 Hour (150°C Ambient)")
     plt.xlabel("Time (Hours)")
     plt.ylabel("Maximum Internal Temperature (°C)")
     # plt.axhline(y=40, color='r', linestyle='--', label='Critical Threshold (40°C)')
@@ -108,17 +99,16 @@ def plot_all_results(results_dir="results"):
     plt.grid(True)
     
     # Save PNG
-    plt.savefig("temperature_plot.png", dpi=300, bbox_inches='tight')
-    print("Saved plot to temperature_plot.png")
+    plot_path = os.path.join(results_dir, "temperature_plot.png")
+    plt.savefig(plot_path, dpi=300, bbox_inches='tight')
+    print(f"Saved plot to {plot_path}")
     
     # Save CSV
     if csv_data:
         keys = csv_data[0].keys()
-        with open("numerical_data.csv", "w", newline='') as f:
+        csv_path = os.path.join(results_dir, "numerical_data.csv")
+        with open(csv_path, "w", newline='') as f:
             writer = csv.DictWriter(f, fieldnames=keys)
             writer.writeheader()
             writer.writerows(csv_data)
-        print("Saved numeric data to numerical_data.csv")
-
-if __name__ == "__main__":
-    plot_all_results()
+        print(f"Saved numeric data to {csv_path}")

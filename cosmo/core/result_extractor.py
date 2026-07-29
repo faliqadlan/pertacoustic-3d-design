@@ -1,4 +1,3 @@
-import os
 import numpy as np
 
 def parse_frd_temperatures(frd_file):
@@ -111,6 +110,3 @@ def extract_max_internal_temperature(frd_file, target_time=14400, r_inner=12.7):
                 max_t = temps[nid]
                 
     return max_t
-
-if __name__ == "__main__":
-    pass

@@ -5,17 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "cosmo"
 version = "0.2.0"
-description = "COSMO HTI-02-DHPC/D Integrated CAD-CAE Design"
-authors = [
-    { name = "Antigravity Agent" }
-]
+description = "Transient thermal CAD-CAE casing prototype"
 dependencies = [
     "cadquery",
     "gmsh",
     "numpy",
-    "matplotlib",
-    "pyvista"
+    "matplotlib"
 ]
 
 [tool.setuptools]
-packages = ["cosmo", "cosmo.core", "cosmo.hydrophone", "cosmo.optimization"]
+packages = ["cosmo", "cosmo.core", "cosmo.optimization"]

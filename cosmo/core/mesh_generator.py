@@ -1,5 +1,4 @@
 import gmsh
-import sys
 import os
 
 def generate_mesh(step_file, output_inp_file, layers):

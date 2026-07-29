@@ -1,6 +1,4 @@
 import cadquery as cq
-import json
-import os
 
 def generate_casing(od_mm, length_mm, layers, output_file="casing.step"):
     """

@@ -56,7 +56,7 @@ def propose_next_config(current_config, max_temp, threshold):
     return proposed_config, reasoning
 
 def run_automated_optimization():
-    print("Starting automated COSMO-Agent optimization loop")
+    print("Starting automated thermal optimization loop")
     
     results_dir = os.path.join("results", "hti-02-dhpc-d-20260716")
     os.makedirs(results_dir, exist_ok=True)
@@ -84,7 +84,6 @@ def run_automated_optimization():
     threshold = 50.0
     max_iterations = 10
     
-    best_candidate = None
     best_temp = float('inf')
     
     for i in range(1, max_iterations + 1):
@@ -92,7 +91,7 @@ def run_automated_optimization():
         od = current_config['od']
         layers = current_config['layers']
         
-        max_temp = run_cosmo_iteration(i, od, length, layers, bht=bht, time_seconds=time_seconds, animate=False)
+        max_temp = run_cosmo_iteration(i, od, length, layers, bht=bht, time_seconds=time_seconds)
         
         if max_temp is None:
             print(f"Iteration {i} failed to complete. Stopping optimization.")
@@ -100,7 +99,6 @@ def run_automated_optimization():
             
         if max_temp < best_temp:
             best_temp = max_temp
-            best_candidate = current_config
             
         # Save summary and move artifacts
         iter_dir = os.path.join(results_dir, f"iteration_{i:02d}")
@@ -115,10 +113,6 @@ def run_automated_optimization():
                     os.remove(dst)
                 shutil.move(src, dst)
                 
-        mp4_src = f"thermal_anim_iter{i}.mp4"
-        if os.path.exists(mp4_src):
-            shutil.move(mp4_src, os.path.join(iter_dir, mp4_src))
-            
         summary = {
             'iteration': i,
             'layers': layers,
@@ -133,7 +127,7 @@ def run_automated_optimization():
         iter_log = {
             "iteration": i,
             "config": copy.deepcopy(current_config),
-            "result": {"max_temp": max_temp, "converged": True},
+            "result": {"max_temp": max_temp, "converged": max_temp <= threshold},
             "constraints": {
                 "thermal": {
                     "threshold": threshold,
@@ -154,7 +148,7 @@ def run_automated_optimization():
             
         # Determine next configuration
         next_config, reasoning = propose_next_config(current_config, max_temp, threshold)
-        print(f"Agent Reasoning: {reasoning}")
+        print(f"Optimization reasoning: {reasoning}")
         
         iter_log["reasoning"] = reasoning
         iter_log["proposed_next"] = next_config
@@ -172,7 +166,11 @@ def run_automated_optimization():
         
     # Run compiler
     from core.results_compiler import compile_results
-    compile_results(results_dir=results_dir, output_md=os.path.join(results_dir, "comparison_table.md"))
+    compile_results(
+        results_dir=results_dir,
+        output_md=os.path.join(results_dir, "comparison_table.md"),
+        threshold=threshold,
+    )
     
     # Generate numerical data and plots
     try:

@@ -146,6 +146,3 @@ def setup_and_run_calculix(inp_file, layers, od_mm, ccx_path=None, bht=150.0, ti
         print(e.stdout)
         print(e.stderr)
         return False
-
-if __name__ == "__main__":
-    pass

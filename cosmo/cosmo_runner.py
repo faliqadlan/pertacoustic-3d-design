@@ -6,9 +6,8 @@ from core.cad_generator import generate_casing
 from core.mesh_generator import generate_mesh
 from core.solver_interface import setup_and_run_calculix
 from core.result_extractor import extract_max_internal_temperature
-from core.thermal_animator import animate_results
 
-def run_cosmo_iteration(iteration_num, od_mm, length_mm, layers, bht=150.0, time_seconds=14400, animate=False):
+def run_cosmo_iteration(iteration_num, od_mm, length_mm, layers, bht=150.0, time_seconds=14400):
     """
     Executes a single COSMO CAD-CAE loop iteration.
     
@@ -26,7 +25,6 @@ def run_cosmo_iteration(iteration_num, od_mm, length_mm, layers, bht=150.0, time
     step_file = f"casing_iter{iteration_num}.step"
     inp_file = f"casing_iter{iteration_num}.inp"
     frd_file = f"casing_iter{iteration_num}.frd"
-    mp4_file = f"thermal_anim_iter{iteration_num}.mp4"
     
     # Step 1: CAD Generation
     try:
@@ -64,13 +62,6 @@ def run_cosmo_iteration(iteration_num, od_mm, length_mm, layers, bht=150.0, time
         print(f"Result extraction failed: {e}")
         return None
         
-    # Step 5: Animation
-    if animate:
-        try:
-            animate_results(inp_file, frd_file, output_mp4=mp4_file)
-        except Exception as e:
-            print(f"Animation failed: {e}")
-            
     return max_temp
 
 if __name__ == "__main__":
@@ -82,4 +73,4 @@ if __name__ == "__main__":
         {'name': 'InnerChassis', 'material': 'PEEK', 'thickness': 1.8}
     ]
     
-    run_cosmo_iteration(0, 43.0, 100.0, test_layers, time_seconds=3600, animate=False)
+    run_cosmo_iteration(0, 43.0, 100.0, test_layers, time_seconds=3600)

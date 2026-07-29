@@ -2,14 +2,14 @@ import os
 import json
 import glob
 
-def compile_results(results_dir="results", output_md="comparison_table.md"):
+def compile_results(results_dir="results", output_md="comparison_table.md", threshold=50.0):
     """
     Reads the results from all COSMO iterations and generates a comparison table.
     Expects a JSON file in each iteration folder containing the summary metrics.
     """
     
-    table_header = "| Iteration | Configuration | OD (mm) | Length (mm) | Max Temp (C) | Time to 40C (h) | Status |\n"
-    table_header += "|:---|:---|:---|:---|:---|:---|:---|\n"
+    table_header = "| Iteration | Configuration | OD (mm) | Length (mm) | Max Temp (C) | Status |\n"
+    table_header += "|:---|:---|:---|:---|:---|:---|\n"
     
     table_rows = []
     
@@ -27,22 +27,19 @@ def compile_results(results_dir="results", output_md="comparison_table.md"):
             od = data['od']
             length = data['length']
             max_temp = data['max_temp']
-            time_to_40 = data.get('time_to_40', '> 4.0')
-            status = "PASS" if max_temp <= 70.0 else "FAIL"
+            status = "PASS" if max_temp <= threshold else "FAIL"
             
-            row = f"| {iter_name} | {config_str} | {od} | {length} | {max_temp:.2f} | {time_to_40} | {status} |\n"
+            row = f"| {iter_name} | {config_str} | {od} | {length} | {max_temp:.2f} | {status} |\n"
             table_rows.append((max_temp, row))
             
     # Sort by max_temp (ascending)
     table_rows.sort(key=lambda x: x[0])
     
     with open(output_md, "w") as f:
-        f.write("# COSMO-Agent Transient Thermal Results\n\n")
+        f.write("# Transient Thermal Results\n\n")
+        f.write(f"Pass threshold: {threshold:.2f} C.\n\n")
         f.write(table_header)
         for _, row in table_rows:
             f.write(row)
             
     print(f"Comparison table generated: {output_md}")
-
-if __name__ == "__main__":
-    pass

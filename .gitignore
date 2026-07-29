@@ -26,3 +26,7 @@ cosmo/python_portable
 *.msg
 *.rout
 *.nam
+
+# Generated result visualizations
+results/**/temperature_plot.png
+results/**/numerical_data.csv
