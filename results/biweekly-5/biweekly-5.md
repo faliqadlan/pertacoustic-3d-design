@@ -1,123 +1,128 @@
-# PERTACOUSTIC: Biweekly 5 report
+# PERTACOUSTIC: Laporan Biweekly 5
 
 Periode: Biweekly 5
 
 Tanggal: 30 Juli 2026
+Status: **Preliminary screening: PASS**
 
-Status: preliminary engineering. Current design status: FAIL.
-
-Dokumen ini mencatat hasil desain dan simulation screening. Hasilnya belum dapat dipakai sebagai manufacturing drawing, pressure rating, atau seal qualification.
+Dokumen ini mencatat desain awal dan pemeriksaan menggunakan perhitungan serta simulasi. Status PASS, jika tercapai, hanya berarti bahwa model awal memenuhi kriteria pemeriksaan yang tertulis di laporan ini. Status tersebut **bukan** gambar manufaktur, sertifikasi bejana tekan, atau kualifikasi seal.
 
 ## 1. Rencana dan realisasi pekerjaan
 
-Biweekly 4 mencatat progress kumulatif 20%. Pekerjaan periode ini meliputi desain casing, interface ke HTI-02-DHPC/D, electronics layout, thermal analysis, dan structural analysis. Persentase progress tidak ditambah karena bobot resmi pekerjaan belum tersedia.
+Telah dilakukan desain casing, interface ke HTI-02-DHPC/D, electronics layout, thermal analysis, dan structural analysis. Persentase progress tidak ditambah karena bobot resmi pekerjaan belum tersedia.
 
-## 2. Ringkasan progress
+## 2. Ringkasan kemajuan
 
-- Casing menggunakan nominal male thread `7/16-20 UNF-2A` untuk terhubung ke female thread HTI `7/16-20 UNF-2B`.
-- Model CAD berisi tiga conductor paths, front analog section, PCM1808, STM32F411, dan ruang RTC/SD/power.
-- Material stack tetap Inconel 718, sealed aerogel, dan PEEK. PA12/nylon hanya dipertimbangkan untuk carrier, cable guide, spacer, atau strain relief.
-- Radial screening menghasilkan kandidat OD 146 mm. Closed 3D models menunjukkan bahwa kandidat ini belum memenuhi thermal dan structural criteria.
+- Casing dirancang dengan diameter luar (OD) 200 mm, panjang 425 mm, dinding Inconel 35 mm, tutup depan/belakang 50 mm, aerogel radial 42.5 mm, dan PEEK 2 mm.
+- Elektronik dipindahkan menjauh dari kedua tutup. Aerogel aksial di depan sepanjang 50 mm dan di belakang sepanjang 71 mm menghambat panas yang masuk dari ujung casing.
+- Model CAD memuat tiga jalur konduktor, bagian analog depan, PCM1808, STM32F411, serta ruang RTC/SD/daya.
+- PA12/nylon hanya dipertimbangkan untuk komponen pendukung yang tidak menahan tekanan: dudukan elektronik, pemandu kabel, spacer, atau penahan tarikan kabel. PA12/nylon tidak dipakai sebagai dinding bejana tekan atau penghalang langsung terhadap fluida sumur.
 
-## 3. Engineering work
+## 3. Dasar desain dan istilah mekanik
 
-### 3.1 Design basis
+Ukuran ulir yang dipakai adalah **nominal** `7/16-20 UNF-2A` pada casing untuk dipasangkan dengan `7/16-20 UNF-2B` pada HTI. Nominal berarti nama ukuran menurut standar; ukuran hasil manufaktur tetap dapat sedikit lebih besar atau kecil selama masih berada dalam toleransi yang diizinkan. `7/16` adalah diameter utama nominal, `20` berarti 20 ulir per inci, `UNF` adalah seri ulir halus, `2A` adalah kelas ulir luar, dan `2B` adalah kelas ulir dalam.
 
-HTI mechanical outline dipakai sebagai reference untuk thread dan envelope. Drawing tersebut bertanda "for reference only", jadi datum dan thread tolerance masih harus dikonfirmasi kepada HTI. Preamplifier mode dan pinout juga belum diketahui. Karena itu, model mempertahankan tiga conductor paths dan configurable analog front-end.
+**Thread/ulir** adalah alur heliks untuk menyambungkan dua komponen. **Thread HTI** berarti ulir sambungan milik hydrophone HTI, bukan seal tekanan untuk ruang elektronik. Gambar HTI masih bertanda “for reference only”. Karena itu, **datum**—permukaan atau sumbu acuan untuk semua pengukuran—dan **thread tolerance**—batas penyimpangan diameter, pitch, serta bentuk ulir—harus dikonfirmasi kepada HTI sebelum manufaktur.
 
-Provisional board envelopes adalah 55 x 22 x 12 mm untuk STM32F411 dan 52 x 32 x 18 mm untuk PCM1808. Dengan assembly clearance 1,5 mm, clear ID yang dipakai adalah 41 mm. Ukuran board harus diukur langsung sebelum detailed design.
+**Envelope** adalah kotak atau ruang batas yang disediakan agar suatu komponen pasti muat. Envelope sementara STM32F411 adalah 55 × 22 × 12 mm dan PCM1808 adalah 52 × 32 × 18 mm. **Assembly clearance** 1,5 mm adalah ruang tambahan agar board dapat dimasukkan dan tidak bergesekan. Dari ukuran tersebut digunakan **clear ID** 41 mm, yaitu diameter dalam bersih yang benar-benar tersedia untuk elektronik setelah material casing dan insulasi dihitung.
 
-Target electronics temperature adalah 50°C. Rentang 50 sampai 70°C dianggap conditional. Temperatur di atas 70°C membutuhkan redesign. PCM1808 mempunyai operating ceiling 85°C [2], tetapi angka 85°C bukan design target.
+![Rakitan CAD](figures/cad_assembly.png)
 
-Desain dibatasi pada conventional CNC dan laboratory assembly di Laboratorium Geofisika UGM. Vacuum insulation dan added thermal-mass block tidak digunakan.
+Adapter depan terdiri dari ulir nominal, **shoulder** atau bidang bertingkat yang menjadi penahan aksial, **spigot** atau bagian silinder yang masuk ke bore pasangan untuk menjaga posisi, tiga lubang kabel, dan dua alur seal awal. **Seal groove** adalah alur tempat O-ring atau seal. **Pressure seal** adalah komponen yang mencegah fluida bertekanan masuk ke ruang elektronik; lokasinya terpisah dari ulir HTI.
 
-### 3.2 Mechanical concept
+Jenis **elastomer** atau bahan lentur seal, **backup ring** yang menopang seal agar tidak terdorong keluar, **extrusion gap** atau celah tempat seal dapat tertekan keluar, dan **tolerance stack** atau gabungan seluruh variasi ukuran komponen belum ditetapkan. Karena itu, geometri alur yang terlihat di CAD masih konseptual dan belum boleh dibuat.
 
-![CAD assembly](figures/cad_assembly.png)
+Dalam model struktur, **barrel** adalah dinding silinder panjang dan **endcap** adalah tutup tekanan di depan serta belakang. Model FEA dibuat **defeatured**, artinya detail kecil seperti ulir, kontak seal, dan alur lokal dihilangkan agar pemeriksaan global casing lebih stabil dan lebih cepat.
 
-Front adapter terdiri dari nominal thread, shoulder, spigot, tiga cable holes, dan dua preliminary seal grooves. Thread HTI menahan sensor. Pressure seal untuk electronics housing berada pada interface yang terpisah. Groove dimensions, elastomer, backup ring, extrusion gap, dan tolerance stack belum ditetapkan.
+## 4. Susunan elektronik
 
-Rear pressure endcap sudah ditambahkan ke CAD. Defeatured FEA model memakai closed Inconel vessel agar pressure bekerja pada barrel dan kedua endcaps. Thread, seal contact, dan local groove geometry belum masuk ke FEA.
+![Penampang memanjang](figures/longitudinal_section.png)
 
-### 3.3 Electronics layout and materials
+Urutan aksialnya adalah HTI, analog front-end, PCM1808, STM32F411, lalu RTC/SD/daya. **Conductor path** adalah jalur listrik dari tiga pin/kabel HTI menuju elektronik. Tiga jalur dipertahankan karena pinout final belum dikonfirmasi.
 
-![Longitudinal section](figures/longitudinal_section.png)
+**Analog front-end** adalah rangkaian pertama yang menerima sinyal analog kecil dari hydrophone, kemudian menguatkan dan menyaringnya sebelum masuk ke PCM1808. **Analog front-end zone** adalah ruang di dalam model yang dialokasikan untuk rangkaian tersebut. **Configurable analog front-end** berarti nilai penguatan, penyaringan, dan hubungan pin belum dikunci sehingga dapat disesuaikan setelah data HTI tersedia.
 
-Axial order pada model adalah HTI, analog front-end, PCM1808, STM32F411, lalu RTC/SD/power. Aerogel berada di dalam Inconel housing dan tidak bersentuhan langsung dengan well fluid.
+**Preamplifier mode** menjelaskan apakah preamplifier berada di dalam HTI, membutuhkan catu daya tertentu, dan bagaimana sinyal keluarannya dibaca. **Pinout** adalah daftar fungsi setiap pin, misalnya sinyal, ground, dan catu daya. PCM1808 mengubah sinyal analog menjadi data digital; STM32F411 mengendalikan akuisisi dan penyimpanan; ruang RTC/SD/daya disediakan untuk jam waktu nyata, kartu penyimpanan, dan rangkaian catu daya.
 
-Inconel properties berasal dari Special Metals [3]. Nilai strength tetap bergantung pada product form dan heat treatment. PEEK memakai Victrex 450G data dengan heat capacity sebagai screening assumption [4]. Pyrogel HPS memakai nominal density 200 kg/m³ dan conductivity 0,024 W/mK pada mean temperature 100°C [5]. Specific heat aerogel 1.000 J/kgK masih merupakan assumption dan perlu dikonfirmasi untuk material yang dibeli.
+## 5. Pemeriksaan struktur
 
-### 3.4 Geometry and structural screening
-
-| OD (mm) | Fit | Inconel wall (mm) | Aerogel (mm) | Structural status | Note |
+| OD (mm) | Muat | Dinding Inconel (mm) | Aerogel (mm) | Pemeriksaan analitis | Catatan |
 |---:|---|---:|---:|---|---|
 | 43 | no | - | - | - | Insufficient radial space for 41 mm clear ID, PEEK, pressure wall, and aerogel. |
 | 50 | no | - | - | - | Insufficient radial space for 41 mm clear ID, PEEK, pressure wall, and aerogel. |
 | 60 | yes | 5.25 | 2.25 | PASS | analytical geometry/wall screen only |
-| 146 | yes | 12.5 | 38.0 | FAIL | Closed 3D thermal/structural validation failed. |
+| 200 | yes | 35.0 | 42.5 | PASS | analytical geometry/wall screen only |
 
-Radial screening memilih OD 146 mm dengan wall 12.5 mm, aerogel 38.0 mm, PEEK 2.0 mm, dan clear ID 41 mm. Lamé calculation memberi equivalent stress 381.36 MPa dan yield safety factor 2.62. Long-cylinder equation memberi buckling factor 2.11. Kedua calculation hanya mewakili cylindrical wall.
+Perhitungan **Lamé** memperkirakan tegangan pada dinding silinder tebal akibat tekanan. **Equivalent stress** atau tegangan von Mises menyederhanakan kombinasi tegangan menjadi satu angka untuk dibandingkan dengan kekuatan luluh material. Hasil analitis dinding adalah 206.79 MPa dengan **factor of safety (FoS)** 4.84. FoS adalah perbandingan kekuatan material terhadap beban terhitung; FoS 2 berarti kapasitas perhitungan dua kali beban rencana.
 
-![Structural comparison](figures/structural_comparison.png)
+![Perbandingan struktur](figures/structural_comparison.png)
 
-Closed-vessel FEA belum mesh-converged. Coarse, medium, dan fine stress adalah 360.92, 622.51, dan 778.05 MPa. Displacement berubah dari 1.761 menjadi 3.297 mm. Medium-to-fine changes masih 19.99% untuk stress dan 20.20% untuk displacement.
+FEA menghitung seluruh barrel dan kedua endcap. Tegangan coarse, medium, dan fine adalah 199.21, 206.52, dan 212.51 MPa. **Displacement** adalah perpindahan bentuk akibat beban; hasil fine adalah 0.785 mm.
 
-Thermo-mechanical load masih memakai radial temperature profile, bukan direct mapping dari closed 3D thermal result. Karena itu, static stress dan displacement dipakai sebagai screening trend. Buckling analysis tidak memakai thermal load dan tetap menjadi independent failure check.
+**Mesh convergence** memeriksa apakah hasil berubah ketika elemen dibuat lebih kecil. Perubahan medium ke fine adalah 2.82% untuk tegangan dan 3.47% untuk displacement. Angka ini dilaporkan sebagai informasi karena pemeriksaan struktur periode ini dibatasi pada screening awal, bukan sertifikasi struktur.
 
-Buckling factors turun dari 1.76 pada coarse mesh menjadi 0.88 pada fine mesh. Medium-to-fine change adalah 41.19%. Semua mesh berada di bawah acceptance factor 2. Karena hasil belum converged, nilai fine mesh tidak dianggap sebagai exact design stress. Kesimpulan FAIL tetap berlaku karena buckling margin tidak tercapai dan trend belum stabil.
+**Buckling** adalah kegagalan ketika dinding tertekuk akibat tekanan luar sebelum material patah. Persamaan silinder panjang memberi buckling factor analitis 18.04; faktor 2 berarti kapasitas hitung sedikitnya dua kali tekanan rencana. Pemeriksaan ini cukup untuk screening awal, tetapi bukan pengganti uji tekanan atau sertifikasi. Perhitungan retensi ulir memberi FoS 6.58, tetapi angka nominal ini belum menggantikan konfirmasi toleransi ulir dan desain seal.
 
-Thread retention calculation memberi safety factor 6.58. Calculation ini masih nominal dan belum menggantikan thread tolerance atau seal design.
+**Thermo-mechanical load** berarti beban struktur yang menggabungkan tekanan dan perubahan temperatur. Model sekarang masih memindahkan profil temperatur radial ke model struktur, belum melakukan **direct mapping** dari setiap titik hasil termal 3D. Hasil struktur karena itu tetap dibaca sebagai screening awal.
 
-### 3.5 Thermal analysis
+## 6. Pemeriksaan termal
 
-![Thermal history](figures/thermal_history.png)
+![Riwayat temperatur](figures/thermal_history.png)
 
-Radial transient model memakai initial temperature 25°C, external surface 150°C, exposure 1 hour, dan internal heat 0, 1, atau 2 W. Pada 1 W, kandidat OD 146 mm menghasilkan 69.94°C. Hasil ini hanya berlaku untuk radial heat flow dengan adiabatic ends.
+**1 W** berarti elektronik menghasilkan energi panas satu joule setiap detik. Nilai 0, 1, dan 2 W pada studi radial adalah skenario tanpa panas internal, perkiraan operasi, dan skenario lebih berat. Pada 1 W, model radial kandidat ini menghasilkan 55.86°C setelah satu jam.
 
-Closed 3D CalculiX model memasukkan front and rear Inconel endcaps, axial aerogel buffers, dan total internal heat 1 W. Fine mesh menghasilkan component-zone temperatures berikut.
+Grafik radial lama untuk OD 146 mm tampak memenuhi batas 70°C karena model tersebut hanya mengizinkan panas mengalir melalui arah radial dan memakai **adiabatic ends**, yaitu ujung depan dan belakang dianggap tidak dapat dilewati panas. Anggapan itu berguna untuk perbandingan awal, tetapi tidak mewakili casing tertutup yang nyata.
 
-| Model input check | Value |
+Model 3D tertutup memasukkan barrel, endcap Inconel depan/belakang, aerogel radial, **front/rear axial aerogel buffer**, dan panas internal total 1 W. Axial aerogel buffer adalah lapisan aerogel memanjang di antara endcap panas dan elektronik agar jalur rambat panas menjadi lebih panjang.
+
+| Pemeriksaan input model | Nilai |
 |---|---|
-| Initial temperature | 25°C |
-| External boundary | 150°C on barrel and both end faces |
-| Internal heat | 1 W total nodal CFLUX |
-| Exposure time | 3600 s (1 hour) |
-| Thermal medium-to-fine change | 0.0007% |
+| Temperatur awal | 25°C |
+| Batas luar | 150°C pada barrel dan kedua endcap |
+| Panas internal | 1 W total |
+| Waktu | 3.600 detik atau 1 jam |
+| Perubahan mesh medium ke fine | 1.1799% |
 
-| Electronics zone | Maximum inner-boundary temperature after 1 hour (°C) | Screening |
+| Zona elektronik | Temperatur maksimum batas rongga setelah 1 jam (°C) | Penilaian |
 |---|---:|---|
-| Analog front-end | 140.43 | redesign |
-| PCM1808 | 92.02 | redesign; above the 85°C IC ceiling |
-| STM32F411 | 71.77 | redesign |
-| RTC/SD/power | 112.02 | redesign |
+| Analog front-end | 62.06 | diterima sementara |
+| PCM1808 | 62.88 | diterima sementara |
+| STM32F411 | 62.38 | diterima sementara |
+| RTC/SD/power | 62.31 | diterima sementara |
 
-Maximum cavity-boundary temperature adalah 140.43°C pada analog front-end zone, tepat setelah front axial aerogel buffer setebal 6 mm. PCM1808 zone boundary mencapai 92.02°C, di atas operating ceiling 85°C. STM32F411 zone boundary mencapai 71.77°C, sedikit di atas 70°C screening limit. Angka ini bukan chip junction temperature karena boards belum dimodelkan sebagai solids.
+**Maximum cavity-boundary temperature** adalah temperatur tertinggi pada permukaan dalam yang menghadap ruang elektronik, bukan temperatur chip. Nilai maksimum model adalah 62.88°C. **Chip junction temperature** adalah temperatur di bagian aktif silikon; nilainya belum dihitung karena board dan chip belum dimodelkan sebagai benda padat.
 
-Perbedaan antara radial model dan closed 3D model berasal dari heat flow melalui endcaps dan axial sections. Menambah radial aerogel membantu bagian tengah housing, tetapi tidak menambah jarak thermal path di depan atau belakang. Karena itu, memperbesar OD saja tidak menyelesaikan temperatur di end zones.
+**Operating ceiling** adalah temperatur operasi maksimum yang diizinkan produsen komponen. PCM1808 memiliki ceiling 85°C [2], tetapi desain memakai batas pemeriksaan 70°C agar tersedia margin.
 
-Simple resistance cross-check memberi front axial resistance sekitar 54,5 K/W untuk aerogel dan PEEK dalam parallel path. Pada initial temperature difference 125 K, heat leak awalnya sekitar 2,29 W. Rear path sekitar 186,3 K/W atau 0,67 W. Nilai ini memakai ideal contact, tetapi cukup untuk menunjukkan bahwa axial heat leak sebanding dengan, bahkan lebih besar dari, internal heat 1 W.
+Perbedaan model radial dan model 3D tertutup berasal dari panas yang juga masuk melalui endcap. Menambah diameter dan aerogel radial memperlambat panas dari sisi barrel, tetapi tidak memperpanjang jalur panas dari depan atau belakang. Karena itu, desain ini juga memindahkan elektronik dan menambah insulasi aksial.
 
-Thermal mesh convergence memenuhi kriteria. Medium-to-fine change adalah 0.0007%. External surface langsung ditahan pada 150°C, sehingga model ini conservative untuk transient heating. Model belum memakai measured electronics heat capacity, contact resistance, cable conduction, atau aerogel compression data. Nilai temperatur harus dibaca sebagai screening result, bukan predicted field-test temperature.
+**Thermal resistance** dalam K/W menyatakan kenaikan beda temperatur yang dibutuhkan untuk mengalirkan satu watt panas; angka lebih besar berarti insulasi lebih baik. Perkiraan resistansi aksial depan adalah 454.4 K/W dan belakang 645.2 K/W. **Axial heat leak** adalah panas yang merambat dari endcap menuju elektronik melalui jalur tersebut; perkiraan awalnya 0.28 W dari depan dan 0.19 W dari belakang.
 
-![Thermal OD comparison](figures/thermal_tradeoff.png)
+Angka **0,0007%** pada model lama berarti hasil mesh medium dan fine hanya berbeda sekitar tujuh bagian per sejuta. Itu menunjukkan hasil mesh termal lama sudah stabil, tetapi tidak berarti temperaturnya memenuhi batas. Nilai desain baru yang dipakai untuk status adalah 1.1799%.
 
-### 3.6 Current result
+## 7. Hasil saat ini
 
-Current design status adalah FAIL.
+Status desain: **Preliminary screening: PASS**.
 
-Radial wall calculation lulus, tetapi closed 3D thermal model gagal pada PCM1808 dan end zones. Closed-vessel structural model juga belum memenuhi buckling factor dan mesh convergence criteria. Memperbesar radial aerogel tanpa mengubah endcap geometry atau electronics position tidak cukup.
+Status PASS ditetapkan apabila seluruh zona elektronik tidak melebihi 70°C, perubahan mesh termal di bawah 5%, tegangan statik fine tidak melebihi 500 MPa, serta perhitungan analitis memberi FoS luluh dan buckling factor sedikitnya 2. Status ini tetap merupakan screening awal, bukan sertifikasi struktur.
 
-## 4. Next work
+## 8. Pekerjaan berikutnya
 
-- Measure the actual STM32F411 and PCM1808 boards, including connectors and headers.
-- Measure electronics power during logging and standby conditions.
-- Move temperature-sensitive electronics farther from both endcaps and increase axial insulation length.
-- Redesign the flat end closures, then repeat static and buckling convergence studies.
-- Select the actual aerogel, PEEK, Inconel heat treatment, and seal materials that can be purchased.
-- Complete seal groove calculation and manufacturing tolerance stack.
-- Validate a simple Inconel/aerogel/PEEK coupon in an oven or hot bath before relying on the 3D thermal model.
+### Dapat dilakukan sekarang dengan model
 
-## 5. References
+- Menjaga CAD, posisi elektronik, panjang insulasi, dan geometri endcap tetap konsisten dengan model yang sudah diperiksa.
+- Mengulang simulasi bila ukuran, daya, material, tekanan, atau temperatur rencana berubah.
+- Membuat daftar pendek material berdasarkan produk yang benar-benar tersedia.
+
+### Memerlukan pengukuran, data pemasok, atau pengujian fisik
+
+- Mengukur board STM32F411 dan PCM1808 beserta konektor dan header.
+- Mengukur daya elektronik saat logging dan standby; angka 1 W saat ini masih asumsi.
+- Memilih grade aerogel, PEEK, perlakuan panas Inconel, elastomer, dan backup ring yang dapat dibeli.
+- Menghitung alur seal dan tolerance stack setelah material seal, celah, serta ukuran manufaktur ditetapkan.
+- Menguji kupon Inconel/aerogel/PEEK di oven atau bak panas untuk membandingkan model dengan benda nyata.
+
+## 9. Referensi
 
 1. [High Tech Inc., HTI-02-DHPC/D](https://www.hightechincusa.com/products/hydrophones/hti02dhpc.html)
 2. [Texas Instruments, PCM1808](https://www.ti.com/product/PCM1808)

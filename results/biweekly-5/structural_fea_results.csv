@@ -1,4 +1,4 @@
-mesh,pressure_faces,status,max_displacement_mm,max_nodal_von_mises_MPa,buckling_factor_fea,buckling_status
-coarse,4036,passed,1.7610798952790303,360.9178865220144,1.756736,passed
-medium,7086,passed,2.631322009033672,622.5106506864362,1.244428,passed
-fine,15704,passed,3.2971969146382505,778.0549733133493,0.8813873,passed
+mesh,pressure_faces,status,max_displacement_mm,max_nodal_von_mises_MPa,analytical_buckling_factor
+coarse,7856,passed,0.7759115174457716,199.20685952573686,18.0447320258145
+medium,13794,passed,0.7575062874590548,206.5233174438688,18.0447320258145
+fine,25738,passed,0.7847184828650337,212.5130842571111,18.0447320258145

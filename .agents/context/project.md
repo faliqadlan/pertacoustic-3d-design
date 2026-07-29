@@ -32,7 +32,7 @@ The thermal workflow uses layer dictionaries ordered from outside to inside:
 
 `results/hti-02-dhpc-d-20260716/` contains one historical 43 mm OD, 100 mm long SS316/Aerogel/PEEK run. Its raw FRD reproduces 25.0177 C, but the input was generated with conductivity divided by 1,000. The result is invalid and retained only as historical provenance.
 
-`cosmo/biweekly5.py` generates the current HTI-connected preliminary CAD, one-hour radial trade study, closed 3D thermal model at 1 W, closed-vessel static and eigenvalue-buckling FEA at three mesh levels, analytical checks, figures, and Indonesian report under `results/biweekly-5/`. The current engineering status is FAIL.
+`cosmo/biweekly5.py` generates the current HTI-connected preliminary CAD, one-hour radial trade study, closed 3D thermal model at 1 W, static pressure screening at three mesh levels, analytical structural checks, figures, and Indonesian report under `results/biweekly-5/`. The current status is preliminary screening PASS; this is not structural certification or a manufacturing pressure rating.
 
 ## Technology Stack
 
@@ -83,14 +83,14 @@ Run repository workflows from the repository root because output paths are relat
 - The reusable legacy pipeline covers transient heat transfer. The bounded Biweekly 5 runner adds preliminary pressure-shell FEA and analytical checks but does not validate sealing, collapse qualification, acoustic response, corrosion, fatigue, sour service, or manufacturability.
 - Temperature extraction fails closed when the requested boundary or time is absent; callers must handle `ValueError` rather than substituting another metric.
 - CalculiX can return exit code 0 after fatal input errors, so solver success requires clean logs and freshly generated result files.
-- The Biweekly 5 hydrophone envelope, mating thread, adapter, and seal area are preliminary geometry only; supplier-controlled datums and seal qualification remain required before manufacture.
+- The Biweekly 5 hydrophone envelope, mating thread, adapter, and seal area are preliminary geometry only; supplier-controlled datums, physical pressure testing, and seal qualification remain required before manufacture.
 - Vacuum insulation and added thermal-mass blocks are out of scope because the design must be manufacturable with conventional CNC and assembly capability at the UGM Geophysics Laboratory.
 
 ## Evidence Provenance
 
 - Source, manifests, current raw solver output, and remaining reference locations were inspected locally on 2026-07-29.
 - Dependency imports, CalculiX 2.22, the result extractor against the raw FRD, and the comparison-table regression test passed.
-- The complete Biweekly 5 CAD-mesh-solve-report runner passed on 2026-07-29 and reproducibly reported engineering status FAIL.
+- The complete Biweekly 5 CAD-mesh-solve-report runner passed on 2026-07-29 and reproducibly reported preliminary screening PASS for the 200 mm OD thermal-priority concept.
 - Antigravity-generated legacy reports, presentations, hydrophone geometry, duplicate outputs, bootstrapping code, bytecode, and redundant solver binaries were deliberately removed as untrusted or unnecessary.
 
 ## Proposed Behavior
@@ -112,7 +112,7 @@ Run repository workflows from the repository root because output paths are relat
 - Regression coverage contains focused standard-library tests for result-table accuracy, Biweekly 5 geometry/thermal screens, HTI thread datums, and thermal-conductivity units.
 - The packaging configuration does not explicitly include `material_library.json` or the bundled solver as package data.
 - The historical thermal run used an incorrect conductivity conversion and is not valid evidence.
-- The 146 mm radial candidate fails the closed 3D thermal, static-stress, displacement-convergence, and buckling criteria; no validated passing casing is currently claimed.
+- The revised 200 mm OD, 425 mm long concept passes the one-hour closed 3D thermal screen and preliminary analytical/static structural screen. Eigenvalue buckling convergence and pressure-vessel certification are intentionally not claimed.
 
 ## Open Questions
 

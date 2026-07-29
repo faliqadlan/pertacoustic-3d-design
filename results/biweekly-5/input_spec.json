@@ -1,5 +1,5 @@
 {
-  "status": "preliminary_fail",
+  "status": "preliminary_pass",
   "external_temperature_C": 150.0,
   "initial_temperature_C": 25.0,
   "external_pressure_MPa": 68.9476,
@@ -11,20 +11,13 @@
   "derived_OD_mm": [
     65,
     70,
-    75,
     80,
-    90,
     100,
-    110,
     120,
-    130,
     140,
-    145,
     146,
-    147,
-    148,
-    149,
-    150
+    150,
+    200
   ],
   "durations_h": [
     1
@@ -109,23 +102,26 @@
     }
   },
   "selected_geometry": {
-    "od_mm": 146.0,
+    "od_mm": 200.0,
     "fit": true,
     "clear_id_mm": 41,
-    "inconel_wall_mm": 12.5,
-    "aerogel_mm": 38.0,
+    "inconel_wall_mm": 35.0,
+    "endcap_thickness_mm": 50.0,
+    "aerogel_mm": 42.5,
     "peek_mm": 2.0,
-    "max_von_mises_MPa": 381.35919509764705,
-    "yield_safety_factor": 2.622199786592139,
-    "elastic_buckling_pressure_MPa": 145.6890515272446,
-    "buckling_factor": 2.113040214992902,
-    "selection_note": "Radial-screen candidate; closed 3D validation governs final status.",
+    "front_axial_insulation_mm": 50.0,
+    "rear_axial_insulation_mm": 71.0,
+    "housing_length_mm": 425.0,
+    "max_von_mises_MPa": 206.78917101287607,
+    "yield_safety_factor": 4.835843168681852,
+    "elastic_buckling_pressure_MPa": 1244.1409658230477,
+    "buckling_factor": 18.0447320258145,
+    "selection_note": "Revised 200 mm concept; closed 3D validation governs final status.",
     "radial_thermal_screen": "PASS",
     "analytical_structural_screen": "PASS",
-    "thermal_screen": "FAIL",
-    "structural_screen": "FAIL",
-    "engineering_status": "FAIL",
-    "reason": "Closed 3D thermal/structural validation failed."
+    "thermal_screen": "PASS",
+    "structural_screen": "PASS",
+    "engineering_status": "PASS"
   },
   "thread_screen": {
     "nominal_thread": "7/16-20 UNF-2A concept",

@@ -1,6 +1,6 @@
 # Biweekly 5 Working Context
 
-**Status:** Preliminary package executed; closed 3D validation status is FAIL
+**Status:** Preliminary package executed; screening status is PASS
 **Reporting deadline:** 30 July 2026
 **Scope:** AI context for the Biweekly 5 milestone
 
@@ -21,10 +21,10 @@ Prepare an evidence-based 3D casing concept that can connect to the HTI-02-DHPC/
 - `results/biweekly-5/` contains the Indonesian Markdown report, final presentation/analysis STEP files, figures, tabular results, run inputs, and solver summaries.
 - The reference design uses a nominal 7/16-20 UNF-2A male adapter, a separate pressure-seal area, three provisional conductors, and axial electronics envelopes.
 - A 41 mm clear internal diameter is required by the provisional PCM1808 envelope and 1.5 mm clearance. The 43 mm and 50 mm OD candidates fail the resulting fit screen.
-- The smallest radial-screen candidate is 146 mm OD: 12.5 mm Inconel 718, 38 mm sealed aerogel, 2 mm PEEK, 41 mm clear ID, and 255 mm housing length.
-- The closed 3D one-hour/1 W thermal model includes both endcaps and available axial aerogel buffers. The 140.434 C maximum occurs on the cavity boundary in the analog front-end zone beside the 6 mm front buffer; the PCM1808 and STM32F411 zone boundaries reach 92.02 C and 71.77 C. Boards are not modeled as solids, so these are screening boundary temperatures rather than chip junction temperatures. Radial aerogel cools the middle of the housing, but the short axial paths still fail the electronics limits.
-- The closed-vessel structural FEA applies 10,000 psi to the barrel and both endcaps. The fine result is 778.05 MPa, 3.297 mm displacement, and buckling factor 0.881; all fail acceptance and medium-to-fine changes remain above 5%.
-- The detailed CAD now includes a rear pressure endcap and front/rear axial aerogel buffers. Seal grooves, contacts, thread tolerances, and pressure retention remain conceptual.
+- The revised thermal-priority concept is 200 mm OD and 425 mm long: 35 mm Inconel 718 barrel, 50 mm endcaps, 42.5 mm sealed radial aerogel, 2 mm PEEK, 41 mm clear ID, and 50/71 mm front/rear axial aerogel buffers.
+- The closed 3D one-hour/1 W thermal model includes both endcaps and axial buffers. The fine maximum electronics-boundary temperature is 62.8849 C and thermal medium-to-fine change is 1.1799%, so the stated 70 C screening limit passes. Boards are not modeled as solids, so these remain cavity-boundary rather than chip-junction temperatures.
+- The simplified structural scope uses Lamé/yield and long-cylinder buckling calculations plus three static pressure meshes at 10,000 psi. Fine static stress is 212.51 MPa, displacement is 0.785 mm, analytical yield FoS is 4.84, and analytical buckling factor is 18.04. This is preliminary screening, not eigenvalue-buckling convergence or pressure-vessel certification.
+- The detailed CAD now includes the longer housing, separate 50 mm endcaps, relocated electronics, and front/rear axial aerogel buffers. Seal grooves, contacts, thread tolerances, and certified pressure retention remain conceptual.
 - Gmsh fragment-to-material mapping and solver success detection now fail closed; stale FRD files and CalculiX fatal text cannot be reported as successful reruns.
 - The thermal workflow previously divided conductivity by 1,000. That unit error was fixed; the old near-25 C result is invalid and must not be cited.
 - The user excluded vacuum insulation and added thermal-mass blocks because the tool must be made with conventional CNC and assembly capability at the UGM Geophysics Laboratory.
@@ -43,7 +43,7 @@ Prepare an evidence-based 3D casing concept that can connect to the HTI-02-DHPC/
 1. Obtain the supplier-controlled HTI drawing, pinout, preamplifier mode, cable, and endcap configuration.
 2. Measure the purchased boards and confirm maximum tool OD/length.
 3. Select exact Inconel heat treatment, aerogel/PEEK grades, seal system, and well-fluid/sour-service requirements.
-4. Redesign the end closures and axial thermal path before seeking a passing OD; increasing radial aerogel alone is not sufficient.
+4. Physically validate the thermal stack and pressure hardware before treating preliminary screening as a manufacturing design.
 
 ## Package Acceptance Criteria
 

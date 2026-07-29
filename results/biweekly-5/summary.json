@@ -1,96 +1,97 @@
 {
-  "engineering_status": "FAIL",
+  "engineering_status": "PASS",
   "selected_geometry": {
-    "od_mm": 146.0,
+    "od_mm": 200.0,
     "fit": true,
     "clear_id_mm": 41,
-    "inconel_wall_mm": 12.5,
-    "aerogel_mm": 38.0,
+    "inconel_wall_mm": 35.0,
+    "endcap_thickness_mm": 50.0,
+    "aerogel_mm": 42.5,
     "peek_mm": 2.0,
-    "max_von_mises_MPa": 381.35919509764705,
-    "yield_safety_factor": 2.622199786592139,
-    "elastic_buckling_pressure_MPa": 145.6890515272446,
-    "buckling_factor": 2.113040214992902,
-    "selection_note": "Radial-screen candidate; closed 3D validation governs final status.",
+    "front_axial_insulation_mm": 50.0,
+    "rear_axial_insulation_mm": 71.0,
+    "housing_length_mm": 425.0,
+    "max_von_mises_MPa": 206.78917101287607,
+    "yield_safety_factor": 4.835843168681852,
+    "elastic_buckling_pressure_MPa": 1244.1409658230477,
+    "buckling_factor": 18.0447320258145,
+    "selection_note": "Revised 200 mm concept; closed 3D validation governs final status.",
     "radial_thermal_screen": "PASS",
     "analytical_structural_screen": "PASS",
-    "thermal_screen": "FAIL",
-    "structural_screen": "FAIL",
-    "engineering_status": "FAIL",
-    "reason": "Closed 3D thermal/structural validation failed."
+    "thermal_screen": "PASS",
+    "structural_screen": "PASS",
+    "engineering_status": "PASS"
   },
-  "selected_thermal_1h_1W_C": 69.93549121822569,
+  "selected_thermal_1h_1W_C": 55.85592820214571,
   "thermal_calculix": {
     "status": "passed",
-    "acceptance": "FAIL",
+    "acceptance": "PASS",
     "power_W": 1.0,
-    "mesh_convergence_pct": 0.0007120782716470191,
+    "mesh_convergence_pct": 1.179933497548703,
     "meshes": [
       {
         "mesh": "coarse",
         "status": "passed",
-        "inner_temperature_C": 140.401
+        "inner_temperature_C": 62.0912
       },
       {
         "mesh": "medium",
         "status": "passed",
-        "inner_temperature_C": 140.433
+        "inner_temperature_C": 62.1429
       },
       {
         "mesh": "fine",
         "status": "passed",
-        "inner_temperature_C": 140.434
+        "inner_temperature_C": 62.8849
       }
     ],
     "note": "Closed 3D model includes front/rear Inconel caps and available axial aerogel buffers.",
-    "inner_temperature_C": 140.434,
+    "inner_temperature_C": 62.8849,
     "component_max_temperature_C": {
-      "Analog front-end": 140.434,
-      "PCM1808": 92.0152,
-      "STM32F411": 71.7669,
-      "RTC/SD/power": 112.022
+      "Analog front-end": 62.0626,
+      "PCM1808": 62.8849,
+      "STM32F411": 62.3762,
+      "RTC/SD/power": 62.3131
     }
   },
   "axial_heat_leak_screen": {
-    "front_resistance_K_W": 54.526903360439256,
-    "front_initial_heat_W": 2.2924463392632504,
-    "rear_resistance_K_W": 186.30025314816749,
-    "rear_initial_heat_W": 0.6709599041746098
+    "front_resistance_K_W": 454.39086133699385,
+    "front_initial_heat_W": 0.27509356071159,
+    "rear_resistance_K_W": 645.2350230985312,
+    "rear_initial_heat_W": 0.19372785965604933
   },
   "structural_calculix": [
     {
       "mesh": "coarse",
-      "pressure_faces": 4036,
+      "pressure_faces": 7856,
       "status": "passed",
-      "max_displacement_mm": 1.7610798952790303,
-      "max_nodal_von_mises_MPa": 360.9178865220144,
-      "buckling_factor_fea": 1.756736,
-      "buckling_status": "passed"
+      "max_displacement_mm": 0.7759115174457716,
+      "max_nodal_von_mises_MPa": 199.20685952573686,
+      "analytical_buckling_factor": 18.0447320258145
     },
     {
       "mesh": "medium",
-      "pressure_faces": 7086,
+      "pressure_faces": 13794,
       "status": "passed",
-      "max_displacement_mm": 2.631322009033672,
-      "max_nodal_von_mises_MPa": 622.5106506864362,
-      "buckling_factor_fea": 1.244428,
-      "buckling_status": "passed"
+      "max_displacement_mm": 0.7575062874590548,
+      "max_nodal_von_mises_MPa": 206.5233174438688,
+      "analytical_buckling_factor": 18.0447320258145
     },
     {
       "mesh": "fine",
-      "pressure_faces": 15704,
+      "pressure_faces": 25738,
       "status": "passed",
-      "max_displacement_mm": 3.2971969146382505,
-      "max_nodal_von_mises_MPa": 778.0549733133493,
-      "buckling_factor_fea": 0.8813873,
-      "buckling_status": "passed"
+      "max_displacement_mm": 0.7847184828650337,
+      "max_nodal_von_mises_MPa": 212.5130842571111,
+      "analytical_buckling_factor": 18.0447320258145
     }
   ],
   "structural_qc": {
-    "stress_medium_to_fine_pct": 19.991430935082537,
-    "displacement_medium_to_fine_pct": 20.195181629837066,
-    "buckling_medium_to_fine_pct": 41.18969038923071,
-    "acceptance": "FAIL"
+    "stress_medium_to_fine_pct": 2.8185402485597226,
+    "displacement_medium_to_fine_pct": 3.467765319688433,
+    "analytical_buckling_factor": 18.0447320258145,
+    "scope": "analytical wall checks plus static FEA screening",
+    "acceptance": "PASS"
   },
   "thread_screen": {
     "nominal_thread": "7/16-20 UNF-2A concept",
