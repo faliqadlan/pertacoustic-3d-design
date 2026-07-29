@@ -92,6 +92,8 @@ Simulasi termal 3D casing tertutup memperhitungkan barrel, endcap Inconel depan/
 
 Perbedaan model radial dan model 3D tertutup berasal dari panas yang juga masuk melalui endcap. Menambah diameter dan aerogel radial memperlambat panas dari sisi barrel, tetapi tidak memperpanjang jalur panas dari depan atau belakang. Karena itu, desain ini juga memindahkan elektronik dan menambah insulasi aksial.
 
+![Studi trade-off termal radial](figures/thermal_tradeoff.png)
+
 **Thermal resistance** dalam K/W menyatakan kenaikan beda temperatur yang dibutuhkan untuk mengalirkan satu watt panas; angka lebih besar berarti insulasi lebih baik. Perkiraan resistansi aksial depan adalah 454.4 K/W dan belakang 645.2 K/W. **Axial heat leak** adalah panas yang merambat dari endcap menuju elektronik melalui jalur tersebut; perkiraan awalnya 0.28 W dari depan dan 0.19 W dari belakang.
 
 Angka **0,0007%** pada model lama berarti hasil mesh medium dan fine hanya berbeda sekitar tujuh bagian per sejuta. Itu menunjukkan hasil mesh termal lama sudah stabil, tetapi tidak berarti temperaturnya memenuhi batas. Nilai desain baru yang dipakai untuk status adalah 1.1799%.

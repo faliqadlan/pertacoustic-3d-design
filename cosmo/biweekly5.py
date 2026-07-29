@@ -653,7 +653,7 @@ def plot_thermal(rows: list[dict], selected: dict, selected_run: dict) -> None:
     fig.savefig(FIG_DIR / "thermal_history.png", dpi=180)
     plt.close(fig)
 
-    plotted_ods = {60, 80, 100, 120, 140, 145, 150}
+    plotted_ods = {60, 80, 100, 120, 140, 150, 200}
     one_hour = [
         r
         for r in rows
@@ -661,15 +661,39 @@ def plot_thermal(rows: list[dict], selected: dict, selected_run: dict) -> None:
         and r["power_W"] == 1.0
         and int(r["od_mm"]) in plotted_ods
     ]
-    fig, ax = plt.subplots(figsize=(8, 4.5))
-    ax.bar([str(int(r["od_mm"])) for r in one_hour], [r["inner_temperature_C"] for r in one_hour], color="#4472c4")
-    ax.axhline(70, color="orange", linestyle="--")
-    ax.set_xlabel("Outer diameter (mm)")
-    ax.set_ylabel("Temperature after 1 h (°C)")
-    ax.set_title("Thermal trade study at 150°C and 1 W")
+    one_hour.sort(key=lambda r: r["od_mm"])
+    fig, ax = plt.subplots(figsize=(9, 5), dpi=200)
+    colors = ["#e05638" if r["inner_temperature_C"] > 70 else "#2d8a3c" if r["od_mm"] == 200 else "#4472c4" for r in one_hour]
+    bars = ax.bar(
+        [f"{int(r['od_mm'])}" for r in one_hour],
+        [r["inner_temperature_C"] for r in one_hour],
+        color=colors,
+        edgecolor="black",
+        linewidth=0.8,
+    )
+    ax.axhline(70, color="orange", linestyle="--", linewidth=1.5, label="Screening Limit 70°C")
+    ax.set_xlabel("Outer Diameter (mm)", fontsize=10, labelpad=6)
+    ax.set_ylabel("Inner Temperature after 1 h (°C)", fontsize=10, labelpad=6)
+    ax.set_title("Radial Thermal Trade Study at 150°C Outer Temp & 1 W Internal Power", fontsize=11, fontweight="bold", pad=10)
+    ax.grid(axis="y", alpha=0.3)
+    for bar, r in zip(bars, one_hour):
+        height = bar.get_height()
+        label = f"{height:.1f}°C\n(Selected)" if r["od_mm"] == 200 else f"{height:.1f}°C"
+        ax.annotate(
+            label,
+            xy=(bar.get_x() + bar.get_width() / 2, height),
+            xytext=(0, 3),
+            textcoords="offset points",
+            ha="center",
+            va="bottom",
+            fontsize=8,
+            fontweight="bold" if r["od_mm"] == 200 else "normal",
+        )
+    ax.legend(loc="upper right", fontsize=9)
     fig.tight_layout()
-    fig.savefig(FIG_DIR / "thermal_tradeoff.png", dpi=180)
+    fig.savefig(FIG_DIR / "thermal_tradeoff.png", dpi=200)
     plt.close(fig)
+
 
 
 def run_calculix_thermal(selected: dict) -> dict:
