@@ -7,90 +7,49 @@
     "poisson_ratio": 0.28,
     "yield_strength_mpa_150c_screening": 1000,
     "thermal_expansion_per_c": 0.000013,
-    "notes": "Inconel 718 screening values near 150C. Strength depends on product form and heat treatment; 1000 MPa is a conservative study value, not a procurement specification.",
-    "standard": "NACE MR0175 / ISO 15156-3, ASTM B637, AMS 5662/5663",
-    "datasheet_url": "https://www.specialmetals.com/documents/technical-bulletins/inconel/inconel-alloy-718.pdf",
-    "used_by": ["Sitan (SS3100 series)", "GoWell (Pegasus sour-service tools)", "Schlumberger", "Halliburton"],
-    "justification": "Pre-qualified under NACE MR0175/ISO 15156-3 Annex for CRA use in sour environments. Non-magnetic, maintains yield strength at 150C, immune to SSC/HIC in H2S up to 25%."
+    "notes": "Screening values near 150 C. Strength depends on product form and heat treatment.",
+    "datasheet_url": "https://www.specialmetals.com/documents/technical-bulletins/inconel/inconel-alloy-718.pdf"
   },
   "SS316": {
     "density": 7990,
     "conductivity": 16.2,
     "specific_heat": 500,
-    "notes": "Stainless Steel 316L (UNS S31603). Budget structural casing for mild environments only.",
-    "standard": "NACE MR0175 / ISO 15156-3 (limited to low H2S partial pressure, solution annealed, max 22 HRC)",
-    "datasheet_url": "https://www.azom.com/article.aspx?ArticleID=863",
-    "used_by": ["GoWell (standard-service tools)", "General oilfield equipment"],
-    "justification": "Conditionally compliant under NACE MR0175 only when solution-annealed and hardness-controlled. NOT recommended for >3% H2S environments."
+    "notes": "Generic 316L screening properties; exact product-form data are required before use.",
+    "datasheet_url": "https://www.azom.com/article.aspx?ArticleID=863"
   },
   "Titanium": {
     "density": 4430,
     "conductivity": 6.7,
     "specific_heat": 526,
-    "notes": "Titanium alloy Ti-6Al-4V (UNS R56400, Grade 5). Lightweight, high strength-to-weight, non-magnetic.",
-    "standard": "NACE MR0175 / ISO 15156-3, ASTM B265, AMS 4928",
-    "datasheet_url": "https://www.azom.com/article.aspx?ArticleID=1547",
-    "used_by": ["Well Sun (density logging tools)", "Sitan (selected models)", "Baker Hughes"],
-    "justification": "Listed in NACE MR0175/ISO 15156-3 for sour service. Preferred for acoustic tools due to favorable acoustic impedance and lightweight construction."
+    "notes": "Generic Ti-6Al-4V screening properties; exact product-form data are required before use.",
+    "datasheet_url": "https://www.azom.com/article.aspx?ArticleID=1547"
   },
   "PEEK": {
     "density": 1300,
     "conductivity": 0.29,
     "specific_heat": 1500,
-    "notes": "Victrex PEEK 450G density and conductivity with a 1500 J/kg.K screening heat-capacity assumption. Exact temperature-dependent Cp requires a grade-specific source before final design.",
-    "standard": "ISO 1183 (density), ISO 22007-4 (thermal conductivity). No NACE requirement (non-metallic).",
-    "datasheet_url": "https://www.victrex.com/en/products/polymers/peek-polymer",
-    "used_by": ["Sitan (internal electronics modules)", "GoWell (sensor housings)", "Well Sun (electrical connectors)", "Schlumberger", "Halliburton"],
-    "justification": "De facto industry standard thermoplastic for downhole electronics. Continuous service temperature 260C, excellent chemical resistance to drilling fluids, electrical isolation properties."
+    "notes": "Victrex 450G density and conductivity with an unverified screening heat-capacity assumption.",
+    "datasheet_url": "https://images.victrex.com/-/media/downloads/datasheets/victrex_tds_450g.pdf"
   },
   "Microporous": {
     "density": 240,
     "conductivity": 0.021,
     "specific_heat": 900,
-    "notes": "Microporous insulation (Promat Microtherm 1000R). Industry standard for space-constrained high-temp thermal barriers in downhole tools.",
-    "standard": "EN 14303 (thermal insulation products), manufacturer TDS",
-    "datasheet_url": "https://www.promat.com/en/industry/solutions-by-market/oil-gas/",
-    "used_by": ["Downhole thermal flask designs", "Schlumberger HPHT tools", "General oilfield thermal management"],
-    "justification": "Thermal conductivity 4x lower than conventional insulation at equivalent thickness. Rigid panel form ideal for annular gaps in cylindrical tool housings."
+    "notes": "Generic screening values; not selected for Biweekly 5.",
+    "datasheet_url": "https://www.promat.com/en/industry/solutions-by-market/oil-gas/"
   },
   "Aerogel": {
-    "density": 150,
-    "conductivity": 0.02,
+    "density": 200,
+    "conductivity": 0.024,
     "specific_heat": 1000,
-    "notes": "Representative silica-aerogel blanket screening value. Use the purchased grade's temperature-dependent TDS before final design.",
-    "standard": "ASTM C1728 (aerogel blanket insulation)",
-    "datasheet_url": "https://www.aerogel.com/products-and-solutions/pyrogel-hps/",
-    "used_by": ["Subsea pipeline insulation", "HPHT well completions", "Specialized downhole thermal flasks"],
-    "justification": "Lowest thermal conductivity of any commercially available solid insulation. Hydrophobic. Flexible blanket form conforms to complex geometries."
+    "notes": "Pyrogel HPS nominal density and conductivity at 100 C mean temperature. Specific heat remains an explicit screening assumption.",
+    "datasheet_url": "https://www.aerogel.com/wp-content/uploads/2021/06/Pyrogel-HPS-Datasheet-English.pdf"
   },
   "PTFE": {
     "density": 2200,
     "conductivity": 0.25,
     "specific_heat": 1050,
-    "notes": "Polytetrafluoroethylene (Teflon, DuPont). Chemically inert, easy to machine. Good thermal insulation.",
-    "standard": "ASTM D4894 / D4895 (PTFE molding and extrusion materials)",
-    "datasheet_url": "https://www.azom.com/article.aspx?ArticleID=1277",
-    "used_by": ["General oilfield seals and gaskets", "Backup rings in downhole tools"],
-    "justification": "Universally used in oilfield for seals due to extreme chemical inertness. Service temperature up to 260C. Poor acoustic coupling limits use in acoustic tool designs."
-  },
-  "Vacuum_Gap": {
-    "density": 0.001,
-    "conductivity": 0.005,
-    "specific_heat": 1000,
-    "notes": "Approximated vacuum gap for Dewar flask (effective conductivity accounts for thermal radiation).",
-    "standard": "Industry standard for HPHT thermal flasks",
-    "datasheet_url": "N/A",
-    "used_by": ["All HPHT logging tools"],
-    "justification": "Primary thermal barrier for >150C environments."
-  },
-  "Thermal_Mass_CuBe": {
-    "density": 8250,
-    "conductivity": 130,
-    "specific_heat": 420,
-    "notes": "Copper-Beryllium alloy. High thermal mass buffer to absorb heat leakage.",
-    "standard": "UNS C17200",
-    "datasheet_url": "N/A",
-    "used_by": ["HPHT internal chassis"],
-    "justification": "Provides immense thermal inertia compared to PEEK, delaying internal temperature rise."
+    "notes": "Generic screening values; not selected for Biweekly 5.",
+    "datasheet_url": "https://www.azom.com/article.aspx?ArticleID=1277"
   }
 }

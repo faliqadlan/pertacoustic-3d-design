@@ -1,15 +1,22 @@
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from cosmo.biweekly5 import (
+    MATERIALS,
+    HOUSING_LENGTH_MM,
     REQUIRED_CLEAR_ID_MM,
+    _parse_buckling_factor,
     choose_wall,
     lame_screen,
+    pressure_vessel_solid,
+    run_screening_matrix,
     thermal_simulation,
     thread_retention_screen,
 )
+from cosmo.core.result_extractor import extract_max_internal_temperature
 from cosmo.core.solver_interface import setup_and_run_calculix
 
 
@@ -33,6 +40,13 @@ class Biweekly5StudyTests(unittest.TestCase):
         self.assertAlmostEqual(thread["pitch_mm"], 1.27, places=6)
         self.assertAlmostEqual(thread["engagement_mm"], 10.16, places=6)
 
+    def test_minimum_integer_od_for_one_hour_conditional_target(self):
+        at_145 = thermal_simulation(choose_wall(145), 1, 16)["inner_temperature_C"][-1]
+        at_146 = thermal_simulation(choose_wall(146), 1, 16)["inner_temperature_C"][-1]
+        self.assertGreater(at_145, 70)
+        self.assertLessEqual(at_146, 70)
+        self.assertEqual(run_screening_matrix()[2]["od_mm"], 146)
+
     def test_calculix_conductivity_keeps_w_per_mk_numeric_value(self):
         with TemporaryDirectory() as directory:
             inp = Path(directory) / "probe.inp"
@@ -46,6 +60,45 @@ class Biweekly5StudyTests(unittest.TestCase):
                 )
             generated = inp.read_text(encoding="utf-8")
             self.assertIn("*CONDUCTIVITY\n1.470000E+01", generated)
+
+    def test_calculix_fatal_text_is_not_success(self):
+        with TemporaryDirectory() as directory:
+            inp = Path(directory) / "fatal_probe.inp"
+            inp.write_text("*NODE\n1, 10, 0, 0\n", encoding="utf-8")
+            layers = [{"name": "Outer", "material": "Inconel718", "thickness": 1.0}]
+            completed = SimpleNamespace(stdout="*ERROR invalid element set", stderr="", returncode=0)
+            with patch("cosmo.core.solver_interface.subprocess.run", return_value=completed):
+                self.assertFalse(
+                    setup_and_run_calculix(
+                        str(inp), layers, od_mm=20, ccx_path="ccx", time_seconds=60
+                    )
+                )
+
+    def test_pressure_model_is_closed_and_materials_match_library(self):
+        candidate = choose_wall(150)
+        vessel = pressure_vessel_solid(candidate).val()
+        outer = candidate["od_mm"] / 2
+        inner = outer - candidate["inconel_wall_mm"]
+        cap = candidate["inconel_wall_mm"]
+        expected = 3.141592653589793 * (
+            outer**2 * HOUSING_LENGTH_MM - inner**2 * (HOUSING_LENGTH_MM - 2 * cap)
+        )
+        self.assertTrue(vessel.isValid())
+        self.assertAlmostEqual(vessel.Volume(), expected, delta=expected * 1e-6)
+        self.assertEqual(MATERIALS["Aerogel"]["density"], 200)
+        self.assertEqual(MATERIALS["Aerogel"]["conductivity"], 0.024)
+
+    def test_buckling_parser_and_temperature_extractor_fail_closed(self):
+        with TemporaryDirectory() as directory:
+            dat = Path(directory) / "buckling.dat"
+            dat.write_text(" BUCKLING FACTOR = 2.1250E+00\n", encoding="utf-8")
+            self.assertAlmostEqual(_parse_buckling_factor(dat), 2.125)
+        with patch(
+            "cosmo.core.result_extractor.parse_frd_temperatures",
+            return_value=({1: (0.0, 0.0, 0.0)}, [{"time": 3600.0, "temperatures": {1: 42.0}}]),
+        ):
+            with self.assertRaises(ValueError):
+                extract_max_internal_temperature("unused.frd", target_time=3600, r_inner=20.5)
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@
 
 **Periode laporan:** Biweekly 5  
 **Tanggal:** 30 Juli 2026  
-**Status dokumen:** Rekayasa awal, bukan persetujuan manufaktur atau sertifikasi tekanan
+**Status dokumen:** Rekayasa awal — **FAIL**, bukan persetujuan manufaktur atau sertifikasi tekanan
 
 ## Daftar Isi
 
@@ -22,7 +22,7 @@ Laporan Biweekly 4 mencatat kemajuan kumulatif 20%. Pada Biweekly 5 dilakukan pe
 - Dibuat rute tiga konduktor dari feedthrough HTI menuju front-end analog, ADC PCM1808, STM32F411, dan ruang RTC/SD/daya.
 - Stack material dasar ditetapkan sebagai Inconel 718–aerogel tersegel–PEEK.
 - PA12/nylon tidak dipilih sebagai pressure housing; penggunaannya dibatasi untuk carrier, guide kabel, atau strain relief setelah grade material ditentukan.
-- Dilakukan penyaringan OD 43, 50, dan 60 mm serta kandidat turunan. Diperoleh kandidat referensi yang lolos fit dan struktur, tetapi target termal satu jam belum tercapai.
+- Dilakukan penyaringan OD 43, 50, dan 60 mm serta kandidat turunan. Diperoleh kandidat radial untuk diuji, tetapi model tertutup menunjukkan desain belum lolos termal dan struktur.
 
 ## 3. Deskripsi Kemajuan Pelaksanaan Pekerjaan
 
@@ -33,6 +33,8 @@ Mechanical outline pemasok digunakan untuk konsep antarmuka. Dokumen tersebut be
 Envelope sementara komponen adalah 55 × 22 × 12 mm untuk STM32F411 dan 52 × 32 × 18 mm untuk PCM1808. Setelah clearance 1,5 mm, kebutuhan diameter ruang bersih adalah 41 mm. Ukuran ini berasal dari informasi internet dan wajib diperiksa dengan jangka sorong pada komponen yang telah dibeli.
 
 PCM1808 memiliki rentang operasi IC −40 sampai 85°C [2]. Nilai 85°C hanya dipakai sebagai batas penyaringan; target desain tetap 50°C, sedangkan 50–70°C dikategorikan bersyarat.
+
+Desain harus dapat dibuat mandiri di Laboratorium Geofisika UGM menggunakan proses CNC dan perakitan konvensional. Vacuum insulation dan blok massa termal tambahan dikeluarkan dari ruang solusi karena kompleksitas pembuatan dan pengujiannya. Pengguna tidak menetapkan batas maksimum OD untuk studi awal ini.
 
 ### 3.2 Konsep Mekanik, Drat, Seal, dan Kabel
 
@@ -48,7 +50,7 @@ Tiga kabel diberi strain relief sebelum sambungan solder. ADC ditempatkan dekat 
 
 Urutan aksial yang dimodelkan adalah HTI → front-end analog → PCM1808 → STM32F411 → ruang RTC/SD/daya. Aerogel ditempatkan sepenuhnya di dalam pressure housing sehingga tidak menerima tekanan sumur atau kontak langsung dengan fluida.
 
-Inconel 718 dipilih sebagai pressure shell awal. Data modulus dan sifat temperatur berasal dari bulletin Special Metals, tetapi nilai aktual tetap bergantung pada product form dan heat treatment [3]. PEEK 450G dipertahankan sebagai carrier karena kestabilan termal dan isolasi listriknya [4]. Nylon hanya menjadi alternatif carrier setelah grade, creep, penyerapan air, dan stabilitas dimensinya tersedia.
+Inconel 718 dipilih sebagai pressure shell awal. Data modulus dan sifat temperatur berasal dari bulletin Special Metals, tetapi nilai aktual tetap bergantung pada product form dan heat treatment [3]. PEEK 450G dipertahankan sebagai carrier karena kestabilan termal dan isolasi listriknya [4]. Pyrogel HPS dimodelkan dengan densitas nominal 200 kg/m³ dan konduktivitas 0,024 W/mK pada mean temperature 100°C [5]; kapasitas panas 1.000 J/kgK tetap merupakan asumsi screening. Nylon hanya menjadi alternatif carrier setelah grade, creep, penyerapan air, dan stabilitas dimensinya tersedia.
 
 ### 3.4 Penyaringan Geometri dan Struktur
 
@@ -57,39 +59,41 @@ Inconel 718 dipilih sebagai pressure shell awal. Data modulus dan sifat temperat
 | 43 | Tidak | - | - | - | Insufficient radial space for 41 mm clear ID, PEEK, pressure wall, and aerogel. |
 | 50 | Tidak | - | - | - | Insufficient radial space for 41 mm clear ID, PEEK, pressure wall, and aerogel. |
 | 60 | Lolos | 5.25 | 2.25 | PASS | Lolos penyaringan geometri/struktur |
+| 146 | Lolos | 12.5 | 38.0 | FAIL | Closed 3D thermal/structural validation failed. |
 
-Kandidat referensi terkecil yang lolos fit dan struktur adalah **OD 60 mm**, dengan Inconel 5.25 mm, aerogel 2.25 mm, PEEK 2.0 mm, dan clear ID 41 mm. Hasil analitik Lamé memberikan tegangan ekuivalen 373.92 MPa dan faktor keamanan luluh 2.67. Penyaringan buckling silinder panjang menghasilkan faktor 2.26. Tidak ada kandidat aerogel padat sampai OD 80 mm yang memenuhi batas 70°C selama satu jam tanpa mengkreditkan massa termal elektronik yang belum terukur. Nilai ini adalah screening konservatif, bukan collapse rating tersertifikasi.
+Kandidat radial terkecil adalah **OD 146 mm**, dengan Inconel 12.5 mm, aerogel 38.0 mm, PEEK 2.0 mm, dan clear ID 41 mm. Hasil analitik Lamé memberikan tegangan ekuivalen 381.36 MPa dan faktor keamanan luluh 2.62. Penyaringan buckling silinder panjang menghasilkan faktor 2.11. Kandidat radial tidak lolos validasi 3D tertutup; status rekayasa akhir milestone ini adalah **FAIL**. Solusi analitik hanya memeriksa dinding silinder; hasil FEA bejana tertutup menjadi keputusan yang mengikat.
 
 Perhitungan konservatif retensi drat menghasilkan faktor keamanan 6.58. Beban tersebut sengaja menganggap pressure thrust bekerja pada diameter drat, walaupun konsep aktual memisahkan drat HTI dari pressure boundary.
 
 ![Perbandingan struktur](figures/structural_comparison.png)
 
-FEA mesh halus menghasilkan tegangan nodal maksimum 433.37 MPa dan perpindahan maksimum 0.0714 mm. Perubahan tegangan mesh medium-ke-fine adalah 2,76%, sedangkan perubahan perpindahan 0,53%. FEA menggunakan segmen shell representatif sepanjang 30 mm dengan tekanan pada permukaan luar dan gradien temperatur; endcap, kontak, dan seal belum dimodelkan. Tegangan nodal lokal dapat mengandung singularitas mesh; keputusan desain menggunakan perbandingan dengan solusi Lamé dan tren mesh, bukan satu puncak nodal saja.
+FEA mesh halus menghasilkan tegangan nodal maksimum 778.05 MPa dan perpindahan maksimum 3.2972 mm, dengan faktor buckling eigenvalue 0.88. Perubahan tegangan mesh medium-ke-fine adalah 19.99%, sedangkan perubahan perpindahan 20.20%. FEA menggunakan bejana tertutup sepanjang 255 mm dengan tekanan pada barrel dan kedua endcap serta gradien temperatur. Kontak, seal, drat, dan imperfection terukur belum dimodelkan. Karena konvergensi belum di bawah 5% dan faktor buckling halus di bawah 2, hasil struktur dikategorikan **FAIL**.
 
 ### 3.5 Analisis Termal
 
 ![Riwayat temperatur](figures/thermal_history.png)
 
-Model radial transient menggunakan temperatur awal 25°C, batas luar 150°C, durasi 1 jam, dan panas internal 0/1/2 W. Kandidat referensi mencapai **153.41°C pada 1 jam dan 1 W**, sehingga dikategorikan **redesign**. Hasil yang dapat melebihi 150°C berasal dari panas internal pada kondisi mendekati tunak; ini bukan kesalahan clipping.
+Model radial transient menggunakan temperatur awal 25°C, batas luar 150°C, durasi 1 jam, dan panas internal 0/1/2 W. Kandidat referensi mencapai **69.94°C pada 1 jam dan 1 W**, sehingga dikategorikan **conditional**. Hasil yang dapat melebihi 150°C berasal dari panas internal pada kondisi mendekati tunak; ini bukan kesalahan clipping.
 
 ![Trade-off termal](figures/thermal_tradeoff.png)
 
-Model 3D CalculiX tanpa panas internal menghasilkan temperatur batas dalam 149.62°C setelah 1 jam. Model radial dan model 3D memiliki idealisasi berbeda; selisihnya dilaporkan dan tidak disembunyikan. Analisis ini belum memodelkan endcap heat bridge, kontak nyata, kabel, toleransi aerogel, atau distribusi daya elektronik terukur.
+Model 3D CalculiX tertutup dengan panas internal 1 W menghasilkan temperatur maksimum ruang elektronik 140.43°C setelah 1 jam dan berstatus **FAIL**. Model 3D mencakup kedua endcap Inconel, buffer aerogel aksial yang tersedia, dan tiga mesh. Analisis belum mencakup kontak nyata, kabel, toleransi kompresi aerogel, atau distribusi daya per komponen.
 
 ### 3.6 Konvergensi dan Keterbatasan
 
-Studi radial menggunakan 12, 24, dan 48 sel total. Seluruh kandidat yang dilaporkan harus memiliki perubahan mesh menengah-ke-halus di bawah 5%. Model struktur CalculiX dijalankan dengan mesh coarse, medium, dan fine. File input, output solver, dan ringkasan disimpan pada folder `simulation/`.
+Studi radial menggunakan 12, 24, dan 48 sel total. Model termal 3D, struktur statik, dan buckling CalculiX masing-masing dijalankan dengan mesh coarse, medium, dan fine. Kriteria perubahan medium-ke-fine adalah di bawah 5%; kegagalan memenuhi kriteria dilaporkan sebagai FAIL, bukan disembunyikan.
 
-Hasil belum mencakup massa termal aktual elektronik, uji kebocoran, fatigue, shock/vibration, respons akustik casing, sour-service qualification, toleransi manufaktur, atau proof pressure. Tidak ada klaim bahwa desain siap diproduksi. Simulasi juga menemukan kesalahan unit pada workflow lama: konduktivitas pernah dibagi 1.000. Kesalahan tersebut telah diperbaiki, sehingga hasil lama yang mendekati 25°C tidak digunakan.
+Hasil belum mencakup kapasitas panas bawaan komponen aktual, uji kebocoran, fatigue, shock/vibration, respons akustik casing, sour-service qualification, toleransi manufaktur, atau proof pressure. Vacuum insulation dan blok massa termal tambahan tidak dipertimbangkan karena tidak sesuai kemampuan pembuatan laboratorium. Tidak ada klaim bahwa desain siap diproduksi. Simulasi juga menemukan kesalahan unit pada workflow lama: konduktivitas pernah dibagi 1.000. Kesalahan tersebut telah diperbaiki, sehingga hasil lama yang mendekati 25°C tidak digunakan.
 
 ## 4. Rencana Pekerjaan Dua Minggu ke Depan
 
 - Ukur dimensi aktual STM32F411 dan PCM1808, termasuk header, jack, mounting hole, dan tinggi konektor.
 - Konfirmasi drawing terkendali, mode preamplifier, pinout, kabel, dan detail endcap kepada HTI.
-- Tentukan batas maksimum OD dan panjang tool dari kebutuhan sumur.
+- Konfirmasi batas OD dan panjang tool terhadap borehole serta fasilitas uji yang sebenarnya.
 - Pilih grade aerogel, PEEK, seal, dan kondisi heat treatment Inconel yang dapat dibeli.
-- Tambahkan massa termal aktual, endcap heat bridge, contact resistance, dan daya elektronik hasil pengukuran ke model termal.
-- Bandingkan aerogel padat terhadap vacuum gap/thermal flask dan thermal-mass buffer karena stack padat saat ini gagal pada satu jam.
+- Ukur daya dan kapasitas panas bawaan komponen, lalu kalibrasi distribusi daya, konduksi kabel, dan contact resistance pada model termal tertutup.
+- Validasi model menggunakan coupon Inconel–aerogel–PEEK sederhana di oven atau hot bath dengan thermocouple.
+- Prioritaskan studi pemindahan ADC/MCU ke zona yang lebih dingin melalui kabel. Jika tidak memungkinkan, pilih elektronik bertemperatur lebih tinggi, perbesar batas OD solid-insulation, atau revisi temperatur/durasi operasi.
 - Lakukan desain groove seal sesuai standar yang dipilih, tolerance stack-up, dan review manufaktur.
 - Siapkan pressure test, leak test, thermal soak, dan pemeriksaan akustik setelah prototipe tersedia.
 
@@ -99,7 +103,8 @@ Hasil belum mencakup massa termal aktual elektronik, uji kebocoran, fatigue, sho
 2. [Texas Instruments, PCM1808](https://www.ti.com/product/PCM1808)
 3. [Special Metals, INCONEL Alloy 718 Technical Bulletin](https://www.specialmetals.com/documents/technical-bulletins/inconel/inconel-alloy-718.pdf)
 4. [Victrex, PEEK 450G Technical Data Sheet](https://images.victrex.com/-/media/downloads/datasheets/victrex_tds_450g.pdf)
-5. HTI-02-DHPC/D Mechanical Outline 02-001-25-00-00, dokumen pemasok, *for reference only*.
+5. [Aspen Aerogels, Pyrogel HPS Product Data Sheet](https://www.aerogel.com/wp-content/uploads/2021/06/Pyrogel-HPS-Datasheet-English.pdf)
+6. HTI-02-DHPC/D Mechanical Outline 02-001-25-00-00, dokumen pemasok, *for reference only*.
 
 ---
 

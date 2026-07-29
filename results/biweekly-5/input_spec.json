@@ -1,5 +1,5 @@
 {
-  "status": "preliminary_engineering_only",
+  "status": "preliminary_fail",
   "external_temperature_C": 150.0,
   "initial_temperature_C": 25.0,
   "external_pressure_MPa": 68.9476,
@@ -12,7 +12,19 @@
     65,
     70,
     75,
-    80
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    145,
+    146,
+    147,
+    148,
+    149,
+    150
   ],
   "durations_h": [
     1
@@ -21,6 +33,11 @@
     0,
     1,
     2
+  ],
+  "manufacturing_constraints": [
+    "Conventional CNC and laboratory assembly at UGM Geophysics Laboratory",
+    "No vacuum insulation",
+    "No added thermal-mass block"
   ],
   "board_clearance_mm": 1.5,
   "required_clear_ID_mm": 41,
@@ -38,45 +55,77 @@
   },
   "materials": {
     "Inconel718": {
-      "density_kg_m3": 8190.0,
-      "conductivity_W_mK": 14.7,
-      "specific_heat_J_kgK": 460.0,
-      "elastic_modulus_MPa_150C": 193000.0,
-      "poisson": 0.28,
-      "yield_MPa_150C_screening": 1000.0,
-      "thermal_expansion_1_K": 1.3e-05,
-      "source": "https://www.specialmetals.com/documents/technical-bulletins/inconel/inconel-alloy-718.pdf",
-      "note": "Conservative screening yield; final value depends on product form and heat treatment."
+      "density": 8190,
+      "conductivity": 14.7,
+      "specific_heat": 460,
+      "elastic_modulus_mpa_150c": 193000,
+      "poisson_ratio": 0.28,
+      "yield_strength_mpa_150c_screening": 1000,
+      "thermal_expansion_per_c": 1.3e-05,
+      "notes": "Screening values near 150 C. Strength depends on product form and heat treatment.",
+      "datasheet_url": "https://www.specialmetals.com/documents/technical-bulletins/inconel/inconel-alloy-718.pdf"
     },
-    "Aerogel": {
-      "density_kg_m3": 150.0,
-      "conductivity_W_mK": 0.02,
-      "specific_heat_J_kgK": 1000.0,
-      "source": "https://www.aerogel.com/products-and-solutions/pyrogel-hps/",
-      "note": "Representative sealed blanket properties; exact purchased grade is required before final design."
+    "SS316": {
+      "density": 7990,
+      "conductivity": 16.2,
+      "specific_heat": 500,
+      "notes": "Generic 316L screening properties; exact product-form data are required before use.",
+      "datasheet_url": "https://www.azom.com/article.aspx?ArticleID=863"
+    },
+    "Titanium": {
+      "density": 4430,
+      "conductivity": 6.7,
+      "specific_heat": 526,
+      "notes": "Generic Ti-6Al-4V screening properties; exact product-form data are required before use.",
+      "datasheet_url": "https://www.azom.com/article.aspx?ArticleID=1547"
     },
     "PEEK": {
-      "density_kg_m3": 1300.0,
-      "conductivity_W_mK": 0.29,
-      "specific_heat_J_kgK": 1500.0,
-      "source": "https://images.victrex.com/-/media/downloads/datasheets/victrex_tds_450g.pdf",
-      "note": "450G density/conductivity with conservative screening heat capacity assumption."
+      "density": 1300,
+      "conductivity": 0.29,
+      "specific_heat": 1500,
+      "notes": "Victrex 450G density and conductivity with an unverified screening heat-capacity assumption.",
+      "datasheet_url": "https://images.victrex.com/-/media/downloads/datasheets/victrex_tds_450g.pdf"
+    },
+    "Microporous": {
+      "density": 240,
+      "conductivity": 0.021,
+      "specific_heat": 900,
+      "notes": "Generic screening values; not selected for Biweekly 5.",
+      "datasheet_url": "https://www.promat.com/en/industry/solutions-by-market/oil-gas/"
+    },
+    "Aerogel": {
+      "density": 200,
+      "conductivity": 0.024,
+      "specific_heat": 1000,
+      "notes": "Pyrogel HPS nominal density and conductivity at 100 C mean temperature. Specific heat remains an explicit screening assumption.",
+      "datasheet_url": "https://www.aerogel.com/wp-content/uploads/2021/06/Pyrogel-HPS-Datasheet-English.pdf"
+    },
+    "PTFE": {
+      "density": 2200,
+      "conductivity": 0.25,
+      "specific_heat": 1050,
+      "notes": "Generic screening values; not selected for Biweekly 5.",
+      "datasheet_url": "https://www.azom.com/article.aspx?ArticleID=1277"
     }
   },
   "selected_geometry": {
-    "od_mm": 60.0,
+    "od_mm": 146.0,
     "fit": true,
     "clear_id_mm": 41,
-    "inconel_wall_mm": 5.25,
-    "aerogel_mm": 2.25,
+    "inconel_wall_mm": 12.5,
+    "aerogel_mm": 38.0,
     "peek_mm": 2.0,
-    "max_von_mises_MPa": 373.9201448452005,
-    "yield_safety_factor": 2.674367812983146,
-    "elastic_buckling_pressure_MPa": 155.51762072788097,
-    "buckling_factor": 2.2555915032268126,
-    "structural_screen": "PASS",
+    "max_von_mises_MPa": 381.35919509764705,
+    "yield_safety_factor": 2.622199786592139,
+    "elastic_buckling_pressure_MPa": 145.6890515272446,
+    "buckling_factor": 2.113040214992902,
+    "selection_note": "Radial-screen candidate; closed 3D validation governs final status.",
+    "radial_thermal_screen": "PASS",
+    "analytical_structural_screen": "PASS",
     "thermal_screen": "FAIL",
-    "selection_note": "Smallest fit/structural reference candidate; no studied solid-aerogel candidate met the one-hour 70C target without crediting unverified electronics thermal mass."
+    "structural_screen": "FAIL",
+    "engineering_status": "FAIL",
+    "reason": "Closed 3D thermal/structural validation failed."
   },
   "thread_screen": {
     "nominal_thread": "7/16-20 UNF-2A concept",

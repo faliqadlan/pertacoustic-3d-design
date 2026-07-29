@@ -40,7 +40,7 @@ def parse_frd_temperatures(frd_file):
             if len(parts) >= 3:
                 try:
                     current_time = float(parts[2])
-                except:
+                except (IndexError, ValueError):
                     pass
             in_temp = True
             in_nodes = False
@@ -59,7 +59,7 @@ def parse_frd_temperatures(frd_file):
                     y = float(line[25:37])
                     z = float(line[37:49])
                     nodes[nid] = (x, y, z)
-            except:
+            except ValueError:
                 pass
                 
         if in_temp:
@@ -70,12 +70,12 @@ def parse_frd_temperatures(frd_file):
                     nid = int(line[3:13])
                     t_val = float(line[13:25])
                     current_temps[nid] = t_val
-            except:
+            except ValueError:
                 pass
                 
     return nodes, steps
 
-def extract_max_internal_temperature(frd_file, target_time=14400, r_inner=12.7):
+def extract_max_internal_temperature(frd_file, target_time=14400, r_inner=12.7, z_bounds=None):
     """
     Finds the maximum temperature on the inner surface at a given time.
     r_inner is the inner radius (25.4 mm / 2).
@@ -83,24 +83,25 @@ def extract_max_internal_temperature(frd_file, target_time=14400, r_inner=12.7):
     nodes, steps = parse_frd_temperatures(frd_file)
     
     if not steps:
-        print("No temperature steps found in FRD file.")
-        return None
+        raise ValueError(f"No temperature steps found in {frd_file}")
         
     # Find the step closest to target_time
     closest_step = min(steps, key=lambda x: abs(x['time'] - target_time))
+    if abs(closest_step['time'] - target_time) > max(1.0, target_time * 0.01):
+        raise ValueError(
+            f"Closest FRD time {closest_step['time']} is not within 1% of {target_time}"
+        )
     
     # Filter nodes that are on the inner boundary (r ~ r_inner)
     inner_nodes = []
     tol = 0.5 # mm tolerance
     for nid, (x, y, z) in nodes.items():
         r = (x**2 + y**2)**0.5
-        if abs(r - r_inner) < tol:
+        if abs(r - r_inner) < tol and (z_bounds is None or z_bounds[0] <= z <= z_bounds[1]):
             inner_nodes.append(nid)
             
     if not inner_nodes:
-        print("Could not identify any nodes on the inner boundary.")
-        # Fallback: just return the max temp of all nodes to avoid failing
-        inner_nodes = list(nodes.keys())
+        raise ValueError(f"No nodes found at requested inner radius {r_inner} mm")
         
     max_t = -999.0
     temps = closest_step['temperatures']
@@ -109,4 +110,6 @@ def extract_max_internal_temperature(frd_file, target_time=14400, r_inner=12.7):
             if temps[nid] > max_t:
                 max_t = temps[nid]
                 
+    if max_t == -999.0:
+        raise ValueError("Inner-boundary nodes have no temperatures in the selected FRD step")
     return max_t

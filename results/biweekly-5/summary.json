@@ -1,50 +1,85 @@
 {
+  "engineering_status": "FAIL",
   "selected_geometry": {
-    "od_mm": 60.0,
+    "od_mm": 146.0,
     "fit": true,
     "clear_id_mm": 41,
-    "inconel_wall_mm": 5.25,
-    "aerogel_mm": 2.25,
+    "inconel_wall_mm": 12.5,
+    "aerogel_mm": 38.0,
     "peek_mm": 2.0,
-    "max_von_mises_MPa": 373.9201448452005,
-    "yield_safety_factor": 2.674367812983146,
-    "elastic_buckling_pressure_MPa": 155.51762072788097,
-    "buckling_factor": 2.2555915032268126,
-    "structural_screen": "PASS",
+    "max_von_mises_MPa": 381.35919509764705,
+    "yield_safety_factor": 2.622199786592139,
+    "elastic_buckling_pressure_MPa": 145.6890515272446,
+    "buckling_factor": 2.113040214992902,
+    "selection_note": "Radial-screen candidate; closed 3D validation governs final status.",
+    "radial_thermal_screen": "PASS",
+    "analytical_structural_screen": "PASS",
     "thermal_screen": "FAIL",
-    "selection_note": "Smallest fit/structural reference candidate; no studied solid-aerogel candidate met the one-hour 70C target without crediting unverified electronics thermal mass."
+    "structural_screen": "FAIL",
+    "engineering_status": "FAIL",
+    "reason": "Closed 3D thermal/structural validation failed."
   },
-  "selected_thermal_1h_1W_C": 153.4087423492498,
+  "selected_thermal_1h_1W_C": 69.93549121822569,
   "thermal_calculix": {
     "status": "passed",
-    "job": "results\\biweekly-5\\simulation\\calculix_thermal\\selected_thermal.inp",
-    "power_W": 0.0,
-    "note": "3D CalculiX comparison uses zero internal heat and a representative 30 mm axial segment.",
-    "inner_temperature_C": 149.624
+    "acceptance": "FAIL",
+    "power_W": 1.0,
+    "mesh_convergence_pct": 0.0007120782716470191,
+    "meshes": [
+      {
+        "mesh": "coarse",
+        "status": "passed",
+        "inner_temperature_C": 140.401
+      },
+      {
+        "mesh": "medium",
+        "status": "passed",
+        "inner_temperature_C": 140.433
+      },
+      {
+        "mesh": "fine",
+        "status": "passed",
+        "inner_temperature_C": 140.434
+      }
+    ],
+    "note": "Closed 3D model includes front/rear Inconel caps and available axial aerogel buffers.",
+    "inner_temperature_C": 140.434
   },
   "structural_calculix": [
     {
       "mesh": "coarse",
-      "pressure_faces": 880,
+      "pressure_faces": 4036,
       "status": "passed",
-      "max_displacement_mm": 0.07087085887006025,
-      "max_nodal_von_mises_MPa": 406.79264026678266
+      "max_displacement_mm": 1.7610798952790303,
+      "max_nodal_von_mises_MPa": 360.9178865220144,
+      "buckling_factor_fea": 1.756736,
+      "buckling_status": "passed"
     },
     {
       "mesh": "medium",
-      "pressure_faces": 1516,
+      "pressure_faces": 7086,
       "status": "passed",
-      "max_displacement_mm": 0.07101813878904459,
-      "max_nodal_von_mises_MPa": 445.3474236610975
+      "max_displacement_mm": 2.631322009033672,
+      "max_nodal_von_mises_MPa": 622.5106506864362,
+      "buckling_factor_fea": 1.244428,
+      "buckling_status": "passed"
     },
     {
       "mesh": "fine",
-      "pressure_faces": 3414,
+      "pressure_faces": 15704,
       "status": "passed",
-      "max_displacement_mm": 0.0713957985784878,
-      "max_nodal_von_mises_MPa": 433.36928562006966
+      "max_displacement_mm": 3.2971969146382505,
+      "max_nodal_von_mises_MPa": 778.0549733133493,
+      "buckling_factor_fea": 0.8813873,
+      "buckling_status": "passed"
     }
   ],
+  "structural_qc": {
+    "stress_medium_to_fine_pct": 19.991430935082537,
+    "displacement_medium_to_fine_pct": 20.195181629837066,
+    "buckling_medium_to_fine_pct": 41.18969038923071,
+    "acceptance": "FAIL"
+  },
   "thread_screen": {
     "nominal_thread": "7/16-20 UNF-2A concept",
     "pitch_mm": 1.27,
@@ -58,5 +93,10 @@
     "Supplier-controlled HTI dimensions and preamplifier mode are not confirmed.",
     "Board envelopes are internet-derived and not physically measured.",
     "No seal, collapse, fatigue, acoustic, corrosion, or manufacturing qualification is claimed."
+  ],
+  "manufacturing_constraints": [
+    "UGM Geophysics Laboratory conventional CNC and assembly",
+    "Vacuum insulation excluded",
+    "Added thermal-mass block excluded"
   ]
 }

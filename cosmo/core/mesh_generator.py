@@ -1,5 +1,6 @@
 import gmsh
 import os
+from pathlib import Path
 
 def generate_mesh(
     step_file,
@@ -20,65 +21,50 @@ def generate_mesh(
     """
     
     gmsh.initialize()
-    gmsh.option.setNumber("General.Terminal", 1)
-    
-    # We want second-order tetrahedral elements for better thermal/stress accuracy
-    gmsh.option.setNumber("Mesh.ElementOrder", element_order)
-    # High quality mesh optimization
-    gmsh.option.setNumber("Mesh.Optimize", 1)
-    gmsh.option.setNumber("Mesh.OptimizeNetgen", 1)
-    # Save node sets for boundary conditions
-    gmsh.option.setNumber("Mesh.SaveGroupsOfNodes", 1)
-    
-    # Load STEP
-    vols = gmsh.model.occ.importShapes(step_file)
-    
-    # Fragment all volumes to ensure conformal meshes at the interfaces
-    # This guarantees that nodes align perfectly across layer boundaries
-    gmsh.model.occ.fragment(vols, [])
-    gmsh.model.occ.synchronize()
-    
-    # Get all the resulting volumes
-    # The order of volumes in gmsh might change after fragment. 
-    # For a concentric cylinder starting from OD to ID, we can sort volumes by their center of mass or max radius.
-    # A robust way is to compute the bounding box or center of mass for each volume.
-    
-    volume_tags = gmsh.model.getEntities(3)
-    
-    # Sort volumes from outermost to innermost based on their maximum X coordinate (which is radius if centered at 0,0)
-    def get_max_r(tag):
-        bounds = gmsh.model.getBoundingBox(3, tag[1])
-        # bounds = (xmin, ymin, zmin, xmax, ymax, zmax)
-        return bounds[3] # xmax is the outer radius
-        
-    sorted_vols = sorted(volume_tags, key=get_max_r, reverse=True)
-    
-    if len(sorted_vols) != len(layers):
-        print(f"Warning: Number of meshed volumes ({len(sorted_vols)}) != number of layers ({len(layers)})")
-    
-    # Assign physical groups for materials
-    for i, (dim, tag) in enumerate(sorted_vols):
-        if i < len(layers):
+    try:
+        gmsh.option.setNumber("General.Terminal", 1)
+        gmsh.option.setNumber("Mesh.ElementOrder", element_order)
+        gmsh.option.setNumber("Mesh.Optimize", 1)
+        gmsh.option.setNumber("Mesh.OptimizeNetgen", 1)
+        gmsh.option.setNumber("Mesh.SaveGroupsOfNodes", 1)
+        gmsh.option.setNumber("Mesh.SaveAll", 0)
+
+        vols = gmsh.model.occ.importShapes(step_file)
+        if len(vols) != len(layers):
+            raise ValueError(f"STEP solids ({len(vols)}) do not match layers ({len(layers)})")
+        if len(vols) == 1:
+            fragment_map = [vols]
+        else:
+            _, fragment_map = gmsh.model.occ.fragment(vols, [])
+        gmsh.model.occ.synchronize()
+        volume_rank = {
+            tag: index + 1
+            for index, (_, tag) in enumerate(sorted(gmsh.model.getEntities(3)))
+        }
+        exported_sets = {}
+        for i, mapped in enumerate(fragment_map):
             layer_name = layers[i].get('name', f'Layer_{i}')
-            # We must use Physical Groups to export sets to .inp
-            pg_tag = gmsh.model.addPhysicalGroup(3, [tag], name=layer_name)
-            
-    # Assign physical groups for boundary conditions
-    # We will NOT create a 2D physical group in Gmsh because Gmsh will export 2D plane stress elements
-    # which crashes CalculiX. Instead, solver_interface.py will find the outer nodes and create a *NSET.
-        
-    # Generate 3D Mesh
-    # Set a characteristic length (mesh size). 
-    # Since casing thickness is ~1-5mm, mesh size should be ~1mm to get elements across the thickness.
-    gmsh.option.setNumber("Mesh.MeshSizeMax", mesh_size_max)
-    gmsh.option.setNumber("Mesh.MeshSizeMin", mesh_size_min)
-    
-    gmsh.model.mesh.generate(3)
-    
-    # Save as Abaqus INP format (which CalculiX reads)
-    gmsh.write(output_inp_file)
-    
-    gmsh.finalize()
+            tags = sorted({tag for dim, tag in mapped if dim == 3})
+            if not tags:
+                raise ValueError(f"No meshed volume remains for layer {layer_name}")
+            group = gmsh.model.addPhysicalGroup(3, tags)
+            gmsh.model.setPhysicalName(3, group, layer_name)
+            exported_sets[layer_name] = tags
+
+        gmsh.option.setNumber("Mesh.MeshSizeMax", mesh_size_max)
+        gmsh.option.setNumber("Mesh.MeshSizeMin", mesh_size_min)
+        gmsh.model.mesh.generate(3)
+        gmsh.write(output_inp_file)
+        path = Path(output_inp_file)
+        inp = path.read_text(encoding="utf-8")
+        for layer_name, tags in exported_sets.items():
+            for tag in tags:
+                inp = inp.replace(
+                    f"ELSET=Volume{volume_rank[tag]}", f"ELSET={layer_name}"
+                )
+        path.write_text(inp, encoding="utf-8")
+    finally:
+        gmsh.finalize()
     print(f"Mesh generated and saved to {output_inp_file}")
 
 if __name__ == "__main__":

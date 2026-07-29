@@ -1,6 +1,6 @@
 # Biweekly 5 Working Context
 
-**Status:** Preliminary package executed and verified locally
+**Status:** Preliminary package executed; closed 3D validation status is FAIL
 **Reporting deadline:** 30 July 2026
 **Scope:** AI context for the Biweekly 5 milestone
 
@@ -21,10 +21,13 @@ Prepare an evidence-based 3D casing concept that can connect to the HTI-02-DHPC/
 - `results/biweekly-5/` contains the Indonesian Markdown report, final presentation/analysis STEP files, figures, tabular results, run inputs, and solver summaries.
 - The reference design uses a nominal 7/16-20 UNF-2A male adapter, a separate pressure-seal area, three provisional conductors, and axial electronics envelopes.
 - A 41 mm clear internal diameter is required by the provisional PCM1808 envelope and 1.5 mm clearance. The 43 mm and 50 mm OD candidates fail the resulting fit screen.
-- The 60 mm OD reference uses 5.25 mm Inconel 718, 2.25 mm sealed aerogel, and 2 mm PEEK. It passes the preliminary analytical yield and elastic-buckling factors.
-- Three CalculiX structural meshes converged to 433.37 MPa maximum nodal von Mises stress and 0.0714 mm displacement; medium-to-fine stress change is 2.76%.
-- The corrected one-hour thermal study fails: 153.41 C at 1 W in the radial model and 149.62 C at zero internal power in the 3D CalculiX comparison.
+- The smallest radial-screen candidate is 146 mm OD: 12.5 mm Inconel 718, 38 mm sealed aerogel, 2 mm PEEK, 41 mm clear ID, and 255 mm housing length.
+- The closed 3D one-hour/1 W thermal model includes both endcaps and available axial aerogel buffers. It converges to 140.434 C and therefore fails the 70 C limit despite the radial model's conditional 69.94 C result.
+- The closed-vessel structural FEA applies 10,000 psi to the barrel and both endcaps. The fine result is 778.05 MPa, 3.297 mm displacement, and buckling factor 0.881; all fail acceptance and medium-to-fine changes remain above 5%.
+- The detailed CAD now includes a rear pressure endcap and front/rear axial aerogel buffers. Seal grooves, contacts, thread tolerances, and pressure retention remain conceptual.
+- Gmsh fragment-to-material mapping and solver success detection now fail closed; stale FRD files and CalculiX fatal text cannot be reported as successful reruns.
 - The thermal workflow previously divided conductivity by 1,000. That unit error was fixed; the old near-25 C result is invalid and must not be cited.
+- The user excluded vacuum insulation and added thermal-mass blocks because the tool must be made with conventional CNC and assembly capability at the UGM Geophysics Laboratory.
 
 ## Execution Guardrails
 
@@ -40,7 +43,7 @@ Prepare an evidence-based 3D casing concept that can connect to the HTI-02-DHPC/
 1. Obtain the supplier-controlled HTI drawing, pinout, preamplifier mode, cable, and endcap configuration.
 2. Measure the purchased boards and confirm maximum tool OD/length.
 3. Select exact Inconel heat treatment, aerogel/PEEK grades, seal system, and well-fluid/sour-service requirements.
-4. Replace the failed solid-aerogel thermal concept with a vacuum-flask or verified thermal-mass architecture.
+4. Redesign the end closures and axial thermal path before seeking a passing OD; increasing radial aerogel alone is not sufficient.
 
 ## Package Acceptance Criteria
 
