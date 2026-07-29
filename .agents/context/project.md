@@ -24,13 +24,15 @@ The thermal workflow uses layer dictionaries ordered from outside to inside:
 
 1. `cosmo/core/cad_generator.py` creates separate concentric CadQuery solids and exports a STEP assembly.
 2. `cosmo/core/mesh_generator.py` fragments and meshes the STEP volumes with Gmsh and exports a CalculiX-compatible INP file.
-3. `cosmo/core/solver_interface.py` appends material data, initial temperature, and an outer-temperature boundary before invoking the bundled CalculiX solver.
+3. `cosmo/core/solver_interface.py` appends material data, initial temperature, and an outer-temperature boundary before invoking the bundled CalculiX solver. Conductivity now preserves the numerically identical W/(m.K) to mW/(mm.K) value.
 4. `cosmo/core/result_extractor.py` parses FRD coordinates and temperature steps and extracts the maximum temperature near a requested inner radius.
 5. `cosmo/cosmo_runner.py` composes one CAD-mesh-solve-extract iteration.
 6. `cosmo/optimization/optimizer.py` applies hard-coded geometry heuristics until the configured 50 C threshold is met or ten iterations are exhausted.
 7. `cosmo/core/results_compiler.py` creates a comparison table using the same supplied threshold; it does not invent unavailable time-to-temperature metrics.
 
-`results/hti-02-dhpc-d-20260716/` contains one historical 43 mm OD, 100 mm long SS316/Aerogel/PEEK run. Its raw local FRD and STA files show an actual 3,600-second CalculiX run, and the extractor reproduces the recorded 25.0177 C inner-boundary maximum. The model and result remain preliminary engineering evidence, not product validation.
+`results/hti-02-dhpc-d-20260716/` contains one historical 43 mm OD, 100 mm long SS316/Aerogel/PEEK run. Its raw FRD reproduces 25.0177 C, but the input was generated with conductivity divided by 1,000. The result is invalid and retained only as historical provenance.
+
+`cosmo/biweekly5.py` generates the current HTI-connected preliminary CAD, one-hour radial thermal trade study, 3D CalculiX thermal comparison, three-level structural FEA, analytical pressure/thread checks, figures, and Indonesian report under `results/biweekly-5/`.
 
 ## Technology Stack
 
@@ -58,6 +60,7 @@ Run repository workflows from the repository root because output paths are relat
 | Run regression check | `.\.venv\Scripts\python.exe -m unittest tests.test_results_compiler` | Passed on 2026-07-29 |
 | Install project | `.\.venv\Scripts\python.exe -m pip install -e .` | Derived from `pyproject.toml`; not run during verification |
 | Run optimizer | `.\.venv\Scripts\python.exe .\cosmo\optimization\optimizer.py` | Not run during cleanup; it mutates result artifacts |
+| Reproduce Biweekly 5 | `.\.venv\Scripts\python.exe -m cosmo.biweekly5` | Passed on 2026-07-29; generates CAD, simulations, and report |
 
 ## Data and Integrations
 
@@ -77,10 +80,10 @@ Run repository workflows from the repository root because output paths are relat
 ## Constraints and Hazards
 
 - The optimizer deletes an existing run log and moves or overwrites generated artifacts. It is not a read-only verification command.
-- The implemented solver covers transient heat transfer only. It does not validate external pressure, structural stress, acoustic response, sealing, corrosion, fatigue, sour service, or manufacturability.
+- The reusable legacy pipeline covers transient heat transfer. The bounded Biweekly 5 runner adds preliminary pressure-shell FEA and analytical checks but does not validate sealing, collapse qualification, acoustic response, corrosion, fatigue, sour service, or manufacturability.
 - `extract_max_internal_temperature` falls back to all nodes when it cannot identify inner-boundary nodes, changing the meaning of the reported maximum.
 - Broad exception handlers can return `None` or suppress parsing details; inspect actual output before claiming success.
-- No hydrophone envelope, mating thread, adapter, or seal geometry remains after cleanup because the previous prototype contradicted the supplied HTI drawing and contained overlapping solids.
+- The Biweekly 5 hydrophone envelope, mating thread, adapter, and seal area are preliminary geometry only; supplier-controlled datums and seal qualification remain required before manufacture.
 
 ## Evidence Provenance
 
@@ -105,10 +108,10 @@ Run repository workflows from the repository root because output paths are relat
 
 - Dependencies are unpinned; no lockfile exists.
 - No CLI entry point, lint/format configuration, or CI workflow exists.
-- Regression coverage currently contains one focused standard-library test for result-table accuracy.
+- Regression coverage contains focused standard-library tests for result-table accuracy, Biweekly 5 geometry/thermal screens, HTI thread datums, and thermal-conductivity units.
 - The packaging configuration does not explicitly include `material_library.json` or the bundled solver as package data.
-- The thermal run has not been reproduced from a clean environment after cleanup.
-- The HTI mechanical interface, envelope, thread engagement, seal, pressure boundary, and casing assembly require a fresh evidence-based implementation.
+- The historical thermal run used an incorrect conductivity conversion and is not valid evidence.
+- Supplier-controlled HTI dimensions, electrical configuration, board measurements, seal design, and a viable one-hour thermal architecture remain open.
 
 ## Open Questions
 

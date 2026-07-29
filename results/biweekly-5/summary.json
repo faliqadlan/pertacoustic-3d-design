@@ -1,0 +1,62 @@
+{
+  "selected_geometry": {
+    "od_mm": 60.0,
+    "fit": true,
+    "clear_id_mm": 41,
+    "inconel_wall_mm": 5.25,
+    "aerogel_mm": 2.25,
+    "peek_mm": 2.0,
+    "max_von_mises_MPa": 373.9201448452005,
+    "yield_safety_factor": 2.674367812983146,
+    "elastic_buckling_pressure_MPa": 155.51762072788097,
+    "buckling_factor": 2.2555915032268126,
+    "structural_screen": "PASS",
+    "thermal_screen": "FAIL",
+    "selection_note": "Smallest fit/structural reference candidate; no studied solid-aerogel candidate met the one-hour 70C target without crediting unverified electronics thermal mass."
+  },
+  "selected_thermal_1h_1W_C": 153.4087423492498,
+  "thermal_calculix": {
+    "status": "passed",
+    "job": "results\\biweekly-5\\simulation\\calculix_thermal\\selected_thermal.inp",
+    "power_W": 0.0,
+    "note": "3D CalculiX comparison uses zero internal heat and a representative 30 mm axial segment.",
+    "inner_temperature_C": 149.624
+  },
+  "structural_calculix": [
+    {
+      "mesh": "coarse",
+      "pressure_faces": 880,
+      "status": "passed",
+      "max_displacement_mm": 0.07087085887006025,
+      "max_nodal_von_mises_MPa": 406.79264026678266
+    },
+    {
+      "mesh": "medium",
+      "pressure_faces": 1516,
+      "status": "passed",
+      "max_displacement_mm": 0.07101813878904459,
+      "max_nodal_von_mises_MPa": 445.3474236610975
+    },
+    {
+      "mesh": "fine",
+      "pressure_faces": 3414,
+      "status": "passed",
+      "max_displacement_mm": 0.0713957985784878,
+      "max_nodal_von_mises_MPa": 433.36928562006966
+    }
+  ],
+  "thread_screen": {
+    "nominal_thread": "7/16-20 UNF-2A concept",
+    "pitch_mm": 1.27,
+    "engagement_mm": 10.16,
+    "conservative_pressure_thrust_N": 6687.019393380112,
+    "thread_shear_stress_MPa": 43.87301051363031,
+    "thread_retention_safety_factor": 6.575796751179631,
+    "note": "Conservative screen only; the HTI attachment thread is not the pressure seal."
+  },
+  "limitations": [
+    "Supplier-controlled HTI dimensions and preamplifier mode are not confirmed.",
+    "Board envelopes are internet-derived and not physically measured.",
+    "No seal, collapse, fatigue, acoustic, corrosion, or manufacturing qualification is claimed."
+  ]
+}

@@ -1,7 +1,14 @@
 import gmsh
 import os
 
-def generate_mesh(step_file, output_inp_file, layers):
+def generate_mesh(
+    step_file,
+    output_inp_file,
+    layers,
+    mesh_size_min=0.5,
+    mesh_size_max=2.0,
+    element_order=2,
+):
     """
     Loads a STEP file assembly, fragments it to ensure conformal interfaces,
     meshes it, and exports to CalculiX .inp format.
@@ -16,7 +23,7 @@ def generate_mesh(step_file, output_inp_file, layers):
     gmsh.option.setNumber("General.Terminal", 1)
     
     # We want second-order tetrahedral elements for better thermal/stress accuracy
-    gmsh.option.setNumber("Mesh.ElementOrder", 2)
+    gmsh.option.setNumber("Mesh.ElementOrder", element_order)
     # High quality mesh optimization
     gmsh.option.setNumber("Mesh.Optimize", 1)
     gmsh.option.setNumber("Mesh.OptimizeNetgen", 1)
@@ -63,8 +70,8 @@ def generate_mesh(step_file, output_inp_file, layers):
     # Generate 3D Mesh
     # Set a characteristic length (mesh size). 
     # Since casing thickness is ~1-5mm, mesh size should be ~1mm to get elements across the thickness.
-    gmsh.option.setNumber("Mesh.MeshSizeMax", 2.0)
-    gmsh.option.setNumber("Mesh.MeshSizeMin", 0.5)
+    gmsh.option.setNumber("Mesh.MeshSizeMax", mesh_size_max)
+    gmsh.option.setNumber("Mesh.MeshSizeMin", mesh_size_min)
     
     gmsh.model.mesh.generate(3)
     

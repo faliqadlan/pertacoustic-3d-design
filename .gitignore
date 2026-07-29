@@ -26,6 +26,11 @@ cosmo/python_portable
 *.msg
 *.rout
 *.nam
+*.stdout.txt
+
+# Final Biweekly 5 CAD deliverables are small and intentionally versioned.
+!results/biweekly-5/cad/hti_casing_detailed.step
+!results/biweekly-5/cad/hti_casing_analysis.step
 
 # Generated result visualizations
 results/**/temperature_plot.png

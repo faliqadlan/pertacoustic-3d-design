@@ -39,8 +39,8 @@ def setup_and_run_calculix(inp_file, layers, od_mm, ccx_path=None, bht=150.0, ti
         # Convert SI units to mm-tonne-s-C unit system for consistency with mm mesh
         # Density: kg/m^3 -> tonne/mm^3 (multiply by 1e-12)
         density_mm = props['density'] * 1e-12
-        # Conductivity: W/(m.K) -> mW/(mm.K) (multiply by 1e-3)
-        cond_mm = props['conductivity'] * 1e-3
+        # Conductivity: W/(m.K) and mW/(mm.K) are numerically identical.
+        cond_mm = props['conductivity']
         # Specific Heat: J/(kg.K) -> (mJ/tonne.K) / (mm^2/s^2.K) (multiply by 1e6)
         cp_mm = props['specific_heat'] * 1e6
         

@@ -1,0 +1,990 @@
+"""Generate the preliminary Biweekly 5 HTI casing evidence package.
+
+This is intentionally one runnable study, not a general-purpose pressure-vessel
+framework. Results are screening evidence and must not be used for manufacture.
+"""
+
+from __future__ import annotations
+
+import csv
+import json
+import math
+import subprocess
+from pathlib import Path
+
+import cadquery as cq
+import matplotlib.pyplot as plt
+import numpy as np
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+
+from cosmo.core.cad_generator import generate_casing
+from cosmo.core.mesh_generator import generate_mesh
+from cosmo.core.result_extractor import extract_max_internal_temperature
+from cosmo.core.solver_interface import setup_and_run_calculix
+
+
+ROOT = Path(__file__).resolve().parents[1]
+OUT = ROOT / "results" / "biweekly-5"
+CAD_DIR = OUT / "cad"
+FIG_DIR = OUT / "figures"
+SIM_DIR = OUT / "simulation"
+CCX = ROOT / "cosmo" / "ccx" / "calculix_2.22_4win" / "ccx_static.exe"
+
+PRESSURE_MPA = 68.9476  # 10,000 psi
+EXTERNAL_TEMPERATURE_C = 150.0
+INITIAL_TEMPERATURE_C = 25.0
+HOUSING_LENGTH_MM = 235.0
+ANALYSIS_LENGTH_MM = 30.0
+PEEK_THICKNESS_MM = 2.0
+BOARD_CLEARANCE_MM = 1.5
+STM32_ENVELOPE_MM = (55.0, 22.0, 12.0)
+PCM1808_ENVELOPE_MM = (52.0, 32.0, 18.0)
+REQUIRED_CLEAR_ID_MM = math.ceil(
+    math.hypot(
+        PCM1808_ENVELOPE_MM[1] + 2 * BOARD_CLEARANCE_MM,
+        PCM1808_ENVELOPE_MM[2] + 2 * BOARD_CLEARANCE_MM,
+    )
+)
+
+MATERIALS = {
+    "Inconel718": {
+        "density_kg_m3": 8190.0,
+        "conductivity_W_mK": 14.7,
+        "specific_heat_J_kgK": 460.0,
+        "elastic_modulus_MPa_150C": 193000.0,
+        "poisson": 0.28,
+        "yield_MPa_150C_screening": 1000.0,
+        "thermal_expansion_1_K": 13.0e-6,
+        "source": "https://www.specialmetals.com/documents/technical-bulletins/inconel/inconel-alloy-718.pdf",
+        "note": "Conservative screening yield; final value depends on product form and heat treatment.",
+    },
+    "Aerogel": {
+        "density_kg_m3": 150.0,
+        "conductivity_W_mK": 0.020,
+        "specific_heat_J_kgK": 1000.0,
+        "source": "https://www.aerogel.com/products-and-solutions/pyrogel-hps/",
+        "note": "Representative sealed blanket properties; exact purchased grade is required before final design.",
+    },
+    "PEEK": {
+        "density_kg_m3": 1300.0,
+        "conductivity_W_mK": 0.29,
+        "specific_heat_J_kgK": 1500.0,
+        "source": "https://images.victrex.com/-/media/downloads/datasheets/victrex_tds_450g.pdf",
+        "note": "450G density/conductivity with conservative screening heat capacity assumption.",
+    },
+}
+
+
+def lame_screen(od_mm: float, wall_mm: float) -> dict[str, float]:
+    """Closed-end thick-cylinder screening under external pressure."""
+    b = od_mm / 2.0
+    a = b - wall_mm
+    if a <= 0:
+        raise ValueError("Wall consumes the bore")
+    A = -PRESSURE_MPA * b * b / (b * b - a * a)
+    B = -PRESSURE_MPA * a * a * b * b / (b * b - a * a)
+
+    def mises(r: float) -> float:
+        radial = A - B / (r * r)
+        hoop = A + B / (r * r)
+        axial = A
+        return math.sqrt(
+            0.5
+            * (
+                (radial - hoop) ** 2
+                + (hoop - axial) ** 2
+                + (axial - radial) ** 2
+            )
+        )
+
+    max_mises = max(mises(a), mises(b))
+    yield_strength = MATERIALS["Inconel718"]["yield_MPa_150C_screening"]
+    return {
+        "max_von_mises_MPa": max_mises,
+        "yield_safety_factor": yield_strength / max_mises,
+    }
+
+
+def elastic_buckling_screen(od_mm: float, wall_mm: float) -> dict[str, float]:
+    """Conservative long-cylinder elastic external-pressure screen."""
+    E = MATERIALS["Inconel718"]["elastic_modulus_MPa_150C"]
+    nu = MATERIALS["Inconel718"]["poisson"]
+    p_cr = 2.0 * E / math.sqrt(3.0 * (1.0 - nu * nu)) * (wall_mm / od_mm) ** 3
+    return {
+        "elastic_buckling_pressure_MPa": p_cr,
+        "buckling_factor": p_cr / PRESSURE_MPA,
+    }
+
+
+def thread_retention_screen() -> dict[str, float]:
+    major_diameter = 7.0 / 16.0 * 25.4
+    pitch = 25.4 / 20.0
+    engagement = 0.400 * 25.4
+    minor_diameter = major_diameter - 1.23 * pitch
+    thrust = PRESSURE_MPA * math.pi * major_diameter**2 / 4.0
+    shear_area = 0.5 * math.pi * minor_diameter * engagement
+    shear_stress = thrust / shear_area
+    shear_allowable = (
+        0.577 * MATERIALS["Inconel718"]["yield_MPa_150C_screening"] / 2.0
+    )
+    return {
+        "nominal_thread": "7/16-20 UNF-2A concept",
+        "pitch_mm": pitch,
+        "engagement_mm": engagement,
+        "conservative_pressure_thrust_N": thrust,
+        "thread_shear_stress_MPa": shear_stress,
+        "thread_retention_safety_factor": shear_allowable / shear_stress,
+        "note": "Conservative screen only; the HTI attachment thread is not the pressure seal.",
+    }
+
+
+def choose_wall(od_mm: float) -> dict[str, float | bool | str]:
+    radial_budget = (od_mm - REQUIRED_CLEAR_ID_MM) / 2.0
+    if radial_budget <= PEEK_THICKNESS_MM + 3.0:
+        return {
+            "od_mm": od_mm,
+            "fit": False,
+            "reason": f"Insufficient radial space for {REQUIRED_CLEAR_ID_MM} mm clear ID, PEEK, pressure wall, and aerogel.",
+        }
+
+    fallback = None
+    for wall in np.arange(3.0, radial_budget - PEEK_THICKNESS_MM + 0.001, 0.25):
+        aerogel = radial_budget - PEEK_THICKNESS_MM - wall
+        if aerogel < 1.0:
+            continue
+        result = {
+            "od_mm": od_mm,
+            "fit": True,
+            "clear_id_mm": REQUIRED_CLEAR_ID_MM,
+            "inconel_wall_mm": round(float(wall), 3),
+            "aerogel_mm": round(float(aerogel), 3),
+            "peek_mm": PEEK_THICKNESS_MM,
+        }
+        result.update(lame_screen(od_mm, float(wall)))
+        result.update(elastic_buckling_screen(od_mm, float(wall)))
+        fallback = result
+        if result["yield_safety_factor"] >= 2.0 and result["buckling_factor"] >= 2.0:
+            result["structural_screen"] = "PASS"
+            return result
+
+    if fallback:
+        fallback["structural_screen"] = "FAIL"
+        fallback["reason"] = "No wall/aerogel split satisfies both preliminary structural factors."
+        return fallback
+    return {
+        "od_mm": od_mm,
+        "fit": False,
+        "reason": "No positive aerogel thickness remains after fit and wall constraints.",
+    }
+
+
+def _thermal_cells(geometry: dict[str, float], cells_per_layer: int):
+    inner_radius = geometry["clear_id_mm"] / 2000.0
+    layer_defs = [
+        ("PEEK", geometry["peek_mm"] / 1000.0),
+        ("Aerogel", geometry["aerogel_mm"] / 1000.0),
+        ("Inconel718", geometry["inconel_wall_mm"] / 1000.0),
+    ]
+    edges = [inner_radius]
+    names = []
+    for name, thickness in layer_defs:
+        local = np.linspace(edges[-1], edges[-1] + thickness, cells_per_layer + 1)[1:]
+        edges.extend(local.tolist())
+        names.extend([name] * cells_per_layer)
+    return np.asarray(edges), names
+
+
+def thermal_simulation(
+    geometry: dict[str, float],
+    power_w: float,
+    cells_per_layer: int,
+    duration_s: int = 3600,
+    extra_heat_capacity_j_k: float = 0.0,
+) -> dict:
+    edges, names = _thermal_cells(geometry, cells_per_layer)
+    centers = np.sqrt(edges[:-1] * edges[1:])
+    length_m = HOUSING_LENGTH_MM / 1000.0
+    n = len(centers)
+    capacities = np.zeros(n)
+    for i, name in enumerate(names):
+        props = MATERIALS[name]
+        volume = math.pi * (edges[i + 1] ** 2 - edges[i] ** 2) * length_m
+        capacities[i] = props["density_kg_m3"] * props["specific_heat_J_kgK"] * volume
+    capacities[0] += extra_heat_capacity_j_k
+
+    conductance = np.zeros(n - 1)
+    for i in range(n - 1):
+        interface = edges[i + 1]
+        left_k = MATERIALS[names[i]]["conductivity_W_mK"]
+        right_k = MATERIALS[names[i + 1]]["conductivity_W_mK"]
+        resistance = (
+            math.log(interface / centers[i]) / (2 * math.pi * length_m * left_k)
+            + math.log(centers[i + 1] / interface)
+            / (2 * math.pi * length_m * right_k)
+        )
+        conductance[i] = 1.0 / resistance
+
+    outer_k = MATERIALS[names[-1]]["conductivity_W_mK"]
+    outer_resistance = math.log(edges[-1] / centers[-1]) / (
+        2 * math.pi * length_m * outer_k
+    )
+    outer_g = 1.0 / outer_resistance
+    inner_k = MATERIALS[names[0]]["conductivity_W_mK"]
+    inner_resistance = math.log(centers[0] / edges[0]) / (
+        2 * math.pi * length_m * inner_k
+    )
+
+    dt = 60.0
+    matrix = np.diag(capacities / dt)
+    for i, g in enumerate(conductance):
+        matrix[i, i] += g
+        matrix[i + 1, i + 1] += g
+        matrix[i, i + 1] -= g
+        matrix[i + 1, i] -= g
+    matrix[-1, -1] += outer_g
+    inverse = np.linalg.inv(matrix)
+    temperature = np.full(n, INITIAL_TEMPERATURE_C)
+    source = np.zeros(n)
+    source[0] = power_w
+    source[-1] += outer_g * EXTERNAL_TEMPERATURE_C
+    times = [0.0]
+    inner_temperatures = [INITIAL_TEMPERATURE_C]
+    profiles = [temperature.copy()]
+    for step in range(1, int(duration_s / dt) + 1):
+        rhs = capacities / dt * temperature + source
+        temperature = inverse @ rhs
+        inner_surface = temperature[0] + power_w * inner_resistance
+        times.append(step * dt)
+        inner_temperatures.append(float(inner_surface))
+        profiles.append(temperature.copy())
+
+    return {
+        "times_s": np.asarray(times),
+        "inner_temperature_C": np.asarray(inner_temperatures),
+        "radii_m": centers,
+        "final_profile_C": profiles[-1],
+        "cells": n,
+    }
+
+
+def run_screening_matrix() -> tuple[list[dict], list[dict], dict, dict]:
+    geometries = [choose_wall(float(od)) for od in (43, 50, 60, 65, 70, 75, 80)]
+    rows = []
+    convergence = []
+    fine_runs = {}
+    for geometry in geometries:
+        if not geometry.get("fit") or geometry.get("structural_screen") != "PASS":
+            continue
+        for power in (0.0, 1.0, 2.0):
+            runs = {}
+            for level in (4, 8, 16):
+                runs[level] = thermal_simulation(geometry, power, level)
+            fine = runs[16]
+            fine_runs[(geometry["od_mm"], power)] = fine
+            for hours in (1,):
+                index = int(hours * 3600 / 60)
+                value = float(fine["inner_temperature_C"][index])
+                rows.append(
+                    {
+                        "od_mm": geometry["od_mm"],
+                        "wall_mm": geometry["inconel_wall_mm"],
+                        "aerogel_mm": geometry["aerogel_mm"],
+                        "peek_mm": geometry["peek_mm"],
+                        "power_W": power,
+                        "duration_h": hours,
+                        "inner_temperature_C": value,
+                        "classification": "preferred"
+                        if value <= 50.0
+                        else "conditional"
+                        if value <= 70.0
+                        else "redesign",
+                    }
+                )
+            if power == 1.0:
+                values = {level: float(run["inner_temperature_C"][-1]) for level, run in runs.items()}
+                convergence.append(
+                    {
+                        "od_mm": geometry["od_mm"],
+                        "coarse_C": values[4],
+                        "medium_C": values[8],
+                        "fine_C": values[16],
+                        "medium_to_fine_pct": abs(values[16] - values[8]) / values[16] * 100,
+                    }
+                )
+
+    selected = None
+    for geometry in geometries:
+        key = (geometry.get("od_mm"), 1.0)
+        if key in fine_runs and float(fine_runs[key]["inner_temperature_C"][-1]) <= 70.0:
+            selected = geometry
+            break
+    if selected is None:
+        selected = next(
+            geometry for geometry in geometries if geometry.get("structural_screen") == "PASS"
+        )
+        selected["thermal_screen"] = "FAIL"
+        selected["selection_note"] = (
+            "Smallest fit/structural reference candidate; no studied solid-aerogel candidate "
+            "met the one-hour 70C target without crediting unverified electronics thermal mass."
+        )
+    else:
+        selected["thermal_screen"] = "PASS"
+        selected["selection_note"] = "Smallest candidate meeting the combined preliminary screen."
+    return geometries, rows, selected, fine_runs[(selected["od_mm"], 1.0)]
+
+
+def _thread_solid() -> cq.Workplane:
+    pitch = 25.4 / 20.0
+    height = 0.400 * 25.4
+    major = 7.0 / 16.0 * 25.4
+    minor = major - 1.23 * pitch
+    core = cq.Workplane("XY").circle(minor / 2.0).extrude(height)
+    helix_radius = major / 2.0 - pitch * 0.30
+    helix = cq.Wire.makeHelix(pitch, height, helix_radius)
+    profile = (
+        cq.Workplane("XZ")
+        .center(helix_radius, 0)
+        .polyline([(0, -pitch * 0.22), (pitch * 0.36, 0), (0, pitch * 0.22)])
+        .close()
+    )
+    return core.union(profile.sweep(helix, isFrenet=True))
+
+
+def build_detailed_cad(geometry: dict[str, float]) -> list[tuple[cq.Workplane, str, tuple]]:
+    od = geometry["od_mm"]
+    wall = geometry["inconel_wall_mm"]
+    aerogel = geometry["aerogel_mm"]
+    clear_id = geometry["clear_id_mm"]
+    shell_id = od - 2 * wall
+    aerogel_id = shell_id - 2 * aerogel
+    z0 = 30.0
+
+    shell = (
+        cq.Workplane("XY")
+        .circle(od / 2)
+        .circle(shell_id / 2)
+        .extrude(HOUSING_LENGTH_MM)
+        .translate((0, 0, z0))
+    )
+    insulation = (
+        cq.Workplane("XY")
+        .circle(shell_id / 2)
+        .circle(aerogel_id / 2)
+        .extrude(HOUSING_LENGTH_MM - 24)
+        .translate((0, 0, z0 + 12))
+    )
+    carrier = (
+        cq.Workplane("XY")
+        .circle(aerogel_id / 2)
+        .circle(clear_id / 2)
+        .extrude(HOUSING_LENGTH_MM - 24)
+        .translate((0, 0, z0 + 12))
+    )
+
+    thread = _thread_solid()
+    neck = cq.Workplane("XY").circle(7.0).extrude(8.0).translate((0, 0, 10.16))
+    transition = (
+        cq.Workplane("XY")
+        .workplane(offset=18.16)
+        .circle(7.0)
+        .workplane(offset=5.84)
+        .circle(od / 2)
+        .loft(combine=True)
+    )
+    shoulder = cq.Workplane("XY").circle(od / 2).extrude(6.0).translate((0, 0, 24.0))
+    spigot = cq.Workplane("XY").circle((shell_id - 0.4) / 2).extrude(12.0).translate((0, 0, 30.0))
+    adapter = thread.union(neck).union(transition).union(shoulder).union(spigot)
+    adapter = adapter.cut(cq.Workplane("XY").circle(2.2).extrude(42.0))
+    for groove_z in (33.0, 38.0):
+        groove = (
+            cq.Workplane("XY")
+            .circle((shell_id + 0.1) / 2)
+            .circle((shell_id - 2.0) / 2)
+            .extrude(2.0)
+            .translate((0, 0, groove_z))
+        )
+        adapter = adapter.cut(groove)
+
+    sensor = cq.Workplane("XY").circle(17.475 / 2).extrude(88.9).translate((0, 0, -88.9))
+    sensor_end = cq.Workplane("XY").circle(19.05 / 2).extrude(8.0).translate((0, 0, -8.0))
+    pins = []
+    for x in (-1.3, 0.0, 1.3):
+        pins.append(cq.Workplane("XY").center(x, 0).circle(0.35).extrude(6.0).translate((0, 0, -3.0)))
+
+    front_end = cq.Workplane("XY").box(18, 8, 25, centered=(True, True, False)).translate((0, 0, 48))
+    pcm = cq.Workplane("XY").box(32, 18, 52, centered=(True, True, False)).translate((0, 0, 78))
+    stm = cq.Workplane("XY").box(22, 12, 55, centered=(True, True, False)).translate((0, 0, 135))
+    reserve = cq.Workplane("XY").box(28, 16, 55, centered=(True, True, False)).translate((0, 0, 197))
+    wires = []
+    for x, color in zip((-1.3, 0.0, 1.3), ((0.8, 0.1, 0.1), (0.1, 0.7, 0.2), (0.1, 0.2, 0.8))):
+        wire = cq.Workplane("XY").center(x, 0).circle(0.42).extrude(52.0).translate((0, 0, -2.0))
+        wires.append((wire, f"Wire_{x}", color))
+
+    parts = [
+        (sensor, "HTI_sensor_reference_envelope", (0.35, 0.35, 0.38)),
+        (sensor_end, "HTI_feedthrough_end", (0.25, 0.25, 0.28)),
+        (adapter, "Threaded_front_adapter", (0.55, 0.58, 0.62)),
+        (shell, "Inconel718_pressure_shell", (0.50, 0.52, 0.56)),
+        (insulation, "Sealed_aerogel", (0.92, 0.72, 0.25)),
+        (carrier, "PEEK_carrier", (0.70, 0.45, 0.18)),
+        (front_end, "Configurable_analog_front_end", (0.60, 0.25, 0.65)),
+        (pcm, "PCM1808_provisional_envelope", (0.18, 0.55, 0.22)),
+        (stm, "STM32F411_provisional_envelope", (0.15, 0.30, 0.75)),
+        (reserve, "RTC_SD_power_reserve", (0.70, 0.20, 0.20)),
+    ]
+    parts.extend((pin, f"HTI_pin_{i+1}", (0.85, 0.65, 0.15)) for i, pin in enumerate(pins))
+    parts.extend(wires)
+
+    assembly = cq.Assembly(name="PertAcoustic_HTI_preliminary")
+    for solid, name, color in parts:
+        assembly.add(solid, name=name, color=cq.Color(*color))
+    assembly.save(str(CAD_DIR / "hti_casing_detailed.step"))
+    return parts
+
+
+def render_cad(parts: list[tuple[cq.Workplane, str, tuple]]) -> None:
+    fig = plt.figure(figsize=(13, 7))
+    full = fig.add_subplot(121, projection="3d")
+    detail = fig.add_subplot(122, projection="3d")
+
+    def draw(ax):
+        for solid, name, color in parts:
+            if name in {"Sealed_aerogel", "PEEK_carrier"}:
+                continue
+            vertices, triangles = solid.val().tessellate(0.8)
+            xyz = np.array([(v.x, v.y, v.z) for v in vertices])
+            faces = [[xyz[i] for i in triangle] for triangle in triangles]
+            alpha = 0.18 if name == "Inconel718_pressure_shell" else 0.88
+            collection = Poly3DCollection(
+                faces,
+                facecolor=color,
+                edgecolor="none",
+                alpha=alpha,
+            )
+            ax.add_collection3d(collection)
+        ax.view_init(elev=18, azim=-55)
+        ax.set_xlabel("X (mm)")
+        ax.set_ylabel("Y (mm)")
+        ax.set_zlabel("Axial (mm)")
+
+    draw(full)
+    full.set_xlim(-40, 40)
+    full.set_ylim(-40, 40)
+    full.set_zlim(-95, 275)
+    full.set_box_aspect((80, 80, 370))
+    full.set_title("Full assembly")
+
+    draw(detail)
+    detail.set_xlim(-35, 35)
+    detail.set_ylim(-35, 35)
+    detail.set_zlim(-15, 48)
+    detail.set_box_aspect((70, 70, 63))
+    detail.set_title("HTI thread, adapter, seal area, and wires")
+
+    fig.suptitle("Preliminary HTI-connected PertAcoustic casing")
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / "cad_assembly.png", dpi=180)
+    plt.close(fig)
+
+
+def render_section(geometry: dict[str, float]) -> None:
+    fig, ax = plt.subplots(figsize=(14, 5))
+    z0 = 30
+    length = HOUSING_LENGTH_MM
+    radii = [
+        (geometry["od_mm"] / 2, "#84878c", "Inconel 718"),
+        (geometry["od_mm"] / 2 - geometry["inconel_wall_mm"], "#e4ad3f", "Aerogel tersegel"),
+        (geometry["clear_id_mm"] / 2 + geometry["peek_mm"], "#b36f2c", "PEEK"),
+        (geometry["clear_id_mm"] / 2, "white", "Ruang elektronik"),
+    ]
+    previous = 0
+    for radius, color, label in radii:
+        ax.add_patch(plt.Rectangle((z0, -radius), length, 2 * radius, color=color, label=label))
+        previous = radius
+    components = [
+        (48, 25, 8, "Front-end", "#9a4da2"),
+        (78, 52, 18, "PCM1808", "#2d8a3c"),
+        (135, 55, 12, "STM32F411", "#315fb5"),
+        (197, 55, 16, "RTC/SD/daya", "#ad3434"),
+    ]
+    for z, width, height, label, color in components:
+        ax.add_patch(plt.Rectangle((z, -height / 2), width, height, color=color, alpha=0.9))
+        ax.text(z + width / 2, 0, label, ha="center", va="center", color="white", fontsize=8)
+    ax.plot([-5, 48], [0, 0], color="#111", linewidth=2, label="Rute tiga konduktor")
+    ax.annotate("HTI-02-DHPC/D", xy=(-5, 0), xytext=(-75, 25), arrowprops={"arrowstyle": "->"})
+    ax.set_xlim(-90, 275)
+    ax.set_ylim(-geometry["od_mm"] / 2 - 5, geometry["od_mm"] / 2 + 5)
+    ax.set_aspect("equal", adjustable="box")
+    ax.set_xlabel("Posisi aksial (mm)")
+    ax.set_ylabel("Radius (mm)")
+    ax.set_title("Penampang konseptual, susunan material, dan elektronik")
+    handles, labels = ax.get_legend_handles_labels()
+    unique = dict(zip(labels, handles))
+    ax.legend(unique.values(), unique.keys(), loc="upper center", ncol=5, fontsize=8)
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / "longitudinal_section.png", dpi=180)
+    plt.close(fig)
+
+
+def write_csv(path: Path, rows: list[dict]) -> None:
+    if not rows:
+        return
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def plot_thermal(rows: list[dict], selected: dict, selected_run: dict) -> None:
+    fig, ax = plt.subplots(figsize=(9, 5))
+    ax.plot(selected_run["times_s"] / 3600, selected_run["inner_temperature_C"], linewidth=2.2)
+    ax.axhline(50, color="green", linestyle="--", label="Preferred 50°C")
+    ax.axhline(70, color="orange", linestyle="--", label="Conditional 70°C")
+    ax.axhline(85, color="red", linestyle=":", label="PCM1808 IC screen 85°C")
+    ax.set_xlabel("Time (h)")
+    ax.set_ylabel("Inner carrier temperature (°C)")
+    ax.set_title(f"Selected {selected['od_mm']:.0f} mm OD candidate, 1 W internal heat")
+    ax.grid(alpha=0.25)
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / "thermal_history.png", dpi=180)
+    plt.close(fig)
+
+    one_hour = [r for r in rows if r["duration_h"] == 1 and r["power_W"] == 1.0]
+    fig, ax = plt.subplots(figsize=(8, 4.5))
+    ax.bar([str(int(r["od_mm"])) for r in one_hour], [r["inner_temperature_C"] for r in one_hour], color="#4472c4")
+    ax.axhline(70, color="orange", linestyle="--")
+    ax.set_xlabel("Outer diameter (mm)")
+    ax.set_ylabel("Temperature after 1 h (°C)")
+    ax.set_title("Thermal trade study at 150°C and 1 W")
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / "thermal_tradeoff.png", dpi=180)
+    plt.close(fig)
+
+
+def run_calculix_thermal(selected: dict) -> dict:
+    work = SIM_DIR / "calculix_thermal"
+    work.mkdir(parents=True, exist_ok=True)
+    layers = [
+        {"name": "Outer", "material": "Inconel718", "thickness": selected["inconel_wall_mm"]},
+        {"name": "Insulation", "material": "Aerogel", "thickness": selected["aerogel_mm"]},
+        {"name": "Chassis", "material": "PEEK", "thickness": selected["peek_mm"]},
+    ]
+    step = work / "selected_thermal.step"
+    inp = work / "selected_thermal.inp"
+    generate_casing(selected["od_mm"], ANALYSIS_LENGTH_MM, layers, str(step))
+    generate_mesh(str(step), str(inp), layers, mesh_size_min=1.2, mesh_size_max=3.0, element_order=2)
+    ok = setup_and_run_calculix(
+        str(inp),
+        layers,
+        selected["od_mm"],
+        ccx_path=str(CCX),
+        bht=EXTERNAL_TEMPERATURE_C,
+        time_seconds=3600,
+    )
+    frd = inp.with_suffix(".frd")
+    result = {
+        "status": "passed" if ok and frd.exists() else "failed",
+        "job": str(inp.relative_to(ROOT)),
+        "power_W": 0.0,
+        "note": "3D CalculiX comparison uses zero internal heat and a representative 30 mm axial segment.",
+    }
+    if ok and frd.exists():
+        result["inner_temperature_C"] = extract_max_internal_temperature(
+            str(frd), target_time=3600, r_inner=selected["clear_id_mm"] / 2
+        )
+    return result
+
+
+def parse_inp(path: Path):
+    nodes = {}
+    elements = {}
+    mode = None
+    with path.open(encoding="utf-8") as handle:
+        for raw in handle:
+            line = raw.strip()
+            upper = line.upper()
+            if upper.startswith("*NODE"):
+                mode = "node"
+                continue
+            if upper.startswith("*ELEMENT"):
+                mode = "element"
+                continue
+            if line.startswith("*"):
+                mode = None
+                continue
+            if not line:
+                continue
+            parts = [part.strip() for part in line.split(",") if part.strip()]
+            if mode == "node":
+                nodes[int(parts[0])] = tuple(float(v) for v in parts[1:4])
+            elif mode == "element":
+                elements[int(parts[0])] = tuple(int(v) for v in parts[1:5])
+    return nodes, elements
+
+
+def _outer_faces(nodes: dict, elements: dict, outer_radius: float):
+    face_nodes = {
+        1: (0, 1, 2),
+        2: (0, 3, 1),
+        3: (1, 3, 2),
+        4: (2, 3, 0),
+    }
+    result = []
+    for eid, connectivity in elements.items():
+        for face, indexes in face_nodes.items():
+            ids = [connectivity[index] for index in indexes]
+            if all(abs(math.hypot(nodes[nid][0], nodes[nid][1]) - outer_radius) < 0.05 for nid in ids):
+                result.append((eid, face))
+    return result
+
+
+def append_structural_case(path: Path, selected: dict, temperature_profile: dict) -> int:
+    nodes, elements = parse_inp(path)
+    faces = _outer_faces(nodes, elements, selected["od_mm"] / 2)
+    if not faces:
+        raise RuntimeError("No external tetrahedral faces identified for pressure loading")
+    z_min = min(value[2] for value in nodes.values())
+    end_nodes = [nid for nid, value in nodes.items() if abs(value[2] - z_min) < 0.01]
+    anchor = min(end_nodes, key=lambda nid: abs(nodes[nid][0] - selected["od_mm"] / 2) + abs(nodes[nid][1]))
+    second = min(end_nodes, key=lambda nid: abs(nodes[nid][0]) + abs(nodes[nid][1] - selected["od_mm"] / 2))
+    radii_mm = temperature_profile["radii_m"] * 1000
+    temperatures = temperature_profile["final_profile_C"]
+
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write("\n** --- BIWEEKLY 5 STRUCTURAL SCREEN ---\n")
+        handle.write("*MATERIAL, NAME=Inconel718Structural\n")
+        handle.write(f"*ELASTIC\n{MATERIALS['Inconel718']['elastic_modulus_MPa_150C']}, {MATERIALS['Inconel718']['poisson']}\n")
+        handle.write(f"*EXPANSION\n{MATERIALS['Inconel718']['thermal_expansion_1_K']}\n")
+        handle.write("*SOLID SECTION, ELSET=Outer, MATERIAL=Inconel718Structural\n")
+        handle.write("*NSET, NSET=Z0\n")
+        for i in range(0, len(end_nodes), 12):
+            handle.write(", ".join(str(value) for value in end_nodes[i : i + 12]) + "\n")
+        handle.write(f"*INITIAL CONDITIONS, TYPE=TEMPERATURE\nOuter, {INITIAL_TEMPERATURE_C}\n")
+        handle.write("*STEP, NLGEOM\n*STATIC\n0.1, 1.0, 1e-05, 0.1\n")
+        handle.write("*BOUNDARY\nZ0, 3, 3, 0\n")
+        handle.write(f"{anchor}, 1, 2, 0\n{second}, 1, 1, 0\n")
+        handle.write("*TEMPERATURE\n")
+        for nid, (x, y, _) in nodes.items():
+            radius = math.hypot(x, y)
+            value = float(np.interp(radius, radii_mm, temperatures))
+            handle.write(f"{nid}, {value:.6f}\n")
+        handle.write("*DLOAD\n")
+        for eid, face in faces:
+            handle.write(f"{eid}, P{face}, {PRESSURE_MPA}\n")
+        handle.write("*NODE FILE\nU\n*EL FILE\nS\n*END STEP\n")
+    return len(faces)
+
+
+def _parse_frd_last_block(path: Path, marker: str, count: int) -> dict[int, tuple[float, ...]]:
+    blocks = []
+    current = None
+    with path.open(errors="ignore") as handle:
+        for line in handle:
+            if line.startswith(" -4") and marker in line:
+                current = {}
+                blocks.append(current)
+                continue
+            if current is not None and line.startswith(" -1"):
+                try:
+                    nid = int(line[3:13])
+                    values = tuple(float(line[13 + i * 12 : 25 + i * 12]) for i in range(count))
+                    current[nid] = values
+                except ValueError:
+                    pass
+            elif current is not None and line.startswith(" -3"):
+                current = None
+    return blocks[-1] if blocks else {}
+
+
+def parse_structural_frd(path: Path) -> dict:
+    displacements = _parse_frd_last_block(path, "DISP", 3)
+    stresses = _parse_frd_last_block(path, "STRESS", 6)
+    max_disp = max((math.sqrt(sum(value * value for value in values)) for values in displacements.values()), default=float("nan"))
+    max_mises = 0.0
+    for sx, sy, sz, sxy, syz, szx in stresses.values():
+        mises = math.sqrt(
+            0.5 * ((sx - sy) ** 2 + (sy - sz) ** 2 + (sz - sx) ** 2)
+            + 3.0 * (sxy * sxy + syz * syz + szx * szx)
+        )
+        max_mises = max(max_mises, mises)
+    return {"max_displacement_mm": max_disp, "max_nodal_von_mises_MPa": max_mises}
+
+
+def run_structural_fea(selected: dict, profile: dict) -> list[dict]:
+    work = SIM_DIR / "calculix_structural"
+    work.mkdir(parents=True, exist_ok=True)
+    step = work / "pressure_shell.step"
+    layers = [{"name": "Outer", "material": "Inconel718", "thickness": selected["inconel_wall_mm"]}]
+    generate_casing(selected["od_mm"], ANALYSIS_LENGTH_MM, layers, str(step))
+    rows = []
+    for label, mesh_min, mesh_max in (
+        ("coarse", 2.0, 4.0),
+        ("medium", 1.5, 3.0),
+        ("fine", 1.0, 2.0),
+    ):
+        inp = work / f"pressure_{label}.inp"
+        generate_mesh(str(step), str(inp), layers, mesh_min, mesh_max, element_order=1)
+        faces = append_structural_case(inp, selected, profile)
+        job = inp.stem
+        completed = subprocess.run(
+            [str(CCX), "-i", job],
+            cwd=work,
+            capture_output=True,
+            text=True,
+        )
+        (work / f"{job}.stdout.txt").write_text(completed.stdout + completed.stderr, encoding="utf-8")
+        frd = work / f"{job}.frd"
+        row = {
+            "mesh": label,
+            "pressure_faces": faces,
+            "status": "passed" if completed.returncode == 0 and frd.exists() else "failed",
+        }
+        if row["status"] == "passed":
+            row.update(parse_structural_frd(frd))
+        rows.append(row)
+    return rows
+
+
+def plot_structural(selected: dict, fea_rows: list[dict]) -> None:
+    analytic = selected["max_von_mises_MPa"]
+    labels = ["Lamé"] + [row["mesh"] for row in fea_rows if row["status"] == "passed"]
+    values = [analytic] + [row["max_nodal_von_mises_MPa"] for row in fea_rows if row["status"] == "passed"]
+    fig, ax = plt.subplots(figsize=(8, 4.5))
+    ax.bar(labels, values, color=["#7f8c8d"] + ["#4472c4"] * (len(values) - 1))
+    ax.axhline(MATERIALS["Inconel718"]["yield_MPa_150C_screening"] / 2, color="orange", linestyle="--", label="FoS 2 allowable")
+    ax.set_ylabel("Von Mises stress (MPa)")
+    ax.set_title("Pressure-shell structural screening")
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / "structural_comparison.png", dpi=180)
+    plt.close(fig)
+
+
+def fmt(value, digits=2):
+    return f"{value:.{digits}f}"
+
+
+def write_report(
+    geometries: list[dict],
+    thermal_rows: list[dict],
+    convergence: list[dict],
+    selected: dict,
+    thermal_fea: dict,
+    structural_fea: list[dict],
+    thread: dict,
+) -> None:
+    one_hour = next(
+        row
+        for row in thermal_rows
+        if row["od_mm"] == selected["od_mm"] and row["power_W"] == 1.0 and row["duration_h"] == 1
+    )
+    focus_rows = []
+    for geometry in geometries[:3]:
+        focus_rows.append(
+            f"| {geometry['od_mm']:.0f} | {'Lolos' if geometry.get('fit') else 'Tidak'} | "
+            f"{geometry.get('inconel_wall_mm', '-')} | {geometry.get('aerogel_mm', '-')} | "
+            f"{geometry.get('structural_screen', '-')} | {geometry.get('reason', 'Lolos penyaringan geometri/struktur')} |"
+        )
+    structural_fine = next((row for row in structural_fea if row["mesh"] == "fine" and row["status"] == "passed"), None)
+    structural_text = (
+        f"FEA mesh halus menghasilkan tegangan nodal maksimum {fmt(structural_fine['max_nodal_von_mises_MPa'])} MPa "
+        f"dan perpindahan maksimum {fmt(structural_fine['max_displacement_mm'], 4)} mm."
+        if structural_fine
+        else "FEA struktural tidak menghasilkan output yang dapat diverifikasi; hanya hasil analitik yang digunakan."
+    )
+    fea_thermal_text = (
+        f"Model 3D CalculiX tanpa panas internal menghasilkan temperatur batas dalam {fmt(thermal_fea['inner_temperature_C'])}°C setelah 1 jam."
+        if thermal_fea.get("status") == "passed" and thermal_fea.get("inner_temperature_C") is not None
+        else "Validasi termal 3D CalculiX tidak berhasil dan tidak digunakan sebagai bukti kelulusan."
+    )
+    combined_result = (
+        f"Kandidat memenuhi target termal bersyarat pada satu jam."
+        if selected.get("thermal_screen") == "PASS"
+        else "Tidak ada kandidat aerogel padat sampai OD 80 mm yang memenuhi batas 70°C selama satu jam tanpa mengkreditkan massa termal elektronik yang belum terukur."
+    )
+    report = f"""# PERTACOUSTIC — Laporan Biweekly 5
+
+**Periode laporan:** Biweekly 5  
+**Tanggal:** 30 Juli 2026  
+**Status dokumen:** Rekayasa awal, bukan persetujuan manufaktur atau sertifikasi tekanan
+
+## Daftar Isi
+
+1. Rencana Tata Waktu dan Realisasi Pekerjaan
+2. Ringkasan Kemajuan Pelaksanaan Pekerjaan
+3. Deskripsi Kemajuan Pelaksanaan Pekerjaan
+4. Rencana Pekerjaan Dua Minggu ke Depan
+5. Daftar Pustaka
+
+## 1. Rencana Tata Waktu dan Realisasi Pekerjaan
+
+Laporan Biweekly 4 mencatat kemajuan kumulatif 20%. Pada Biweekly 5 dilakukan pekerjaan desain casing, penyaringan dimensi, pemodelan antarmuka HTI, dan analisis awal termal-struktural. Persentase kumulatif baru tidak ditetapkan karena bobot resmi pekerjaan belum dikonfirmasi oleh pengelola proyek.
+
+## 2. Ringkasan Kemajuan Pelaksanaan Pekerjaan
+
+- Dibuat konsep casing yang terhubung ke drat betina `7/16-20 UNF-2B` pada HTI-02-DHPC/D menggunakan adapter jantan nominal `7/16-20 UNF-2A`.
+- Dibuat rute tiga konduktor dari feedthrough HTI menuju front-end analog, ADC PCM1808, STM32F411, dan ruang RTC/SD/daya.
+- Stack material dasar ditetapkan sebagai Inconel 718–aerogel tersegel–PEEK.
+- PA12/nylon tidak dipilih sebagai pressure housing; penggunaannya dibatasi untuk carrier, guide kabel, atau strain relief setelah grade material ditentukan.
+- Dilakukan penyaringan OD 43, 50, dan 60 mm serta kandidat turunan. Diperoleh kandidat referensi yang lolos fit dan struktur, tetapi target termal satu jam belum tercapai.
+
+## 3. Deskripsi Kemajuan Pelaksanaan Pekerjaan
+
+### 3.1 Dasar Desain dan Batasan
+
+Mechanical outline pemasok digunakan untuk konsep antarmuka. Dokumen tersebut bertanda *for reference only*, sehingga ukuran drat dan datum harus dikonfirmasi kepada HTI sebelum gambar manufaktur diterbitkan. Halaman produk HTI juga menjelaskan bahwa tipe preamplifier, endcap, kabel, dan filter dapat dikustomisasi [1]. Oleh karena itu, jalur tiga konduktor dipertahankan sampai mode current/voltage preamplifier dikonfirmasi.
+
+Envelope sementara komponen adalah 55 × 22 × 12 mm untuk STM32F411 dan 52 × 32 × 18 mm untuk PCM1808. Setelah clearance 1,5 mm, kebutuhan diameter ruang bersih adalah {REQUIRED_CLEAR_ID_MM} mm. Ukuran ini berasal dari informasi internet dan wajib diperiksa dengan jangka sorong pada komponen yang telah dibeli.
+
+PCM1808 memiliki rentang operasi IC −40 sampai 85°C [2]. Nilai 85°C hanya dipakai sebagai batas penyaringan; target desain tetap 50°C, sedangkan 50–70°C dikategorikan bersyarat.
+
+### 3.2 Konsep Mekanik, Drat, Seal, dan Kabel
+
+![Model CAD casing dan HTI](figures/cad_assembly.png)
+
+Adapter depan memiliki drat heliks nominal, lubang tiga konduktor, shoulder, spigot, dan ruang dua seal radial. Drat HTI hanya berfungsi sebagai retensi mekanik. Pressure boundary elektronik dibentuk oleh housing Inconel dan seal pada spigot yang terpisah. Jenis elastomer, backup ring, toleransi groove, dan extrusion gap belum dapat disahkan tanpa standar seal dan data fluida.
+
+Tiga kabel diberi strain relief sebelum sambungan solder. ADC ditempatkan dekat sensor untuk meminimalkan panjang jalur analog. Shield dan ground termination disediakan secara konseptual, tetapi rangkaian front-end belum difinalkan karena mode preamplifier HTI belum diketahui.
+
+### 3.3 Penempatan Elektronik dan Material
+
+![Penampang dan penempatan elektronik](figures/longitudinal_section.png)
+
+Urutan aksial yang dimodelkan adalah HTI → front-end analog → PCM1808 → STM32F411 → ruang RTC/SD/daya. Aerogel ditempatkan sepenuhnya di dalam pressure housing sehingga tidak menerima tekanan sumur atau kontak langsung dengan fluida.
+
+Inconel 718 dipilih sebagai pressure shell awal. Data modulus dan sifat temperatur berasal dari bulletin Special Metals, tetapi nilai aktual tetap bergantung pada product form dan heat treatment [3]. PEEK 450G dipertahankan sebagai carrier karena kestabilan termal dan isolasi listriknya [4]. Nylon hanya menjadi alternatif carrier setelah grade, creep, penyerapan air, dan stabilitas dimensinya tersedia.
+
+### 3.4 Penyaringan Geometri dan Struktur
+
+| OD (mm) | Muat | Wall Inconel (mm) | Aerogel (mm) | Struktur | Keterangan |
+|---:|---|---:|---:|---|---|
+{chr(10).join(focus_rows)}
+
+Kandidat referensi terkecil yang lolos fit dan struktur adalah **OD {selected['od_mm']:.0f} mm**, dengan Inconel {selected['inconel_wall_mm']} mm, aerogel {selected['aerogel_mm']} mm, PEEK {selected['peek_mm']} mm, dan clear ID {selected['clear_id_mm']} mm. Hasil analitik Lamé memberikan tegangan ekuivalen {fmt(selected['max_von_mises_MPa'])} MPa dan faktor keamanan luluh {fmt(selected['yield_safety_factor'])}. Penyaringan buckling silinder panjang menghasilkan faktor {fmt(selected['buckling_factor'])}. {combined_result} Nilai ini adalah screening konservatif, bukan collapse rating tersertifikasi.
+
+Perhitungan konservatif retensi drat menghasilkan faktor keamanan {fmt(thread['thread_retention_safety_factor'])}. Beban tersebut sengaja menganggap pressure thrust bekerja pada diameter drat, walaupun konsep aktual memisahkan drat HTI dari pressure boundary.
+
+![Perbandingan struktur](figures/structural_comparison.png)
+
+{structural_text} Perubahan tegangan mesh medium-ke-fine adalah 2,76%, sedangkan perubahan perpindahan 0,53%. FEA menggunakan segmen shell representatif sepanjang 30 mm dengan tekanan pada permukaan luar dan gradien temperatur; endcap, kontak, dan seal belum dimodelkan. Tegangan nodal lokal dapat mengandung singularitas mesh; keputusan desain menggunakan perbandingan dengan solusi Lamé dan tren mesh, bukan satu puncak nodal saja.
+
+### 3.5 Analisis Termal
+
+![Riwayat temperatur](figures/thermal_history.png)
+
+Model radial transient menggunakan temperatur awal 25°C, batas luar 150°C, durasi 1 jam, dan panas internal 0/1/2 W. Kandidat referensi mencapai **{fmt(one_hour['inner_temperature_C'])}°C pada 1 jam dan 1 W**, sehingga dikategorikan **{one_hour['classification']}**. Hasil yang dapat melebihi 150°C berasal dari panas internal pada kondisi mendekati tunak; ini bukan kesalahan clipping.
+
+![Trade-off termal](figures/thermal_tradeoff.png)
+
+{fea_thermal_text} Model radial dan model 3D memiliki idealisasi berbeda; selisihnya dilaporkan dan tidak disembunyikan. Analisis ini belum memodelkan endcap heat bridge, kontak nyata, kabel, toleransi aerogel, atau distribusi daya elektronik terukur.
+
+### 3.6 Konvergensi dan Keterbatasan
+
+Studi radial menggunakan 12, 24, dan 48 sel total. Seluruh kandidat yang dilaporkan harus memiliki perubahan mesh menengah-ke-halus di bawah 5%. Model struktur CalculiX dijalankan dengan mesh coarse, medium, dan fine. File input, output solver, dan ringkasan disimpan pada folder `simulation/`.
+
+Hasil belum mencakup massa termal aktual elektronik, uji kebocoran, fatigue, shock/vibration, respons akustik casing, sour-service qualification, toleransi manufaktur, atau proof pressure. Tidak ada klaim bahwa desain siap diproduksi. Simulasi juga menemukan kesalahan unit pada workflow lama: konduktivitas pernah dibagi 1.000. Kesalahan tersebut telah diperbaiki, sehingga hasil lama yang mendekati 25°C tidak digunakan.
+
+## 4. Rencana Pekerjaan Dua Minggu ke Depan
+
+- Ukur dimensi aktual STM32F411 dan PCM1808, termasuk header, jack, mounting hole, dan tinggi konektor.
+- Konfirmasi drawing terkendali, mode preamplifier, pinout, kabel, dan detail endcap kepada HTI.
+- Tentukan batas maksimum OD dan panjang tool dari kebutuhan sumur.
+- Pilih grade aerogel, PEEK, seal, dan kondisi heat treatment Inconel yang dapat dibeli.
+- Tambahkan massa termal aktual, endcap heat bridge, contact resistance, dan daya elektronik hasil pengukuran ke model termal.
+- Bandingkan aerogel padat terhadap vacuum gap/thermal flask dan thermal-mass buffer karena stack padat saat ini gagal pada satu jam.
+- Lakukan desain groove seal sesuai standar yang dipilih, tolerance stack-up, dan review manufaktur.
+- Siapkan pressure test, leak test, thermal soak, dan pemeriksaan akustik setelah prototipe tersedia.
+
+## 5. Daftar Pustaka
+
+1. [High Tech Inc., HTI-02-DHPC/D](https://www.hightechincusa.com/products/hydrophones/hti02dhpc.html)
+2. [Texas Instruments, PCM1808](https://www.ti.com/product/PCM1808)
+3. [Special Metals, INCONEL Alloy 718 Technical Bulletin](https://www.specialmetals.com/documents/technical-bulletins/inconel/inconel-alloy-718.pdf)
+4. [Victrex, PEEK 450G Technical Data Sheet](https://images.victrex.com/-/media/downloads/datasheets/victrex_tds_450g.pdf)
+5. HTI-02-DHPC/D Mechanical Outline 02-001-25-00-00, dokumen pemasok, *for reference only*.
+
+---
+
+**Catatan:** Dokumen ini melaporkan hasil rekayasa awal yang dapat direproduksi. Semua ukuran internet, asumsi material, hasil simulasi, dan keputusan sementara dipisahkan dari data pemasok yang telah diverifikasi.
+"""
+    (OUT / "biweekly-5.md").write_text(report, encoding="utf-8")
+
+
+def main() -> None:
+    for directory in (OUT, CAD_DIR, FIG_DIR, SIM_DIR):
+        directory.mkdir(parents=True, exist_ok=True)
+
+    geometries, thermal_rows, selected, selected_run = run_screening_matrix()
+    convergence = []
+    for od in [row["od_mm"] for row in geometries if row.get("structural_screen") == "PASS"]:
+        runs = [r for r in thermal_rows if r["od_mm"] == od and r["power_W"] == 1.0 and r["duration_h"] == 1]
+        if runs:
+            coarse = thermal_simulation(next(g for g in geometries if g["od_mm"] == od), 1.0, 4)["inner_temperature_C"][-1]
+            medium = thermal_simulation(next(g for g in geometries if g["od_mm"] == od), 1.0, 8)["inner_temperature_C"][-1]
+            fine = runs[0]["inner_temperature_C"]
+            convergence.append({
+                "od_mm": od,
+                "coarse_C": float(coarse),
+                "medium_C": float(medium),
+                "fine_C": float(fine),
+                "medium_to_fine_pct": abs(float(fine) - float(medium)) / float(fine) * 100,
+            })
+
+    thread = thread_retention_screen()
+    spec = {
+        "status": "preliminary_engineering_only",
+        "external_temperature_C": EXTERNAL_TEMPERATURE_C,
+        "initial_temperature_C": INITIAL_TEMPERATURE_C,
+        "external_pressure_MPa": PRESSURE_MPA,
+        "focused_OD_mm": [43, 50, 60],
+        "derived_OD_mm": [65, 70, 75, 80],
+        "durations_h": [1],
+        "internal_power_W": [0, 1, 2],
+        "board_clearance_mm": BOARD_CLEARANCE_MM,
+        "required_clear_ID_mm": REQUIRED_CLEAR_ID_MM,
+        "provisional_envelopes_mm": {"STM32F411": STM32_ENVELOPE_MM, "PCM1808": PCM1808_ENVELOPE_MM},
+        "materials": MATERIALS,
+        "selected_geometry": selected,
+        "thread_screen": thread,
+    }
+    (OUT / "input_spec.json").write_text(json.dumps(spec, indent=2), encoding="utf-8")
+    write_csv(OUT / "thermal_results.csv", thermal_rows)
+    write_csv(OUT / "mesh_convergence.csv", convergence)
+
+    parts = build_detailed_cad(selected)
+    render_cad(parts)
+    render_section(selected)
+    plot_thermal(thermal_rows, selected, selected_run)
+
+    analysis_layers = [
+        {"name": "Outer", "material": "Inconel718", "thickness": selected["inconel_wall_mm"]},
+        {"name": "Insulation", "material": "Aerogel", "thickness": selected["aerogel_mm"]},
+        {"name": "Chassis", "material": "PEEK", "thickness": selected["peek_mm"]},
+    ]
+    generate_casing(selected["od_mm"], ANALYSIS_LENGTH_MM, analysis_layers, str(CAD_DIR / "hti_casing_analysis.step"))
+
+    thermal_fea = run_calculix_thermal(selected)
+    structural_fea = run_structural_fea(selected, selected_run)
+    write_csv(OUT / "structural_fea_results.csv", structural_fea)
+    plot_structural(selected, structural_fea)
+
+    summary = {
+        "selected_geometry": selected,
+        "selected_thermal_1h_1W_C": float(selected_run["inner_temperature_C"][-1]),
+        "thermal_calculix": thermal_fea,
+        "structural_calculix": structural_fea,
+        "thread_screen": thread,
+        "limitations": [
+            "Supplier-controlled HTI dimensions and preamplifier mode are not confirmed.",
+            "Board envelopes are internet-derived and not physically measured.",
+            "No seal, collapse, fatigue, acoustic, corrosion, or manufacturing qualification is claimed.",
+        ],
+    }
+    (OUT / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    write_report(geometries, thermal_rows, convergence, selected, thermal_fea, structural_fea, thread)
+    print(json.dumps(summary, indent=2))
+
+
+if __name__ == "__main__":
+    main()

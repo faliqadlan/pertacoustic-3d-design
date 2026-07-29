@@ -1,0 +1,90 @@
+{
+  "status": "preliminary_engineering_only",
+  "external_temperature_C": 150.0,
+  "initial_temperature_C": 25.0,
+  "external_pressure_MPa": 68.9476,
+  "focused_OD_mm": [
+    43,
+    50,
+    60
+  ],
+  "derived_OD_mm": [
+    65,
+    70,
+    75,
+    80
+  ],
+  "durations_h": [
+    1
+  ],
+  "internal_power_W": [
+    0,
+    1,
+    2
+  ],
+  "board_clearance_mm": 1.5,
+  "required_clear_ID_mm": 41,
+  "provisional_envelopes_mm": {
+    "STM32F411": [
+      55.0,
+      22.0,
+      12.0
+    ],
+    "PCM1808": [
+      52.0,
+      32.0,
+      18.0
+    ]
+  },
+  "materials": {
+    "Inconel718": {
+      "density_kg_m3": 8190.0,
+      "conductivity_W_mK": 14.7,
+      "specific_heat_J_kgK": 460.0,
+      "elastic_modulus_MPa_150C": 193000.0,
+      "poisson": 0.28,
+      "yield_MPa_150C_screening": 1000.0,
+      "thermal_expansion_1_K": 1.3e-05,
+      "source": "https://www.specialmetals.com/documents/technical-bulletins/inconel/inconel-alloy-718.pdf",
+      "note": "Conservative screening yield; final value depends on product form and heat treatment."
+    },
+    "Aerogel": {
+      "density_kg_m3": 150.0,
+      "conductivity_W_mK": 0.02,
+      "specific_heat_J_kgK": 1000.0,
+      "source": "https://www.aerogel.com/products-and-solutions/pyrogel-hps/",
+      "note": "Representative sealed blanket properties; exact purchased grade is required before final design."
+    },
+    "PEEK": {
+      "density_kg_m3": 1300.0,
+      "conductivity_W_mK": 0.29,
+      "specific_heat_J_kgK": 1500.0,
+      "source": "https://images.victrex.com/-/media/downloads/datasheets/victrex_tds_450g.pdf",
+      "note": "450G density/conductivity with conservative screening heat capacity assumption."
+    }
+  },
+  "selected_geometry": {
+    "od_mm": 60.0,
+    "fit": true,
+    "clear_id_mm": 41,
+    "inconel_wall_mm": 5.25,
+    "aerogel_mm": 2.25,
+    "peek_mm": 2.0,
+    "max_von_mises_MPa": 373.9201448452005,
+    "yield_safety_factor": 2.674367812983146,
+    "elastic_buckling_pressure_MPa": 155.51762072788097,
+    "buckling_factor": 2.2555915032268126,
+    "structural_screen": "PASS",
+    "thermal_screen": "FAIL",
+    "selection_note": "Smallest fit/structural reference candidate; no studied solid-aerogel candidate met the one-hour 70C target without crediting unverified electronics thermal mass."
+  },
+  "thread_screen": {
+    "nominal_thread": "7/16-20 UNF-2A concept",
+    "pitch_mm": 1.27,
+    "engagement_mm": 10.16,
+    "conservative_pressure_thrust_N": 6687.019393380112,
+    "thread_shear_stress_MPa": 43.87301051363031,
+    "thread_retention_safety_factor": 6.575796751179631,
+    "note": "Conservative screen only; the HTI attachment thread is not the pressure seal."
+  }
+}
