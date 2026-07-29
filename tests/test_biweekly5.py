@@ -9,6 +9,8 @@ from cosmo.biweekly5 import (
     HOUSING_LENGTH_MM,
     REQUIRED_CLEAR_ID_MM,
     _parse_buckling_factor,
+    _zone_max_temperatures,
+    axial_heat_leak_screen,
     choose_wall,
     lame_screen,
     pressure_vessel_solid,
@@ -99,6 +101,23 @@ class Biweekly5StudyTests(unittest.TestCase):
         ):
             with self.assertRaises(ValueError):
                 extract_max_internal_temperature("unused.frd", target_time=3600, r_inner=20.5)
+
+    def test_component_temperature_zones_do_not_mix_endcaps(self):
+        nodes = {
+            1: (20.5, 0, 0),
+            2: (20.5, 0, 20),
+            3: (20.5, 0, 50),
+            4: (20.5, 0, 110),
+            5: (20.5, 0, 170),
+        }
+        temperatures = {1: 150, 2: 120, 3: 90, 4: 70, 5: 80}
+        self.assertEqual(
+            _zone_max_temperatures(nodes, temperatures, 20.5),
+            {"Analog front-end": 120, "PCM1808": 90, "STM32F411": 70, "RTC/SD/power": 80},
+        )
+        axial = axial_heat_leak_screen(choose_wall(146))
+        self.assertGreater(axial["front_initial_heat_W"], 2.0)
+        self.assertLess(axial["rear_initial_heat_W"], 1.0)
 
 
 if __name__ == "__main__":

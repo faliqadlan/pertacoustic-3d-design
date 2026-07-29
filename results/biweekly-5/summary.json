@@ -43,7 +43,19 @@
       }
     ],
     "note": "Closed 3D model includes front/rear Inconel caps and available axial aerogel buffers.",
-    "inner_temperature_C": 140.434
+    "inner_temperature_C": 140.434,
+    "component_max_temperature_C": {
+      "Analog front-end": 140.434,
+      "PCM1808": 92.0152,
+      "STM32F411": 71.7669,
+      "RTC/SD/power": 112.022
+    }
+  },
+  "axial_heat_leak_screen": {
+    "front_resistance_K_W": 54.526903360439256,
+    "front_initial_heat_W": 2.2924463392632504,
+    "rear_resistance_K_W": 186.30025314816749,
+    "rear_initial_heat_W": 0.6709599041746098
   },
   "structural_calculix": [
     {

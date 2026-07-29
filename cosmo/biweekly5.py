@@ -20,7 +20,7 @@ import numpy as np
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 from cosmo.core.mesh_generator import generate_mesh
-from cosmo.core.result_extractor import extract_max_internal_temperature
+from cosmo.core.result_extractor import extract_max_internal_temperature, parse_frd_temperatures
 from cosmo.core.solver_interface import setup_and_run_calculix
 
 
@@ -37,6 +37,12 @@ INITIAL_TEMPERATURE_C = 25.0
 HOUSING_LENGTH_MM = 255.0
 FRONT_AXIAL_INSULATION_MM = 6.0
 ELECTRONICS_END_Z_MM = 252.0
+THERMAL_ZONES_LOCAL_MM = {
+    "Analog front-end": (18.0, 43.0),
+    "PCM1808": (48.0, 100.0),
+    "STM32F411": (105.0, 160.0),
+    "RTC/SD/power": (167.0, 222.0),
+}
 PEEK_THICKNESS_MM = 2.0
 BOARD_CLEARANCE_MM = 1.5
 STM32_ENVELOPE_MM = (55.0, 22.0, 12.0)
@@ -711,7 +717,51 @@ def run_calculix_thermal(selected: dict) -> dict:
     }
     if fine["status"] == "passed":
         result["inner_temperature_C"] = fine["inner_temperature_C"]
+        nodes, steps = parse_frd_temperatures(str((work / "selected_thermal_fine.frd")))
+        final = min(steps, key=lambda step: abs(step["time"] - 3600))
+        result["component_max_temperature_C"] = _zone_max_temperatures(
+            nodes, final["temperatures"], selected["clear_id_mm"] / 2
+        )
     return result
+
+
+def _zone_max_temperatures(nodes: dict, temperatures: dict, inner_radius_mm: float) -> dict[str, float]:
+    result = {}
+    for name, (z_min, z_max) in THERMAL_ZONES_LOCAL_MM.items():
+        values = [
+            temperatures[nid]
+            for nid, (x, y, z) in nodes.items()
+            if nid in temperatures
+            and abs(math.hypot(x, y) - inner_radius_mm) < 0.5
+            and z_min <= z <= z_max
+        ]
+        if not values:
+            raise ValueError(f"No thermal nodes found for {name}")
+        result[name] = max(values)
+    return result
+
+
+def axial_heat_leak_screen(geometry: dict[str, float]) -> dict[str, float]:
+    clear_radius = geometry["clear_id_mm"] / 2000
+    peek_outer = clear_radius + geometry["peek_mm"] / 1000
+    aerogel_area = math.pi * clear_radius**2
+    peek_area = math.pi * (peek_outer**2 - clear_radius**2)
+    rear_length = (HOUSING_LENGTH_MM + 30.0 - geometry["inconel_wall_mm"] - ELECTRONICS_END_Z_MM) / 1000
+
+    def parallel_resistance(length: float) -> float:
+        aerogel = length / (MATERIALS["Aerogel"]["conductivity"] * aerogel_area)
+        peek = length / (MATERIALS["PEEK"]["conductivity"] * peek_area)
+        return 1 / (1 / aerogel + 1 / peek)
+
+    front = parallel_resistance(FRONT_AXIAL_INSULATION_MM / 1000)
+    rear = parallel_resistance(rear_length)
+    delta = EXTERNAL_TEMPERATURE_C - INITIAL_TEMPERATURE_C
+    return {
+        "front_resistance_K_W": front,
+        "front_initial_heat_W": delta / front,
+        "rear_resistance_K_W": rear,
+        "rear_initial_heat_W": delta / rear,
+    }
 
 
 def parse_inp(path: Path):
@@ -965,6 +1015,7 @@ def write_report(
     structural_fea: list[dict],
     thread: dict,
 ) -> None:
+    axial_screen = axial_heat_leak_screen(selected)
     one_hour = next(
         row
         for row in thermal_rows
@@ -976,10 +1027,11 @@ def write_report(
         table_geometries.append(selected)
     for geometry in table_geometries:
         focus_rows.append(
-            f"| {geometry['od_mm']:.0f} | {'Lolos' if geometry.get('fit') else 'Tidak'} | "
+            f"| {geometry['od_mm']:.0f} | {'yes' if geometry.get('fit') else 'no'} | "
             f"{geometry.get('inconel_wall_mm', '-')} | {geometry.get('aerogel_mm', '-')} | "
-            f"{geometry.get('structural_screen', '-')} | {geometry.get('reason', 'Lolos penyaringan geometri/struktur')} |"
+            f"{geometry.get('structural_screen', '-')} | {geometry.get('reason', 'analytical geometry/wall screen only')} |"
         )
+    structural_coarse = next((row for row in structural_fea if row["mesh"] == "coarse" and row["status"] == "passed"), None)
     structural_fine = next((row for row in structural_fea if row["mesh"] == "fine" and row["status"] == "passed"), None)
     structural_medium = next((row for row in structural_fea if row["mesh"] == "medium" and row["status"] == "passed"), None)
     stress_change = (
@@ -996,137 +1048,140 @@ def write_report(
         if structural_medium and structural_fine
         else float("nan")
     )
-    structural_text = (
-        f"FEA mesh halus menghasilkan tegangan nodal maksimum {fmt(structural_fine['max_nodal_von_mises_MPa'])} MPa "
-        f"dan perpindahan maksimum {fmt(structural_fine['max_displacement_mm'], 4)} mm, dengan faktor buckling eigenvalue "
-        f"{fmt(structural_fine.get('buckling_factor_fea', float('nan')))}."
-        if structural_fine
-        else "FEA struktural tidak menghasilkan output yang dapat diverifikasi; hanya hasil analitik yang digunakan."
+    buckling_change = (
+        abs(structural_medium["buckling_factor_fea"] - structural_fine["buckling_factor_fea"])
+        / structural_fine["buckling_factor_fea"]
+        * 100
+        if structural_medium and structural_fine
+        else float("nan")
     )
-    fea_thermal_text = (
-        f"Model 3D CalculiX tertutup dengan panas internal 1 W menghasilkan temperatur maksimum ruang elektronik "
-        f"{fmt(thermal_fea['inner_temperature_C'])}°C setelah 1 jam dan berstatus **{thermal_fea['acceptance']}**."
-        if thermal_fea.get("status") == "passed" and thermal_fea.get("inner_temperature_C") is not None
-        else "Validasi termal 3D CalculiX tidak berhasil dan tidak digunakan sebagai bukti kelulusan."
-    )
-    combined_result = (
-        "Kandidat memenuhi seluruh penyaringan awal."
-        if selected.get("engineering_status") == "PASS"
-        else "Kandidat radial tidak lolos validasi 3D tertutup; status rekayasa akhir milestone ini adalah **FAIL**."
-    )
-    progress_result = (
-        "Diperoleh kandidat yang lolos seluruh penyaringan awal."
-        if selected.get("engineering_status") == "PASS"
-        else "Diperoleh kandidat radial untuk diuji, tetapi model tertutup menunjukkan desain belum lolos termal dan struktur."
-    )
-    report = f"""# PERTACOUSTIC — Laporan Biweekly 5
+    component_rows = []
+    for name, value in thermal_fea.get("component_max_temperature_C", {}).items():
+        classification = "preferred" if value <= 50 else "conditional" if value <= 70 else "redesign"
+        if name == "PCM1808" and value > 85:
+            classification += "; above the 85°C IC ceiling"
+        component_rows.append(f"| {name} | {value:.2f} | {classification} |")
+    report = f"""# PERTACOUSTIC: Biweekly 5 report
 
-**Periode laporan:** Biweekly 5  
-**Tanggal:** 30 Juli 2026  
-**Status dokumen:** Rekayasa awal — **{selected['engineering_status']}**, bukan persetujuan manufaktur atau sertifikasi tekanan
+Periode: Biweekly 5
 
-## Daftar Isi
+Tanggal: 30 Juli 2026
 
-1. Rencana Tata Waktu dan Realisasi Pekerjaan
-2. Ringkasan Kemajuan Pelaksanaan Pekerjaan
-3. Deskripsi Kemajuan Pelaksanaan Pekerjaan
-4. Rencana Pekerjaan Dua Minggu ke Depan
-5. Daftar Pustaka
+Status: preliminary engineering. Current design status: {selected['engineering_status']}.
 
-## 1. Rencana Tata Waktu dan Realisasi Pekerjaan
+Dokumen ini mencatat hasil desain dan simulation screening. Hasilnya belum dapat dipakai sebagai manufacturing drawing, pressure rating, atau seal qualification.
 
-Laporan Biweekly 4 mencatat kemajuan kumulatif 20%. Pada Biweekly 5 dilakukan pekerjaan desain casing, penyaringan dimensi, pemodelan antarmuka HTI, dan analisis awal termal-struktural. Persentase kumulatif baru tidak ditetapkan karena bobot resmi pekerjaan belum dikonfirmasi oleh pengelola proyek.
+## 1. Rencana dan realisasi pekerjaan
 
-## 2. Ringkasan Kemajuan Pelaksanaan Pekerjaan
+Biweekly 4 mencatat progress kumulatif 20%. Pekerjaan periode ini meliputi desain casing, interface ke HTI-02-DHPC/D, electronics layout, thermal analysis, dan structural analysis. Persentase progress tidak ditambah karena bobot resmi pekerjaan belum tersedia.
 
-- Dibuat konsep casing yang terhubung ke drat betina `7/16-20 UNF-2B` pada HTI-02-DHPC/D menggunakan adapter jantan nominal `7/16-20 UNF-2A`.
-- Dibuat rute tiga konduktor dari feedthrough HTI menuju front-end analog, ADC PCM1808, STM32F411, dan ruang RTC/SD/daya.
-- Stack material dasar ditetapkan sebagai Inconel 718–aerogel tersegel–PEEK.
-- PA12/nylon tidak dipilih sebagai pressure housing; penggunaannya dibatasi untuk carrier, guide kabel, atau strain relief setelah grade material ditentukan.
-- Dilakukan penyaringan OD 43, 50, dan 60 mm serta kandidat turunan. {progress_result}
+## 2. Ringkasan progress
 
-## 3. Deskripsi Kemajuan Pelaksanaan Pekerjaan
+- Casing menggunakan nominal male thread `7/16-20 UNF-2A` untuk terhubung ke female thread HTI `7/16-20 UNF-2B`.
+- Model CAD berisi tiga conductor paths, front analog section, PCM1808, STM32F411, dan ruang RTC/SD/power.
+- Material stack tetap Inconel 718, sealed aerogel, dan PEEK. PA12/nylon hanya dipertimbangkan untuk carrier, cable guide, spacer, atau strain relief.
+- Radial screening menghasilkan kandidat OD {selected['od_mm']:.0f} mm. Closed 3D models menunjukkan bahwa kandidat ini belum memenuhi thermal dan structural criteria.
 
-### 3.1 Dasar Desain dan Batasan
+## 3. Engineering work
 
-Mechanical outline pemasok digunakan untuk konsep antarmuka. Dokumen tersebut bertanda *for reference only*, sehingga ukuran drat dan datum harus dikonfirmasi kepada HTI sebelum gambar manufaktur diterbitkan. Halaman produk HTI juga menjelaskan bahwa tipe preamplifier, endcap, kabel, dan filter dapat dikustomisasi [1]. Oleh karena itu, jalur tiga konduktor dipertahankan sampai mode current/voltage preamplifier dikonfirmasi.
+### 3.1 Design basis
 
-Envelope sementara komponen adalah 55 × 22 × 12 mm untuk STM32F411 dan 52 × 32 × 18 mm untuk PCM1808. Setelah clearance 1,5 mm, kebutuhan diameter ruang bersih adalah {REQUIRED_CLEAR_ID_MM} mm. Ukuran ini berasal dari informasi internet dan wajib diperiksa dengan jangka sorong pada komponen yang telah dibeli.
+HTI mechanical outline dipakai sebagai reference untuk thread dan envelope. Drawing tersebut bertanda "for reference only", jadi datum dan thread tolerance masih harus dikonfirmasi kepada HTI. Preamplifier mode dan pinout juga belum diketahui. Karena itu, model mempertahankan tiga conductor paths dan configurable analog front-end.
 
-PCM1808 memiliki rentang operasi IC −40 sampai 85°C [2]. Nilai 85°C hanya dipakai sebagai batas penyaringan; target desain tetap 50°C, sedangkan 50–70°C dikategorikan bersyarat.
+Provisional board envelopes adalah 55 x 22 x 12 mm untuk STM32F411 dan 52 x 32 x 18 mm untuk PCM1808. Dengan assembly clearance 1,5 mm, clear ID yang dipakai adalah {REQUIRED_CLEAR_ID_MM} mm. Ukuran board harus diukur langsung sebelum detailed design.
 
-Desain harus dapat dibuat mandiri di Laboratorium Geofisika UGM menggunakan proses CNC dan perakitan konvensional. Vacuum insulation dan blok massa termal tambahan dikeluarkan dari ruang solusi karena kompleksitas pembuatan dan pengujiannya. Pengguna tidak menetapkan batas maksimum OD untuk studi awal ini.
+Target electronics temperature adalah 50°C. Rentang 50 sampai 70°C dianggap conditional. Temperatur di atas 70°C membutuhkan redesign. PCM1808 mempunyai operating ceiling 85°C [2], tetapi angka 85°C bukan design target.
 
-### 3.2 Konsep Mekanik, Drat, Seal, dan Kabel
+Desain dibatasi pada conventional CNC dan laboratory assembly di Laboratorium Geofisika UGM. Vacuum insulation dan added thermal-mass block tidak digunakan.
 
-![Model CAD casing dan HTI](figures/cad_assembly.png)
+### 3.2 Mechanical concept
 
-Adapter depan memiliki drat heliks nominal, lubang tiga konduktor, shoulder, spigot, dan ruang dua seal radial. Drat HTI hanya berfungsi sebagai retensi mekanik. Pressure boundary elektronik dibentuk oleh housing Inconel dan seal pada spigot yang terpisah. Jenis elastomer, backup ring, toleransi groove, dan extrusion gap belum dapat disahkan tanpa standar seal dan data fluida.
+![CAD assembly](figures/cad_assembly.png)
 
-Tiga kabel diberi strain relief sebelum sambungan solder. ADC ditempatkan dekat sensor untuk meminimalkan panjang jalur analog. Shield dan ground termination disediakan secara konseptual, tetapi rangkaian front-end belum difinalkan karena mode preamplifier HTI belum diketahui.
+Front adapter terdiri dari nominal thread, shoulder, spigot, tiga cable holes, dan dua preliminary seal grooves. Thread HTI menahan sensor. Pressure seal untuk electronics housing berada pada interface yang terpisah. Groove dimensions, elastomer, backup ring, extrusion gap, dan tolerance stack belum ditetapkan.
 
-### 3.3 Penempatan Elektronik dan Material
+Rear pressure endcap sudah ditambahkan ke CAD. Defeatured FEA model memakai closed Inconel vessel agar pressure bekerja pada barrel dan kedua endcaps. Thread, seal contact, dan local groove geometry belum masuk ke FEA.
 
-![Penampang dan penempatan elektronik](figures/longitudinal_section.png)
+### 3.3 Electronics layout and materials
 
-Urutan aksial yang dimodelkan adalah HTI → front-end analog → PCM1808 → STM32F411 → ruang RTC/SD/daya. Aerogel ditempatkan sepenuhnya di dalam pressure housing sehingga tidak menerima tekanan sumur atau kontak langsung dengan fluida.
+![Longitudinal section](figures/longitudinal_section.png)
 
-Inconel 718 dipilih sebagai pressure shell awal. Data modulus dan sifat temperatur berasal dari bulletin Special Metals, tetapi nilai aktual tetap bergantung pada product form dan heat treatment [3]. PEEK 450G dipertahankan sebagai carrier karena kestabilan termal dan isolasi listriknya [4]. Pyrogel HPS dimodelkan dengan densitas nominal 200 kg/m³ dan konduktivitas 0,024 W/mK pada mean temperature 100°C [5]; kapasitas panas 1.000 J/kgK tetap merupakan asumsi screening. Nylon hanya menjadi alternatif carrier setelah grade, creep, penyerapan air, dan stabilitas dimensinya tersedia.
+Axial order pada model adalah HTI, analog front-end, PCM1808, STM32F411, lalu RTC/SD/power. Aerogel berada di dalam Inconel housing dan tidak bersentuhan langsung dengan well fluid.
 
-### 3.4 Penyaringan Geometri dan Struktur
+Inconel properties berasal dari Special Metals [3]. Nilai strength tetap bergantung pada product form dan heat treatment. PEEK memakai Victrex 450G data dengan heat capacity sebagai screening assumption [4]. Pyrogel HPS memakai nominal density 200 kg/m³ dan conductivity 0,024 W/mK pada mean temperature 100°C [5]. Specific heat aerogel 1.000 J/kgK masih merupakan assumption dan perlu dikonfirmasi untuk material yang dibeli.
 
-| OD (mm) | Muat | Wall Inconel (mm) | Aerogel (mm) | Struktur | Keterangan |
+### 3.4 Geometry and structural screening
+
+| OD (mm) | Fit | Inconel wall (mm) | Aerogel (mm) | Structural status | Note |
 |---:|---|---:|---:|---|---|
 {chr(10).join(focus_rows)}
 
-Kandidat radial terkecil adalah **OD {selected['od_mm']:.0f} mm**, dengan Inconel {selected['inconel_wall_mm']} mm, aerogel {selected['aerogel_mm']} mm, PEEK {selected['peek_mm']} mm, dan clear ID {selected['clear_id_mm']} mm. Hasil analitik Lamé memberikan tegangan ekuivalen {fmt(selected['max_von_mises_MPa'])} MPa dan faktor keamanan luluh {fmt(selected['yield_safety_factor'])}. Penyaringan buckling silinder panjang menghasilkan faktor {fmt(selected['buckling_factor'])}. {combined_result} Solusi analitik hanya memeriksa dinding silinder; hasil FEA bejana tertutup menjadi keputusan yang mengikat.
+Radial screening memilih OD {selected['od_mm']:.0f} mm dengan wall {selected['inconel_wall_mm']} mm, aerogel {selected['aerogel_mm']} mm, PEEK {selected['peek_mm']} mm, dan clear ID {selected['clear_id_mm']} mm. Lamé calculation memberi equivalent stress {fmt(selected['max_von_mises_MPa'])} MPa dan yield safety factor {fmt(selected['yield_safety_factor'])}. Long-cylinder equation memberi buckling factor {fmt(selected['buckling_factor'])}. Kedua calculation hanya mewakili cylindrical wall.
 
-Perhitungan konservatif retensi drat menghasilkan faktor keamanan {fmt(thread['thread_retention_safety_factor'])}. Beban tersebut sengaja menganggap pressure thrust bekerja pada diameter drat, walaupun konsep aktual memisahkan drat HTI dari pressure boundary.
+![Structural comparison](figures/structural_comparison.png)
 
-![Perbandingan struktur](figures/structural_comparison.png)
+Closed-vessel FEA belum mesh-converged. Coarse, medium, dan fine stress adalah {fmt(structural_coarse['max_nodal_von_mises_MPa'])}, {fmt(structural_medium['max_nodal_von_mises_MPa'])}, dan {fmt(structural_fine['max_nodal_von_mises_MPa'])} MPa. Displacement berubah dari {fmt(structural_coarse['max_displacement_mm'], 3)} menjadi {fmt(structural_fine['max_displacement_mm'], 3)} mm. Medium-to-fine changes masih {fmt(stress_change)}% untuk stress dan {fmt(displacement_change)}% untuk displacement.
 
-{structural_text} Perubahan tegangan mesh medium-ke-fine adalah {fmt(stress_change)}%, sedangkan perubahan perpindahan {fmt(displacement_change)}%. FEA menggunakan bejana tertutup sepanjang {HOUSING_LENGTH_MM:.0f} mm dengan tekanan pada barrel dan kedua endcap serta gradien temperatur. Kontak, seal, drat, dan imperfection terukur belum dimodelkan. Karena konvergensi belum di bawah 5% dan faktor buckling halus di bawah 2, hasil struktur dikategorikan **FAIL**.
+Thermo-mechanical load masih memakai radial temperature profile, bukan direct mapping dari closed 3D thermal result. Karena itu, static stress dan displacement dipakai sebagai screening trend. Buckling analysis tidak memakai thermal load dan tetap menjadi independent failure check.
 
-### 3.5 Analisis Termal
+Buckling factors turun dari {fmt(structural_coarse['buckling_factor_fea'])} pada coarse mesh menjadi {fmt(structural_fine['buckling_factor_fea'])} pada fine mesh. Medium-to-fine change adalah {fmt(buckling_change)}%. Semua mesh berada di bawah acceptance factor 2. Karena hasil belum converged, nilai fine mesh tidak dianggap sebagai exact design stress. Kesimpulan FAIL tetap berlaku karena buckling margin tidak tercapai dan trend belum stabil.
 
-![Riwayat temperatur](figures/thermal_history.png)
+Thread retention calculation memberi safety factor {fmt(thread['thread_retention_safety_factor'])}. Calculation ini masih nominal dan belum menggantikan thread tolerance atau seal design.
 
-Model radial transient menggunakan temperatur awal 25°C, batas luar 150°C, durasi 1 jam, dan panas internal 0/1/2 W. Kandidat referensi mencapai **{fmt(one_hour['inner_temperature_C'])}°C pada 1 jam dan 1 W**, sehingga dikategorikan **{one_hour['classification']}**. Hasil yang dapat melebihi 150°C berasal dari panas internal pada kondisi mendekati tunak; ini bukan kesalahan clipping.
+### 3.5 Thermal analysis
 
-![Trade-off termal](figures/thermal_tradeoff.png)
+![Thermal history](figures/thermal_history.png)
 
-{fea_thermal_text} Model 3D mencakup kedua endcap Inconel, buffer aerogel aksial yang tersedia, dan tiga mesh. Analisis belum mencakup kontak nyata, kabel, toleransi kompresi aerogel, atau distribusi daya per komponen.
+Radial transient model memakai initial temperature 25°C, external surface 150°C, exposure 1 hour, dan internal heat 0, 1, atau 2 W. Pada 1 W, kandidat OD {selected['od_mm']:.0f} mm menghasilkan {fmt(one_hour['inner_temperature_C'])}°C. Hasil ini hanya berlaku untuk radial heat flow dengan adiabatic ends.
 
-### 3.6 Konvergensi dan Keterbatasan
+Closed 3D CalculiX model memasukkan front and rear Inconel endcaps, axial aerogel buffers, dan total internal heat 1 W. Fine mesh menghasilkan component-zone temperatures berikut.
 
-Studi radial menggunakan 12, 24, dan 48 sel total. Model termal 3D, struktur statik, dan buckling CalculiX masing-masing dijalankan dengan mesh coarse, medium, dan fine. Kriteria perubahan medium-ke-fine adalah di bawah 5%; kegagalan memenuhi kriteria dilaporkan sebagai FAIL, bukan disembunyikan.
+| Model input check | Value |
+|---|---|
+| Initial temperature | 25°C |
+| External boundary | 150°C on barrel and both end faces |
+| Internal heat | 1 W total nodal CFLUX |
+| Exposure time | 3600 s (1 hour) |
+| Thermal medium-to-fine change | {fmt(thermal_fea['mesh_convergence_pct'], 4)}% |
 
-Hasil belum mencakup kapasitas panas bawaan komponen aktual, uji kebocoran, fatigue, shock/vibration, respons akustik casing, sour-service qualification, toleransi manufaktur, atau proof pressure. Vacuum insulation dan blok massa termal tambahan tidak dipertimbangkan karena tidak sesuai kemampuan pembuatan laboratorium. Tidak ada klaim bahwa desain siap diproduksi. Simulasi juga menemukan kesalahan unit pada workflow lama: konduktivitas pernah dibagi 1.000. Kesalahan tersebut telah diperbaiki, sehingga hasil lama yang mendekati 25°C tidak digunakan.
+| Electronics zone | Maximum inner-boundary temperature after 1 hour (°C) | Screening |
+|---|---:|---|
+{chr(10).join(component_rows)}
 
-## 4. Rencana Pekerjaan Dua Minggu ke Depan
+Maximum cavity-boundary temperature adalah {fmt(thermal_fea['inner_temperature_C'])}°C pada analog front-end zone, tepat setelah front axial aerogel buffer setebal {FRONT_AXIAL_INSULATION_MM:.0f} mm. PCM1808 zone boundary mencapai {fmt(thermal_fea['component_max_temperature_C']['PCM1808'])}°C, di atas operating ceiling 85°C. STM32F411 zone boundary mencapai {fmt(thermal_fea['component_max_temperature_C']['STM32F411'])}°C, sedikit di atas 70°C screening limit. Angka ini bukan chip junction temperature karena boards belum dimodelkan sebagai solids.
 
-- Ukur dimensi aktual STM32F411 dan PCM1808, termasuk header, jack, mounting hole, dan tinggi konektor.
-- Konfirmasi drawing terkendali, mode preamplifier, pinout, kabel, dan detail endcap kepada HTI.
-- Konfirmasi batas OD dan panjang tool terhadap borehole serta fasilitas uji yang sebenarnya.
-- Pilih grade aerogel, PEEK, seal, dan kondisi heat treatment Inconel yang dapat dibeli.
-- Ukur daya dan kapasitas panas bawaan komponen, lalu kalibrasi distribusi daya, konduksi kabel, dan contact resistance pada model termal tertutup.
-- Validasi model menggunakan coupon Inconel–aerogel–PEEK sederhana di oven atau hot bath dengan thermocouple.
-- Prioritaskan studi pemindahan ADC/MCU ke zona yang lebih dingin melalui kabel. Jika tidak memungkinkan, pilih elektronik bertemperatur lebih tinggi, perbesar batas OD solid-insulation, atau revisi temperatur/durasi operasi.
-- Lakukan desain groove seal sesuai standar yang dipilih, tolerance stack-up, dan review manufaktur.
-- Siapkan pressure test, leak test, thermal soak, dan pemeriksaan akustik setelah prototipe tersedia.
+Perbedaan antara radial model dan closed 3D model berasal dari heat flow melalui endcaps dan axial sections. Menambah radial aerogel membantu bagian tengah housing, tetapi tidak menambah jarak thermal path di depan atau belakang. Karena itu, memperbesar OD saja tidak menyelesaikan temperatur di end zones.
 
-## 5. Daftar Pustaka
+Simple resistance cross-check memberi front axial resistance sekitar {fmt(axial_screen['front_resistance_K_W'], 1)} K/W untuk aerogel dan PEEK dalam parallel path. Pada initial temperature difference 125 K, heat leak awalnya sekitar {fmt(axial_screen['front_initial_heat_W'])} W. Rear path sekitar {fmt(axial_screen['rear_resistance_K_W'], 1)} K/W atau {fmt(axial_screen['rear_initial_heat_W'])} W. Nilai ini memakai ideal contact, tetapi cukup untuk menunjukkan bahwa axial heat leak sebanding dengan, bahkan lebih besar dari, internal heat 1 W.
+
+Thermal mesh convergence memenuhi kriteria. Medium-to-fine change adalah {fmt(thermal_fea['mesh_convergence_pct'], 4)}%. External surface langsung ditahan pada 150°C, sehingga model ini conservative untuk transient heating. Model belum memakai measured electronics heat capacity, contact resistance, cable conduction, atau aerogel compression data. Nilai temperatur harus dibaca sebagai screening result, bukan predicted field-test temperature.
+
+![Thermal OD comparison](figures/thermal_tradeoff.png)
+
+### 3.6 Current result
+
+Current design status adalah {selected['engineering_status']}.
+
+Radial wall calculation lulus, tetapi closed 3D thermal model gagal pada PCM1808 dan end zones. Closed-vessel structural model juga belum memenuhi buckling factor dan mesh convergence criteria. Memperbesar radial aerogel tanpa mengubah endcap geometry atau electronics position tidak cukup.
+
+## 4. Next work
+
+- Measure the actual STM32F411 and PCM1808 boards, including connectors and headers.
+- Measure electronics power during logging and standby conditions.
+- Move temperature-sensitive electronics farther from both endcaps and increase axial insulation length.
+- Redesign the flat end closures, then repeat static and buckling convergence studies.
+- Select the actual aerogel, PEEK, Inconel heat treatment, and seal materials that can be purchased.
+- Complete seal groove calculation and manufacturing tolerance stack.
+- Validate a simple Inconel/aerogel/PEEK coupon in an oven or hot bath before relying on the 3D thermal model.
+
+## 5. References
 
 1. [High Tech Inc., HTI-02-DHPC/D](https://www.hightechincusa.com/products/hydrophones/hti02dhpc.html)
 2. [Texas Instruments, PCM1808](https://www.ti.com/product/PCM1808)
 3. [Special Metals, INCONEL Alloy 718 Technical Bulletin](https://www.specialmetals.com/documents/technical-bulletins/inconel/inconel-alloy-718.pdf)
 4. [Victrex, PEEK 450G Technical Data Sheet](https://images.victrex.com/-/media/downloads/datasheets/victrex_tds_450g.pdf)
 5. [Aspen Aerogels, Pyrogel HPS Product Data Sheet](https://www.aerogel.com/wp-content/uploads/2021/06/Pyrogel-HPS-Datasheet-English.pdf)
-6. HTI-02-DHPC/D Mechanical Outline 02-001-25-00-00, dokumen pemasok, *for reference only*.
-
----
-
-**Catatan:** Dokumen ini melaporkan hasil rekayasa awal yang dapat direproduksi. Semua ukuran internet, asumsi material, hasil simulasi, dan keputusan sementara dipisahkan dari data pemasok yang telah diverifikasi.
+6. HTI-02-DHPC/D Mechanical Outline 02-001-25-00-00, supplier document marked "for reference only".
 """
     (OUT / "biweekly-5.md").write_text(report, encoding="utf-8")
 
@@ -1232,6 +1287,7 @@ def main() -> None:
         "selected_geometry": selected,
         "selected_thermal_1h_1W_C": float(selected_run["inner_temperature_C"][-1]),
         "thermal_calculix": thermal_fea,
+        "axial_heat_leak_screen": axial_heat_leak_screen(selected),
         "structural_calculix": structural_fea,
         "structural_qc": structural_qc,
         "thread_screen": thread,
