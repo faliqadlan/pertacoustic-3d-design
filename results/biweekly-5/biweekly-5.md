@@ -24,9 +24,10 @@ Ukuran nominal ulir yang dipakai adalah `7/16-20 UNF-2A` pada casing untuk dipas
 
 **Thread/ulir** adalah alur heliks untuk menyambungkan dua komponen. **Thread HTI** berarti ulir sambungan milik hydrophone HTI, bukan seal tekanan untuk ruang elektronik. Gambar HTI masih bertanda “for reference only”. Karena itu, **datum** (acuan pengukuran)—permukaan atau sumbu acuan untuk semua pengukuran—dan **thread tolerance** (toleransi ulir)—batas penyimpangan diameter, pitch, serta bentuk ulir—harus dikonfirmasi kepada HTI sebelum manufaktur.
 
-**Envelope** adalah kotak atau ruang batas yang disediakan agar suatu komponen pasti muat. Envelope sementara STM32F411 adalah 55 × 22 × 12 mm dan PCM1808 adalah 52 × 32 × 18 mm. **Assembly clearance** 1,5 mm adalah ruang tambahan agar board dapat dimasukkan dan tidak bergesekan. Dari ukuran tersebut digunakan **clear ID** 41 mm, yaitu diameter dalam bersih yang benar-benar tersedia untuk elektronik setelah material casing dan insulasi dihitung.
+**Envelope** adalah kotak atau ruang batas yang disediakan agar suatu komponen pasti muat. Envelope sementara STM32F411 adalah 55 × 22 × 12 mm dan PCM1808 adalah 52 × 32 × 18 mm. **Assembly clearance** 1,5 mm adalah ruang tambahan agar board dapat dimasukkan dan tidak bergesekan. Dari ukuran tersebut digunakan **clear ID** 41 mm, yaitu diameter dalam bersih yang benar-benar tersedia untuk elektronik setelah material casing dan insulasi dihitung. Visualisasi model CAD rakitan casing ditunjukkan pada **Gambar 1**.
 
 ![Rakitan CAD](figures/cad_assembly.png)
+**Gambar 1: Model CAD rakitan casing PertAcoustic 3D.**
 
 Adapter depan terdiri dari ulir nominal, **shoulder** atau bidang bertingkat yang menjadi penahan aksial, **spigot** atau bagian silinder yang masuk ke bore pasangan untuk menjaga posisi, tiga lubang kabel, dan dua alur seal awal. **Seal groove** adalah alur tempat O-ring atau seal. **Pressure seal** adalah komponen yang mencegah fluida bertekanan masuk ke ruang elektronik; lokasinya terpisah dari ulir HTI.
 
@@ -36,15 +37,20 @@ Dalam model struktur, **barrel** adalah dinding silinder panjang dan **endcap** 
 
 ## 4. Susunan elektronik
 
-![Penampang memanjang](figures/longitudinal_section.png)
+Urutan aksial komponen di dalam casing dapat dilihat pada penampang memanjang (**Gambar 2**). Urutan aksialnya adalah HTI, analog front-end, PCM1808, STM32F411, lalu RTC/SD/daya. **Conductor path** adalah jalur listrik dari tiga pin/kabel HTI menuju elektronik. Tiga jalur dipertahankan karena pinout final belum dikonfirmasi.
 
-Urutan aksialnya adalah HTI, analog front-end, PCM1808, STM32F411, lalu RTC/SD/daya. **Conductor path** adalah jalur listrik dari tiga pin/kabel HTI menuju elektronik. Tiga jalur dipertahankan karena pinout final belum dikonfirmasi.
+![Penampang memanjang](figures/longitudinal_section.png)
+**Gambar 2: Penampang memanjang susunan ruang elektronik dan insulasi aksial.**
 
 **Analog front-end** adalah rangkaian pertama yang menerima sinyal analog kecil dari hydrophone, kemudian menguatkan dan menyaringnya sebelum masuk ke PCM1808. **Analog front-end zone** adalah ruang di dalam model yang dialokasikan untuk rangkaian tersebut. **Configurable analog front-end** berarti nilai penguatan, penyaringan, dan hubungan pin belum dikunci sehingga dapat disesuaikan setelah data HTI tersedia.
 
 **Preamplifier mode** menjelaskan apakah preamplifier berada di dalam HTI, membutuhkan catu daya tertentu, dan bagaimana sinyal keluarannya dibaca. **Pinout** adalah daftar fungsi setiap pin, misalnya sinyal, ground, dan catu daya. PCM1808 mengubah sinyal analog menjadi data digital; STM32F411 mengendalikan akuisisi dan penyimpanan; ruang RTC/SD/daya disediakan untuk jam waktu nyata, kartu penyimpanan, dan rangkaian catu daya.
 
 ## 5. Pemeriksaan struktur
+
+Hasil screening geometri dan ketersediaan ruang radial untuk beberapa opsi OD dirangkum pada **Tabel 1**.
+
+**Tabel 1: Hasil screening ketersediaan ruang radial dan dimensi casing untuk berbagai variasi diameter luar (OD).**
 
 | OD (mm) | Muat | Dinding Inconel (mm) | Aerogel (mm) | Pemeriksaan analitis | Catatan |
 |---:|---|---:|---:|---|---|
@@ -55,9 +61,10 @@ Urutan aksialnya adalah HTI, analog front-end, PCM1808, STM32F411, lalu RTC/SD/d
 
 Perhitungan **Lamé** memperkirakan tegangan pada dinding silinder tebal akibat tekanan. **Equivalent stress** atau tegangan von Mises menyederhanakan kombinasi tegangan menjadi satu angka untuk dibandingkan dengan kekuatan luluh material. Hasil analitis dinding adalah 206.79 MPa dengan **factor of safety (FoS)** 4.84. FoS adalah perbandingan kekuatan material terhadap beban terhitung; FoS 2 berarti kapasitas perhitungan dua kali beban rencana.
 
-![Perbandingan struktur](figures/structural_comparison.png)
+Hasil distribusi tegangan dan deformasi dari analisis elemen hingga (FEA) ditunjukkan pada **Gambar 3**. FEA menghitung seluruh barrel dan kedua endcap. Tegangan coarse, medium, dan fine adalah 199.21, 206.52, dan 212.51 MPa. **Displacement** adalah perpindahan bentuk akibat beban; hasil fine adalah 0.785 mm.
 
-FEA menghitung seluruh barrel dan kedua endcap. Tegangan coarse, medium, dan fine adalah 199.21, 206.52, dan 212.51 MPa. **Displacement** adalah perpindahan bentuk akibat beban; hasil fine adalah 0.785 mm.
+![Perbandingan struktur](figures/structural_comparison.png)
+**Gambar 3: Perbandingan hasil simulasi struktur FEA casing pada variasi mesh.**
 
 **Mesh convergence** memeriksa apakah hasil berubah ketika elemen dibuat lebih kecil. Perubahan medium ke fine adalah 2.82% untuk tegangan dan 3.47% untuk displacement. Angka ini dilaporkan sebagai informasi karena pemeriksaan struktur periode ini dibatasi pada screening awal, bukan sertifikasi struktur.
 
@@ -67,9 +74,14 @@ FEA menghitung seluruh barrel dan kedua endcap. Tegangan coarse, medium, dan fin
 
 ## 6. Pemeriksaan termal
 
-![Riwayat temperatur](figures/thermal_history.png)
+Riwayat perubahan temperatur pada tiap zona elektronik selama 1 jam operasi ditunjukkan pada **Gambar 4**. Simulasi termal 3D casing tertutup memperhitungkan barrel, endcap Inconel depan/belakang, aerogel radial, **front/rear axial aerogel buffer**, serta daya panas internal elektronik sebesar **1 W** (1 joule per detik). **Axial aerogel buffer** adalah lapisan aerogel memanjang di antara endcap dan ruang elektronik untuk menghambat aliran panas aksial dari ujung casing.
 
-Simulasi termal 3D casing tertutup memperhitungkan barrel, endcap Inconel depan/belakang, aerogel radial, **front/rear axial aerogel buffer**, serta daya panas internal elektronik sebesar **1 W** (1 joule per detik). **Axial aerogel buffer** adalah lapisan aerogel memanjang di antara endcap dan ruang elektronik untuk menghambat aliran panas aksial dari ujung casing.
+![Riwayat temperatur](figures/thermal_history.png)
+**Gambar 4: Profil riwayat temperatur transient zona elektronik selama simulasi 1 jam.**
+
+Parameter masukan dan kondisi batas yang digunakan dalam simulasi termal dirangkum pada **Tabel 2**.
+
+**Tabel 2: Parameter input dan kondisi batas simulasi model termal 3D.**
 
 | Pemeriksaan input model | Nilai |
 |---|---|
@@ -78,6 +90,10 @@ Simulasi termal 3D casing tertutup memperhitungkan barrel, endcap Inconel depan/
 | Panas internal | 1 W total |
 | Waktu | 3.600 detik atau 1 jam |
 | Perubahan mesh medium ke fine | 1.1799% |
+
+Hasil perhitungan temperatur maksimum pada permukaan dalam (batas rongga) tiap zona elektronik dirangkum pada **Tabel 3**.
+
+**Tabel 3: Temperatur maksimum pada batas rongga tiap zona elektronik setelah simulasi 1 jam.**
 
 | Zona elektronik | Temperatur maksimum batas rongga setelah 1 jam (°C) | Penilaian |
 |---|---:|---|
@@ -90,9 +106,10 @@ Simulasi termal 3D casing tertutup memperhitungkan barrel, endcap Inconel depan/
 
 **Operating ceiling** adalah temperatur operasi maksimum yang diizinkan produsen komponen. PCM1808 memiliki ceiling 85°C [2], tetapi desain memakai batas pemeriksaan 70°C agar tersedia margin.
 
-Perbedaan model radial dan model 3D tertutup berasal dari panas yang juga masuk melalui endcap. Menambah diameter dan aerogel radial memperlambat panas dari sisi barrel, tetapi tidak memperpanjang jalur panas dari depan atau belakang. Karena itu, desain ini juga memindahkan elektronik dan menambah insulasi aksial.
+Perbedaan model radial dan model 3D tertutup berasal dari panas yang juga masuk melalui endcap. Menambah diameter dan aerogel radial memperlambat panas dari sisi barrel, tetapi tidak memperpanjang jalur panas dari depan atau belakang. Karena itu, desain ini juga memindahkan elektronik dan menambah insulasi aksial. Studi trade-off respon termal radial terhadap variasi diameter dan ketebalan insulasi ditunjukkan pada **Gambar 5**.
 
 ![Studi trade-off termal radial](figures/thermal_tradeoff.png)
+**Gambar 5: Studi trade-off termal radial terhadap variasi diameter luar (OD) dan insulasi aerogel.**
 
 **Thermal resistance** dalam K/W menyatakan kenaikan beda temperatur yang dibutuhkan untuk mengalirkan satu watt panas; angka lebih besar berarti insulasi lebih baik. Perkiraan resistansi aksial depan adalah 454.4 K/W dan belakang 645.2 K/W. **Axial heat leak** adalah panas yang merambat dari endcap menuju elektronik melalui jalur tersebut; perkiraan awalnya 0.28 W dari depan dan 0.19 W dari belakang.
 
