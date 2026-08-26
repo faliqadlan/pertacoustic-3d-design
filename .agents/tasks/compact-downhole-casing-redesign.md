@@ -2,7 +2,7 @@
 title: Compact Downhole Casing Redesign
 document_id: AGENT-TASK-002
 version: 1.2
-status: Draft
+status: Validated/Published
 language: en-US
 last_updated: 2026-08-26
 scope:
@@ -31,7 +31,7 @@ Compact Downhole Casing Redesign: Geometry, Packaging, Thermal, and Structural S
 `.agents/tasks/compact-downhole-casing-redesign.md`
 
 **Task contract state:**  
-Draft
+Validated/Published
 
 The task file is the executable delivery contract.
 
