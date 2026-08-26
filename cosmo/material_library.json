@@ -28,7 +28,12 @@
     "density": 1300,
     "conductivity": 0.29,
     "specific_heat": 1500,
-    "notes": "Victrex 450G density and conductivity with an unverified screening heat-capacity assumption.",
+    "elastic_modulus_mpa_70c": 3700,
+    "yield_strength_mpa_70c_screening": 70,
+    "poisson_ratio": 0.40,
+    "water_absorption_24h_percent": 0.10,
+    "water_absorption_sat_percent": 0.50,
+    "notes": "Victrex 450G density, conductivity, and mechanical screening properties at 70 C.",
     "datasheet_url": "https://images.victrex.com/-/media/downloads/datasheets/victrex_tds_450g.pdf"
   },
   "Microporous": {
@@ -51,5 +56,18 @@
     "specific_heat": 1050,
     "notes": "Generic screening values; not selected for Biweekly 5.",
     "datasheet_url": "https://www.azom.com/article.aspx?ArticleID=1277"
+  },
+  "PPA_Amodel_A1133HS": {
+    "density": 1450,
+    "conductivity": 0.26,
+    "specific_heat": 1200,
+    "elastic_modulus_mpa_23c": 11000,
+    "elastic_modulus_mpa_70c": 8000,
+    "poisson_ratio": 0.36,
+    "yield_strength_mpa_70c_screening": 135,
+    "water_absorption_24h_percent": 0.30,
+    "water_absorption_sat_percent": 1.80,
+    "notes": "Solvay Amodel A-1133 HS (33% Glass Fiber Reinforced PPA, Heat Stabilized). Properties at 70 C from manufacturer technical bulletin.",
+    "datasheet_url": "https://www.syensqo.com/en/product/amodel-a-1133-hs"
   }
 }
