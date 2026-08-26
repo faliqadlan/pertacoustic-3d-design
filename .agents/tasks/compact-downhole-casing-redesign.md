@@ -1,7 +1,7 @@
 ---
 title: Compact Downhole Casing Redesign
 document_id: AGENT-TASK-002
-version: 1.1
+version: 1.2
 status: Draft
 language: en-US
 last_updated: 2026-08-26
@@ -51,7 +51,7 @@ PertAcoustic Research Collaboration / Designated Technical Authority
 
 Historical Biweekly 5 work investigated a preliminary 200 mm (7.87 in) OD, 425 mm long casing concept designed for a 150 °C external environment, 1-hour exposure duration, and 10,000 psi screening pressure with a 41 mm clear ID for a legacy board layout.
 
-Under the 20 August 2026 design direction, the operational envelope is refocused on a representative ~1000 m deployment context with an external ambient temperature of 70 °C and a conservative 2-hour (7200 s) thermal exposure duration. The geometric constraints require exploring a preferred casing OD of 1.75 in (44.45 mm), an absolute maximum casing OD of 2.25 in (57.15 mm), a maximum overall tool length of 2.0 m (2000 mm), and preserving mechanical interface compatibility with the HTI-02-DHPC/D hydrophone outline. User notes also reference contextual downhole information regarding nominal 2-7/8 in tubing and a 2.441 in dimension (pending confirmation as wellbore/tubing drift context rather than casing OD).
+Under the 20 August 2026 design direction, the operational envelope is refocused on a representative ~1000 m deployment context with an external ambient temperature of 70 °C and a conservative 2-hour (7200 s) thermal exposure duration. The geometric constraints require exploring a preferred casing OD of 1.75 in (44.45 mm), an absolute maximum casing OD of 2.25 in (57.15 mm), a maximum overall tool length of 2.0 m (2000 mm), and preserving mechanical interface compatibility with the HTI-02-DHPC/D hydrophone outline. User notes also reference contextual downhole information regarding nominal 2-7/8 in tubing and a 2.441 in dimension (recorded only as a user-provided tubing/bore-related dimension whose exact meaning remains pending confirmation, and which must not become another PertAcoustic casing OD requirement).
 
 Crucially, the redesign must investigate whether an internal clear diameter of approximately 30 mm is physically feasible for the downhole electronics packaging (incorporating the currently selected PCM1808 ADC, STM32 MCU, power regulation, RTC, SD storage, and wiring harness) rather than assuming 30 mm a priori. MCU or ADC component substitutions are outside the scope of this task.
 
@@ -89,7 +89,7 @@ If parallel or intervening repository changes require reconciliation, return the
 
 ## Objective
 
-Execute an integrated geometry, electronics packaging, transient thermal, and structural trade study for the compact downhole casing (preferred OD 1.75 in / 44.45 mm, maximum OD 2.25 in / 57.15 mm, maximum overall length 2.0 m, external temperature 70 °C, 2-hour duration, ~1000 m deployment context) interfacing with the nominal HTI-02-DHPC/D hydrophone interface concept. Determine whether 1.75 in OD with ~30 mm clear ID is feasible or identify the optimal feasible envelope ≤ 2.25 in OD, evaluating thermal behavior against justified component operating limits and reporting structural screening under explicit pressure scenarios, while preserving historical Biweekly 5 artifacts intact.
+Execute an integrated geometry, electronics packaging, transient thermal, and structural trade study for the compact downhole casing (preferred OD 1.75 in / 44.45 mm, maximum OD 2.25 in / 57.15 mm, maximum overall length 2.0 m, external temperature 70 °C, 2-hour duration, ~1000 m deployment context) interfacing with the nominal HTI-02-DHPC/D hydrophone interface concept. Determine whether 1.75 in OD with ~30 mm clear ID is feasible or identify the recommended feasible envelope based on documented trade-offs ≤ 2.25 in OD, evaluating thermal behavior against verified component operating limits and reporting structural screening under explicit pressure scenarios, while preserving historical Biweekly 5 artifacts intact.
 
 ## Authoritative inputs
 
@@ -105,7 +105,7 @@ List of approved sources, working notes, and provenance constraining this task:
 2. **20 August 2026 Meeting Notes (Contextual & Planning Inputs):**
    - Representative deployment / mobilization context: approximately 1000 m depth.
    - Conservative thermal exposure / design duration: 2.0 hours (7200 s).
-   - Contextual wellbore / tubing reference: nominal 2-7/8 in tubing and a 2.441 in dimension (contextual bore drift, pending confirmation; not an approved tool casing OD requirement).
+   - Contextual wellbore / tubing reference: nominal 2-7/8 in tubing and a 2.441 in dimension (user-provided tubing/bore-related dimension whose exact meaning remains pending confirmation; must not become another PertAcoustic casing OD requirement).
 3. **Current User Design Direction:**
    - Investigate whether an internal clear diameter of approximately 30 mm is physically feasible for electronics packaging; do NOT assume 30 mm ID is feasible without packaging evidence.
    - Require an objective geometry/packaging/thermal/structural trade study rather than forcing 1.75 in OD to PASS.
@@ -115,8 +115,8 @@ List of approved sources, working notes, and provenance constraining this task:
    - Historical 10,000 psi (68.9 MPa) screening pressure condition (screening reference scenario only, not an approved design pressure).
    - Historical component-zone temperature extraction logic.
 5. **HTI Supplier Mechanical Outline (`.agents/context/biweekly-5/HTI-02-DHPC_D MECH OUTLINE_.pdf`):**
-   - Nominal interface concept: 7/16-20 UNF-2A male adapter, nominal seal area, and exposed acoustic sensing head.
-   - Documented limitations: A dimensionally validated connection design does not yet exist; supplier-controlled datums, thread tolerances, seal groove geometry, pressure-tight sealing, and manufacturing dimensions remain provisional and uncertified.
+   - Nominal interface concept: 7/16-20 UNF-2A male adapter, separate nominal seal area, conductor routing concept, and exposed acoustic sensing head where supported.
+   - Documented limitations: A dimensionally validated connection design does not yet exist; supplier-controlled datums, engagement length, thread tolerances, seal gland geometry, pressure retention, and manufacturing dimensions remain provisional and uncertified unless directly supported by the supplier drawing. Historical Biweekly 5 thread-retention dimensions are screening assumptions, not supplier requirements.
 6. **Repository AI Delivery Contract & Materials:**
    - `.agents/AGENTS.md`, `.agents/software-workflow.md`, `.agents/context/project.md`.
    - `cosmo/material_library.json` (Inconel 718, Pyrogel/Aerogel, PEEK, SS316).
@@ -126,8 +126,8 @@ List of approved sources, working notes, and provenance constraining this task:
 - `REQ-GEO-001` (Casing Outer Diameter) → Formal 20 August 2026 MoM: Preferred OD is 1.75 in (44.45 mm); maximum allowable OD is 2.25 in (57.15 mm).
 - `REQ-GEO-002` (Overall Length) → Formal 20 August 2026 MoM: Maximum overall tool length is 2.0 m (2000 mm), including housing, endcaps, and HTI interface adapter.
 - `REQ-PKG-001` (Internal Electronics Packaging & Clear ID Investigation) → Current User Direction & Hardware Baseline: Investigate whether an internal clear diameter of approximately 30 mm is feasible for the selected electronics stack (currently selected PCM1808 ADC, STM32 MCU, power regulation, RTC, SD storage, interconnects, and wire harness); do not assume 30 mm ID is feasible without physical component layout and radial clearance evidence.
-- `REQ-IF-001` (Acoustic Interface Concept) → HTI Supplier Drawing & Historical Provenance: Preserve nominal 7/16-20 UNF-2A interface concept, acoustic head exposure, and wiring pass-through while explicitly treating thread tolerances, seal grooves, and pressure retention as provisional engineering screening.
-- `REQ-THM-001` (Thermal Screening & Component Limits) → Formal MoM, Meeting Notes, & Biweekly 5 Baseline: External ambient temperature 70 °C; conservative duration 2 hours (7200 s); inherited screening heat load 1.0 W (with option to report refined hardware estimates alongside 1 W baseline); evaluate results against justified component operating temperature limits where authoritative evidence exists (classifying unestablished limits as conditional).
+- `REQ-IF-001` (Acoustic Interface Concept) → HTI Supplier Drawing & Historical Provenance: Preserve nominal 7/16-20 UNF-2A interface concept, separate nominal seal area, conductor routing concept, and acoustic head exposure where supported, while explicitly treating engagement length, thread tolerances, seal gland geometry, and pressure retention as provisional engineering screening unless directly supported by the supplier drawing; historical Biweekly 5 thread-retention dimensions may be retained only as explicitly labeled screening assumptions, not supplier requirements.
+- `REQ-THM-001` (Thermal Screening & Component Limits) → Formal MoM, Meeting Notes, & Biweekly 5 Baseline: External ambient temperature 70 °C; conservative duration 2 hours (7200 s); inherited screening heat load 1.0 W (with option to report refined hardware estimates alongside 1 W baseline); evaluate results against exact verified part-specific operating temperature limits (STM32F411CEU6 and PCM1808 may use the -40 to +85 °C ranges recorded in the formal 20 August MoM; RTC, SD/storage, power-management, analog-front-end, connectors, batteries, and other selected parts must use exact verified part-specific limits, marking thermal results CONDITIONAL if unverified; do not infer one component's rating for the complete electronics assembly).
 - `REQ-STR-001` (Structural Pressure Screening) → Meeting Notes & Historical Provenance: Perform structural screening across explicit pressure scenarios (including ~1000 m hydrostatic context ~10 MPa and the historical 10,000 psi / 68.9 MPa screening benchmark); explicitly document that authoritative casing design pressure remains unresolved and structural recommendations are conditional on field pressure confirmation.
 - `REQ-PROV-001` (Historical Provenance & Non-Destructive Separation) → `.agents/context/project.md` & Biweekly 5 Context: Historical Biweekly 5 report, CAD/CAE scripts, and results in `results/biweekly-5/` and `cosmo/biweekly5.py` must remain preserved and unmodified.
 
@@ -139,14 +139,14 @@ Do not use existing implementation as retroactive justification for missing auth
 
 - **Electronics Packaging & Clear ID Feasibility Evaluation:**
   - Physical dimension and layout review for the selected hardware components (currently selected PCM1808 ADC, STM32 MCU, power module, RTC, SD, cabling). Packaging rearrangement and axial reorientation are permitted; MCU/ADC component substitution is excluded.
-  - Determination of whether ~30 mm clear ID is feasible and establishment of the minimum required clear ID $D_{\text{clear}}$.
+  - Determination of whether ~30 mm clear ID is feasible and establishment of the minimum screening clear ID $D_{\text{clear}}$ supported by the best available verified component/board dimensions and assembly clearances (explicitly labeled provisional when based on nominal/provisional dimensions rather than physical measurements; a manufacturing-exact minimum ID must not be claimed without corresponding dimensional evidence).
 - **Structural Pressure Screening & Wall Sizing:**
   - Analytical Lamé stress, von Mises yield FoS, and long-cylinder buckling calculations for Inconel 718 across candidate outer diameters (44.45 mm to 57.15 mm).
   - Parametric evaluation under explicit external pressure scenarios (e.g., ~1000 m hydrostatic context and 10,000 psi legacy screening reference) with explicit notation of unresolved design pressure authority.
 - **Parametric Thermal Modeling & Trade Study:**
   - 2-hour (7200 s) transient thermal simulation under 70 °C external ambient boundary.
   - Evaluation of the inherited 1.0 W baseline screening heat load (and comparison with refined hardware dissipation estimates if available).
-  - Multi-layer evaluation (Inconel 718 outer barrel, Aerogel insulation layer, PEEK liner) and assessment of component-zone temperatures against justified manufacturer operating limits.
+  - Multi-layer evaluation (Inconel 718 outer barrel, Aerogel insulation layer, PEEK liner) and assessment of component-zone temperatures against exact verified part-specific operating limits (STM32F411CEU6 and PCM1808 per MoM -40 to +85 °C; exact verified limits for RTC, SD, power, AFE, connectors, batteries; marking thermal results CONDITIONAL where unverified; without inferring one component's rating across the complete assembly).
 - **Trade Study Matrix & Engineering Recommendation:**
   - Structured trade-off matrix evaluating combinations of OD (44.45 mm / 1.75 in to 57.15 mm / 2.25 in), clear ID, insulation thickness, structural FoS, and 2-hour transient thermal response.
   - Formal engineering conclusion regarding 1.75 in OD feasibility and recommended casing geometry ≤ 2.25 in OD, noting conditional structural/thermal limits where authoritative requirements are unresolved.
@@ -170,7 +170,7 @@ Do not use existing implementation as retroactive justification for missing auth
 
 - Existing Biweekly 5 tests (`tests/test_biweekly5.py`) and compiler tests (`tests/test_results_compiler.py`) continue to pass without regression.
 - Core simulation engines (`cosmo/core/cad_generator.py`, `cosmo/core/mesh_generator.py`, `cosmo/core/solver_interface.py`, `cosmo/core/result_extractor.py`) maintain unit consistency and fail-closed error handling.
-- Nominal HTI-02-DHPC/D interface concept (7/16-20 UNF-2A thread pitch, 10.16 mm engagement, nominal seal area, and acoustic head exposure).
+- Nominal HTI-02-DHPC/D interface concept (nominal 7/16-20 UNF-2A interface concept, separate nominal seal area, conductor routing concept, and acoustic head exposure where supported; engagement length, thread tolerances, seal gland geometry, and pressure retention remain provisional unless directly supported by the supplier drawing, with historical Biweekly 5 thread-retention dimensions retained only as explicitly labeled screening assumptions, not supplier requirements).
 - Conventional CNC manufacturability constraint for components fabricated at the UGM Geophysics Laboratory.
 
 ## Dependencies and assumptions
@@ -187,15 +187,15 @@ Do not use existing implementation as retroactive justification for missing auth
 - **External Ambient Temperature:** 70 °C constant Dirichlet boundary condition on outer exposed surfaces (Formal MoM).
 - **Exposure Duration:** 2.0 hours (7200 seconds) conservative transient thermal exposure (Meeting Notes).
 - **Baseline Heat Load:** 1.0 W continuous internal heat dissipation evaluated as an inherited Biweekly 5 screening baseline.
-- **Hardware Configuration:** Currently selected PCM1808 ADC and STM32 MCU baseline hardware; packaging orientation and placement may be optimized axially.
+- **Hardware Configuration:** Currently selected PCM1808 ADC and STM32 MCU baseline hardware; packaging orientation and placement may be arranged axially.
 - **Objective Trade-Off Rule:** If physics, structural safety, or packaging clearance reveals that 1.75 in (44.45 mm) OD cannot satisfy operational component temperature limits over 2 hours with required structural margin, concluding infeasibility of 1.75 in and recommending a feasible OD ≤ 2.25 in (57.15 mm) is an approved valid outcome.
 
 ### Unresolved authority items & conditional assumptions
 
 - **Authoritative Casing Design Pressure:** Unresolved. ~1000 m is deployment context, not an approved design pressure rating. Structural screening will evaluate explicit scenarios (including ~1000 m hydrostatic and 10,000 psi legacy screening), but final structural acceptance remains conditional on client pressure specification.
-- **Component Temperature Limits:** The legacy 50 °C optimizer threshold is not an approved design authority. Thermal results must be evaluated against justified datasheet operating limits (e.g., industrial -40 °C to +85 °C or commercial 0 °C to +70 °C ratings). Where specific component limits are unverified, thermal acceptance remains conditional.
-- **Supplier-Controlled HTI Interface Geometry:** Unresolved. Supplier-controlled datums, exact thread tolerances, seal gland dimensions, and pressure-tight sealing details remain unverified and provisional.
-- **Wellbore / Tubing Drift Reference:** The 2-7/8 in tubing and 2.441 in dimension are contextual bore notes pending confirmation, not approved casing OD constraints.
+- **Component Temperature Limits:** The legacy 50 °C optimizer threshold is not an approved design authority. STM32F411CEU6 and PCM1808 may use the -40 to +85 °C ranges recorded in the formal 20 August MoM. For RTC, SD/storage, power-management, analog-front-end, connectors, batteries, and other actual selected parts, use only exact verified part-specific limits. If an exact selected component or its operating-temperature limit cannot be verified, mark that thermal result CONDITIONAL. Do not infer one component's rating for the complete electronics assembly.
+- **Supplier-Controlled HTI Interface Geometry:** Unresolved. Supplier-controlled datums, engagement length, exact thread tolerances, seal gland geometry, and pressure retention details remain unverified and provisional unless directly supported by the supplier-controlled drawing. Historical Biweekly 5 thread-retention dimensions are screening assumptions, not supplier requirements.
+- **Wellbore / Tubing Context Reference:** The nominal 2-7/8 in tubing and 2.441 in dimension are recorded only as user-provided tubing/bore-related notes whose exact meaning remains pending confirmation; they must not become another PertAcoustic casing OD requirement.
 
 ### Remaining approval requirements
 
@@ -225,11 +225,11 @@ Runtime, model, vendor, reasoning level, or agent implementation SHOULD NOT be e
 
 ## Acceptance criteria
 
-- [ ] **Packaging Feasibility Assessment:** Packaging analysis objectively investigates and documents whether the selected electronics (PCM1808 ADC, STM32 MCU, power, sensors, wiring) can package within ~30 mm clear ID (or establishes the exact minimum required clear ID $D_{\text{clear}}$ based on physical board dimensions and clearance).
+- [ ] **Packaging Feasibility Assessment:** Packaging analysis objectively investigates and documents whether the selected electronics (PCM1808 ADC, STM32 MCU, power, sensors, wiring) can package within ~30 mm clear ID (or establishes the minimum screening clear ID $D_{\text{clear}}$ supported by the best available verified component/board dimensions and assembly clearances, explicitly labeling the result provisional when based on nominal/provisional dimensions rather than physical measurements; a manufacturing-exact minimum ID must not be claimed without corresponding dimensional evidence).
 - [ ] **Parametric Trade Study Execution:** Trade study evaluates casing ODs across the range from preferred 1.75 in (44.45 mm) to maximum 2.25 in (57.15 mm), varying Inconel wall thickness and Aerogel insulation thickness under 70 °C ambient and 2-hour duration.
-- [ ] **Thermal Screening & Component Limits:** 2-hour (7200 s) transient thermal simulation reports internal cavity and zone temperatures under the inherited 1.0 W screening heat load, comparing results against justified component-specific operating limits where authoritative evidence exists (marking unestablished limits as conditional).
+- [ ] **Thermal Screening & Component Limits:** 2-hour (7200 s) transient thermal simulation reports internal cavity and zone temperatures under the inherited 1.0 W screening heat load, comparing results against exact verified part-specific operating limits (STM32F411CEU6 and PCM1808 per MoM -40 to +85 °C; exact verified limits for RTC, SD, power, AFE, connectors, batteries; marking thermal results CONDITIONAL where unverified, without inferring one component's rating for the complete assembly).
 - [ ] **Structural Screening & Pressure Scenarios:** Structural calculations determine Lamé stresses, von Mises yield safety factors, and buckling factors under explicit pressure scenarios (including ~1000 m hydrostatic context and 10,000 psi legacy screening), explicitly documenting that authoritative field design pressure remains unresolved.
-- [ ] **Trade Study Matrix & Recommendation:** A structured trade-off matrix clearly presents OD vs. clear ID vs. insulation thickness vs. structural FoS vs. 2-hour transient thermal response, providing a definitive recommendation on the feasibility of 1.75 in OD and the optimal envelope ≤ 2.25 in OD without exceeding 57.15 mm OD.
+- [ ] **Trade Study Matrix & Recommendation:** A structured trade-off matrix clearly presents OD vs. clear ID vs. insulation thickness vs. structural FoS vs. 2-hour transient thermal response, providing a definitive recommendation on the feasibility of 1.75 in OD and the recommended feasible envelope based on documented trade-offs ≤ 2.25 in OD without exceeding 57.15 mm OD.
 - [ ] **3D CAD Assembly:** Parametric CAD model generates the complete compact downhole casing assembly (housing, endcaps, internal sleeve, axial buffers, and nominal HTI adapter) with total modeled length ≤ 2.0 m.
 - [ ] **Interface & Historical Preservation:** Nominal HTI-02-DHPC/D interface concept is modeled with explicit provisional assumptions; historical Biweekly 5 files (`cosmo/biweekly5.py`, `results/biweekly-5/`) remain unmodified; all existing tests in `tests/test_biweekly5.py` and `tests/test_results_compiler.py` pass.
 - [ ] **Automated Test Coverage:** Automated unit tests in `tests/` verify compact casing geometry sizing, packaging clearance logic, analytical structural formulas, and thermal extraction routines.
