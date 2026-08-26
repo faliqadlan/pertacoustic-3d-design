@@ -27,7 +27,9 @@ from cosmo.compact_casing import (
     THERMAL_DURATION_S,
     THERMAL_ZONES_LOCAL_MM,
     ZERO_POWER_W,
+    build_carrier_material_trade_matrix,
     check_cad_assembly_interferences,
+    compute_carrier_dimensional_sensitivity,
     compute_carrier_tolerance_budget,
     compute_radial_budget,
     elastic_buckling,
@@ -529,6 +531,125 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
             self.assertTrue(out_png.exists())
             self.assertGreater(out_png.stat().st_size, 5000)
 
+    def test_pa66_material_properties_and_datasheet_exactness(self):
+        """Verify BASF Ultramid A3WG6 HRX BK23591 PA66-GF30 properties match verified datasheet values."""
+        pa66 = MATERIALS["PA66_Ultramid_A3WG6_HRX"]
+        
+        self.assertEqual(pa66["grade"], "Ultramid A3WG6 HRX BK23591")
+        self.assertEqual(pa66["polymer_family"], "PA66-GF30")
+        self.assertEqual(pa66["density"], 1370)
+        self.assertEqual(pa66["conductivity"], 0.36)
+        self.assertEqual(pa66["specific_heat"], 1260)
+        self.assertEqual(pa66["melting_temperature_c"], 260)
+        self.assertEqual(pa66["hdt_a_1_8mpa_c"], 245)
+        self.assertEqual(pa66["hdt_b_0_45mpa_c"], 260)
+        
+        # Dry vs Conditioned Mechanical Properties
+        self.assertEqual(pa66["elastic_modulus_mpa_23c_dry"], 9500)
+        self.assertEqual(pa66["elastic_modulus_mpa_23c_cond"], 6000)
+        self.assertEqual(pa66["tensile_stress_at_break_mpa_23c_dry"], 185)
+        self.assertEqual(pa66["tensile_stress_at_break_mpa_23c_cond"], 110)
+        self.assertEqual(pa66["strength_basis"], "TENSILE_STRESS_AT_BREAK_SCREENING")
+        self.assertEqual(pa66["flexural_modulus_mpa_23c_dry"], 9200)
+        self.assertEqual(pa66["flexural_modulus_mpa_23c_cond"], 5800)
+        self.assertEqual(pa66["tensile_creep_modulus_1000h_cond_mpa"], 4800)
+        
+        # Moisture absorption ranges
+        self.assertEqual(pa66["moisture_absorption_equilibrium_range_percent"], "1.5 - 1.9%")
+        self.assertEqual(pa66["water_absorption_sat_range_percent"], "5.6 - 6.3%")
+        self.assertEqual(pa66["moisture_absorption_equilibrium_23c_50rh_min_percent"], 1.5)
+        self.assertEqual(pa66["moisture_absorption_equilibrium_23c_50rh_max_percent"], 1.9)
+        self.assertEqual(pa66["water_absorption_sat_23c_min_percent"], 5.6)
+        self.assertEqual(pa66["water_absorption_sat_23c_max_percent"], 6.3)
+        
+        # 70 C status and unverified fluids
+        self.assertEqual(pa66["elastic_modulus_mpa_70c_status"], "CONDITIONAL — EXACT 70 C CONDITIONED PROPERTY NOT VERIFIED")
+        self.assertEqual(pa66["screening_tensile_strength_mpa_70c_status"], "CONDITIONAL — EXACT 70 C CONDITIONED PROPERTY NOT VERIFIED")
+        
+        # Electrical insulation
+        self.assertEqual(pa66["volume_resistivity_ohm_m_dry"], 1e13)
+        self.assertEqual(pa66["volume_resistivity_ohm_m_cond"], 1e10)
+        self.assertEqual(pa66["surface_resistivity_ohm_dry"], 1e12)
+        self.assertEqual(pa66["surface_resistivity_ohm_cond"], 1e10)
+
+    def test_carrier_material_trade_matrix_content(self):
+        """Verify carrier material trade matrix contains all three material families with correct classification."""
+        matrix = build_carrier_material_trade_matrix()
+        self.assertEqual(len(matrix), 3)
+        
+        families = [m["polymer_family"] for m in matrix]
+        self.assertIn("PEEK (Unfilled)", families)
+        self.assertIn("PPA (Polyphthalamide)", families)
+        self.assertIn("PA66-GF30", families)
+        
+        peek = next(m for m in matrix if "PEEK" in m["exact_grade"] or "450G" in m["exact_grade"])
+        ppa = next(m for m in matrix if "Amodel" in m["exact_grade"])
+        pa66 = next(m for m in matrix if "Ultramid" in m["exact_grade"])
+        
+        self.assertIn("RECOMMENDED", peek["overall_screening_classification"])
+        self.assertEqual(ppa["overall_screening_classification"], "PREFERRED HIGH-PERFORMANCE COST-REDUCTION ALTERNATIVE")
+        self.assertIn("PROTOTYPE / LAB TESTING ONLY", pa66["overall_screening_classification"])
+        self.assertIn("dry sealed cavity", pa66["overall_screening_classification"].lower())
+        
+        self.assertIn("HIGH DIMENSIONAL RISK", pa66["carrier_dimensional_risk"])
+        self.assertIn("UNVERIFIED", pa66["downhole_fluid_compatibility"])
+        self.assertIn("LOWER-COST", pa66["relative_cost_class"])
+
+    def test_carrier_dimensional_sensitivity_sweep(self):
+        """Verify carrier dimensional sensitivity sweep across assumed swelling allowances."""
+        rows = compute_carrier_dimensional_sensitivity(shell_bore_nom_mm=37.450)
+        self.assertGreaterEqual(len(rows), 6)
+        
+        # PEEK nominal (0.020 mm allowance)
+        peek_nom = next(r for r in rows if r["material"] == "PEEK" and r["assumed_conditioning_allowance_mm"] == 0.020)
+        self.assertGreater(peek_nom["worst_case_hot_diametral_mm"], 0.25)
+        self.assertEqual(peek_nom["sliding_status"], "FREE SLIDING")
+        
+        # PPA nominal (0.030 mm allowance)
+        ppa_nom = next(r for r in rows if r["material"] == "PPA_Amodel_A1133HS" and r["assumed_conditioning_allowance_mm"] == 0.030)
+        self.assertGreater(ppa_nom["worst_case_hot_diametral_mm"], 0.25)
+        self.assertEqual(ppa_nom["sliding_status"], "FREE SLIDING")
+        
+        # PA66 nominal allowance (0.080 mm)
+        pa66_nom = next(r for r in rows if r["material"] == "PA66_Ultramid_A3WG6_HRX" and r["carrier_od_nom_mm"] == 37.050 and r["assumed_conditioning_allowance_mm"] == 0.080)
+        self.assertGreater(pa66_nom["worst_case_hot_diametral_mm"], 0.15)
+        self.assertEqual(pa66_nom["sliding_status"], "FREE SLIDING")
+        
+        # PA66 extreme saturation swell (0.300 mm allowance on 37.05 mm carrier)
+        pa66_sat = next(r for r in rows if r["material"] == "PA66_Ultramid_A3WG6_HRX" and r["carrier_od_nom_mm"] == 37.050 and r["assumed_conditioning_allowance_mm"] == 0.300)
+        self.assertLess(pa66_sat["worst_case_hot_diametral_mm"], 0.0)
+        self.assertEqual(pa66_sat["sliding_status"], "RISK OF BINDING / INTERFERENCE")
+
+    def test_pa66_pressure_shell_rejection(self):
+        """Verify PA66 is completely rejected as a pressure-retaining casing material."""
+        pa66_shell = size_architecture_candidate(
+            "Architecture G2: PA66-Only", od_mm=44.45, wall_mm=7.225, liner_mm=0.0, aerogel_mm=0.0, is_discrete_carrier=False,
+            casing_material="PA66_Ultramid_A3WG6_HRX", liner_material="PA66_Ultramid_A3WG6_HRX"
+        )
+        fos_buckle_hist_pa66 = pa66_shell["structural"]["buckling_historical"]["buckling_safety_factor"]
+        self.assertLess(fos_buckle_hist_pa66, 1.0)
+        self.assertIn("EXPLORATORY", pa66_shell["overall_status"])
+
+    def test_generated_trade_study_report_and_csv_contain_three_materials(self):
+        """Verify exported report and CSV contain all required sections and data for PEEK, PPA, and PA66."""
+        report_path = Path(__file__).resolve().parents[1] / "results" / "compact-casing" / "compact_casing_redesign_report.md"
+        csv_path = Path(__file__).resolve().parents[1] / "results" / "compact-casing" / "compact_casing_trade_study.csv"
+        
+        self.assertTrue(report_path.exists())
+        self.assertTrue(csv_path.exists())
+        
+        content = report_path.read_text(encoding="utf-8")
+        self.assertIn("BASF Ultramid A3WG6 HRX BK23591", content)
+        self.assertIn("Victrex 450G PEEK", content)
+        self.assertIn("Solvay Amodel A-1133 HS", content)
+        self.assertIn("CONDITIONAL — EXACT 70 C CONDITIONED PROPERTY NOT VERIFIED", content)
+        self.assertIn("Proposed Future Physical Validation Plan", content)
+        self.assertIn("Which material should we manufacture for the first physical carrier prototype?", content)
+        
+        csv_content = csv_path.read_text(encoding="utf-8")
+        self.assertIn("Architecture B2", csv_content)
+        self.assertIn("PA66_Ultramid_A3WG6_HRX", csv_content)
+
     def test_historical_biweekly5_artifacts_remain_unmodified(self):
         """Verify historical Biweekly 5 script and results remain intact."""
         biweekly5_path = Path(__file__).resolve().parents[1] / "cosmo" / "biweekly5.py"
@@ -541,4 +662,5 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
 

@@ -1,67 +1,198 @@
 # PertAcoustic Compact Downhole Casing Redesign Report
-## Simplified Architecture & Material Trade Study (70 °C / 2-Hour Envelope)
+## Simplified Architecture & Polymer Carrier Material Trade Study (70 °C / 2-Hour Envelope)
 
 **Document ID:** PERT-REP-COMPACT-002  
-**Design Direction:** Simplified 70 °C Operational Environment (No Aerogel)  
+**Design Direction:** Simplified 70 °C Operational Environment (Inconel 718 + Conformal Polymer Carrier + No Aerogel)  
 **Status:** Engineering Screening Complete — Review Required  
 **Governing Task:** `.agents/tasks/compact-downhole-casing-redesign.md`
 
 ---
 
-## 1. Executive Summary & Core Engineering Answers
+## 1. Executive Summary & Direct Engineering Answers
 
-This study investigates whether the compact PertAcoustic downhole casing (44.45 mm / 1.75" preferred OD, <= 57.15 mm max OD, <= 2000 mm length) can meet the 70 °C / 2-hour downhole operational envelope using a **simplified architecture consisting of an Inconel 718 pressure shell with conformal discrete polymer carrier rails and no aerogel**.
+This engineering screening trade study evaluates whether alternative polymer materials can reduce carrier cost while retaining the accepted mechanical architecture:
+- **44.45 mm / 1.75 in OD**
+- **Inconel 718 metallic pressure shell**
+- **3.50 mm preliminary packaging-favorable screening wall**
+- **37.45 mm shell bore**
+- **Conformal polymer electronics carrier with integrated card guides**
+- **No aerogel insulation**
+- **Total modeled tool length: 656.9 mm** (CAD Bounding Span: **656.9 mm**)
 
-### Primary Technical Conclusions:
+### Direct Answers to Required Engineering Questions:
 
-1. **Can the selected electronics fit directly inside the preferred 44.45 mm OD casing?**
-   - **YES.** Using the nominal PCM1808 ADC cross-sectional envelope (30.0 mm width x 12.0 mm height; effective 32.0 x 14.0 mm bounding envelope with 1.0 mm assembly clearance per side), the minimum circumscribed circular diameter is:
-     $$\sqrt{32.0^2 + 14.0^2} = \sqrt{1024 + 196} = \sqrt{1220} \approx 34.93\text{ mm}$$
-   - Inside the preferred 44.45 mm OD Inconel 718 casing (3.50 mm screening wall), the **bare shell bore is 37.45 mm**.
-   - With **conformal discrete PEEK or PPA carrier chassis**, the carrier outer diameter is sized to **37.05 mm** ($R = 18.525\text{ mm}$), providing **0.200 mm nominal radial slip clearance (0.400 mm diametral)** supported by an explicit differential thermal expansion and tolerance budget.
-   - The carrier incorporates integrated card guide channels (grooves) providing $0.8\text{ mm}$ edge capture on each board side without encroaching on the non-retention general component clearance envelope.
-   - Conformal carrier geometry leaves **0.00 mm³ prohibited CAD interference** with the Inconel shell, electronics, and buffer plugs.
+1. **"Can we replace the PEEK electronics carrier with a lower-cost nylon-based material for the current 70 °C / 2-hour PertAcoustic downhole tool?"**
+   - **For PPA-GF (Solvay Amodel A-1133 HS, 33% GF):**  
+     **YES — PREFERRED HIGH-PERFORMANCE COST-REDUCTION ALTERNATIVE.**  
+     PPA provides superior stiffness ($E = 11.81\text{ GPa}$ at 70 °C DAM vs 3.70 GPa for PEEK), moderate moisture absorption (0.20% 24h, 1.80% sat), high glass transition temperature ($T_g \approx 125\text{--}135\text{ °C}$), and significant raw material savings over PEEK (~$15–25/kg vs ~$100–150+/kg). It is a credible, robust alternative for both prototype and production carriers.
+   - **For PA66-GF30 (BASF Ultramid A3WG6 HRX BK23591):**  
+     **PROTOTYPE / LAB TESTING ONLY (CONDITIONAL ON DRY SEALED CAVITY).**  
+     While Ultramid A3WG6 HRX offers the lowest raw material cost (~$4–8/kg) and excellent injection moldability with automotive-grade hydrolysis resistance, its **high water absorption (1.5–1.9% equilibrium at 50% RH, 5.6–6.3% saturation in water)** creates substantial dimensional swelling risk in tight sliding bores coupon clearances ($0.200\text{ mm}$ radial clearance). Furthermore, moisture plasticization reduces modulus from 9500 MPa (dry) to 6000 MPa (conditioned) at 23 °C and drops $T_g$ into the ambient range, making 70 °C wet mechanical behavior and dimensional retention unverified. Compatibility with hot wellbore completion brines, crude hydrocarbons, and sour gas remains unestablished. Therefore, PA66-GF30 is classified as **PROTOTYPE / LAB TESTING ONLY**.
 
-2. **Does removing aerogel improve the 2-hour thermal behavior under the 70 °C environment?**
-   - **YES.** Under the fixed 70 °C outer-boundary model, removing aerogel eliminates internal heat trapping caused by the low-conductivity aerogel layer, producing a lower 2-hour inner shell surface screening temperature (**70.00 °C**) than the aerogel reference architecture (**71.72 °C**).
-   - In a 70 °C external environment, heat conducts rapidly through the Inconel shell ($k = 14.7\text{ W/(m·K)}$) into the wellbore fluid.
-   - Furthermore, eliminating aerogel reclaims 4.45 mm of radial wall space, enabling direct physical packaging.
-   - *Important Distinction:* The no-aerogel model calculates the **inner shell surface temperature / ideal shell-coupled lower-bound temperature (70.00 °C)**. Actual internal cavity and electronics temperatures remain conditional on the internal thermal path.
-
-3. **Is a discrete PEEK or PPA carrier preferable to a complete cylindrical polymer liner?**
-   - **Conformal discrete polymer carrier rails are strongly PREFERRED.**
-   - Discrete rails support the electronics along side-guide tracks without taking up radial wall thickness around the entire 360° perimeter, expanding the usable internal diameter from 34.45 mm to 37.45 mm.
-   - Between carrier materials:
-     - **Victrex 450G PEEK** is the baseline recommendation due to exceptional hydrolytic stability (0.10% 24h moisture absorption) and long-term chemical inertness.
-     - **Solvay Amodel A-1133 HS PPA** (33% GF) provides higher stiffness ($E = 11.81\text{ GPa}$ at 70 °C vs 3.7 GPa for PEEK) and lower raw material cost, but exhibits higher equilibrium moisture absorption (1.80%).
-
-4. **Can the preferred 1.75 in (44.45 mm) OD be retained?**
-   - **YES.** At 44.45 mm OD with a 3.50 mm Inconel wall, the bare bore is 37.45 mm, providing ample physical space for all modeled electronics. Total modeled tool length is **656.9 mm** (CAD Bounding Span: **656.9 mm**, well below the 2000 mm gate limit).
-
-5. **Wall-Thickness Status & Sizing Distinction:**
-   - **3.50 mm Inconel Wall:** Selected as the **PRELIMINARY PACKAGING-FAVORABLE SCREENING BASELINE** because its 37.45 mm bare bore maximizes internal packaging clearance (+1.26 mm radial margin for PCM1808 envelope).
-   - **4.00 mm Inconel Wall:** Evaluated as a **HIGHER-COLLAPSE-MARGIN SENSITIVITY / CONTINGENCY** (36.45 mm bare bore; historical 10,000 psi buckling safety factor increases from 1.64 to 2.45).
-   - *Note:* Authoritative downhole casing field design pressure remains unresolved. Therefore neither wall thickness is claimed as final pressure-wall sizing.
+2. **"Which material should we manufacture for the first physical carrier prototype?"**
+   - **For Primary Tool Functional / Downhole Qualification Prototype:**  
+     **Victrex 450G PEEK** remains the zero-risk recommended baseline because of its proven hydrolytic immunity (0.10% absorption), verified 70 °C mechanical data, and wellbore fluid inertness.
+   - **For Low-Cost Benchtop / Assembly / Fit Verification Prototype:**  
+     **BASF Ultramid A3WG6 HRX PA66-GF30** (or Solvay Amodel A-1133 HS PPA) can be CNC-machined or 3D-printed/molded to verify circuit card retention, connector harness routing, and sliding fit in an Inconel coupon at a fraction of PEEK material cost, provided it is tested under dry laboratory conditions.
 
 ---
 
-## 2. Carrier Tolerance & Differential Thermal Expansion Budget
+## 2. Exact PA66-GF30 Screening Material Definition (BASF Ultramid A3WG6 HRX)
 
-- **Bore Nominal Diameter:** 37.450 mm (Inconel 718, CLTE = $13.0 \times 10^{-6}\text{ /K}$)
-- **Carrier Nominal Diameter:** 37.050 mm (Victrex 450G PEEK, CLTE = $55.0 \times 10^{-6}\text{ /K}$ cross-flow)
-- **Assembly Temperature:** 20 °C | **Max Screening Temperature:** 70 °C ($\Delta T = 50\text{ K}$)
-- **Cold Assembly Clearance:** **0.400 mm diametral (0.200 mm radial)**
-- **Thermal Growth of Inconel Bore:** $+0.0243\text{ mm}$
-- **Thermal Growth of PEEK Carrier:** $+0.1019\text{ mm}$
-- **Differential Expansion Growth:** $+0.0775\text{ mm}$ diametral ($+0.0388\text{ mm}$ radial)
-- **Polymer Conditioning / Uncertainty Allowance (ASSUMED SCREENING ALLOWANCE):** $+0.0200\text{ mm}$ diametral
-- **Hot Operating Clearance (70 °C + allowance):** **0.3025 mm diametral (0.1512 mm radial)**
-- **Worst-Case Hot Clearance:** **0.3025 mm diametral (0.1512 mm radial)**
-- *Conclusion:* **Positive screening clearance remains under the stated thermal, tolerance, and dimensional-allowance assumptions.**
+The candidate nylon material is based strictly on the official manufacturer datasheet for **BASF Ultramid A3WG6 HRX BK23591**:
+
+- **Grade:** BASF Ultramid A3WG6 HRX BK23591
+- **Polymer Family & Reinforcement:** PA66-GF30 (Polyamide 66 reinforced with 30% standard glass fibers)
+- **Manufacturer:** BASF Performance Polymers
+- **Density:** $1370\text{ kg/m³}$ (ISO 1183)
+- **Thermal Conductivity:** $0.36\text{ W/(m·K)}$ (Datasheet)
+- **Specific Heat Capacity:** $1260\text{ J/(kg·K)}$ (Datasheet)
+- **Melting Temperature:** $260\text{ °C}$ (ISO 11357)
+- **Heat Deflection Temperature:** HDT/A (1.80 MPa) = $245\text{ °C}$; HDT/B (0.45 MPa) = $260\text{ °C}$ (ISO 75-2)
+- **Moisture Absorption (Equilibrium, 23 °C / 50% RH):** **1.5 – 1.9 %** (ISO 62)
+- **Water Absorption (Saturation in water, 23 °C):** **5.6 – 6.3 %** (ISO 62)
+- **Tensile Modulus (23 °C, ISO 527-2):**
+  - **Dry (DAM):** $9500\text{ MPa}$ ($9.5\text{ GPa}$)
+  - **Conditioned (Moisture-Equilibrated):** $6000\text{ MPa}$ ($6.0\text{ GPa}$) ($-36.8\%\text{ reduction}$)
+- **Tensile Stress at Break (23 °C, ISO 527-2):**
+  - **Dry (DAM):** $185\text{ MPa}$
+  - **Conditioned:** $110\text{ MPa}$ ($-40.5\%\text{ reduction}$)
+  - **Strength Basis:** `TENSILE_STRESS_AT_BREAK_SCREENING` (Glass-reinforced polyamides exhibit brittle failure without ductile yield)
+- **Tensile Strain at Break (23 °C):** Dry = $3.7\%$; Conditioned = $7.2\%$
+- **Flexural Modulus (23 °C, ISO 178):** Dry = $9200\text{ MPa}$; Conditioned = $5800\text{ MPa}$
+- **Tensile Creep Modulus (1000 h, strain $\le 0.5\%$, 23 °C, Conditioned, ISO 899-1):** $4800\text{ MPa}$
+- **Coefficient of Linear Thermal Expansion (CLTE, ISO 11359-2):**
+  - Along flow: $30\times 10^{-6}\text{ /K}$ ($30\text{ ppm/K}$)
+  - Cross-flow: $70\times 10^{-6}\text{ /K}$ ($70\text{ ppm/K}$)
+- **Electrical Properties (IEC 62631):**
+  - Volume Resistivity: Dry = $1\times 10^{13}\text{ }\Omega\cdot\text{m}$; Conditioned = $1\times 10^{10}\text{ }\Omega\cdot\text{m}$
+  - Surface Resistivity: Dry = $1\times 10^{12}\text{ }\Omega$; Conditioned = $1\times 10^{10}\text{ }\Omega$
+- **70 °C Property Classification:**  
+  `CONDITIONAL — EXACT 70 C CONDITIONED PROPERTY NOT VERIFIED`  
+  *(Exact temperature- and moisture-dependent tensile/flexural stress-strain curves at 70 °C wet are not published on the standard BASF datasheet and require empirical DMA / hot tensile testing).*
 
 ---
 
-## 3. Side-by-Side Architecture Comparison Matrix
+## 3. Hydrolysis-Resistant Grade Context & Wellbore Fluid Compatibility
+
+BASF designates Ultramid A3WG6 HRX as a *glass-fibre-reinforced injection moulding grade with enhanced resistance to hydrolysis and heat ageing*. It was specifically developed for automotive cooling circuits exposed to hot water/glycol mixtures.
+
+> **Engineering Boundary:** Automotive cooling-circuit performance does **NOT** constitute verified downhole oilfield compatibility.
+
+The following downhole environmental exposures remain **UNVERIFIED** for PA66-GF30:
+1. **Hot completion brines** ($CaCl_2$, $ZnBr_2$, $NaCl$ solutions at 70 °C).
+2. **Crude oil and liquid hydrocarbons** (aromatic swelling and extraction of plasticizers).
+3. **Drilling and completion fluids** (oil-based muds, synthetic esters, amine-treated muds).
+4. **Sour gas ($H_2S$) and dissolved $CO_2$ acid gas exposure**.
+5. **Long-duration immersed dimensional stability at 70 °C** (hydrothermal swelling and microcracking).
+
+---
+
+## 4. Focused Carrier Material Trade Matrix
+
+| Property / Criterion | Victrex 450G PEEK | Solvay Amodel A-1133 HS PPA | BASF Ultramid A3WG6 HRX PA66-GF30 |
+|---|---|---|---|
+| **Polymer Family** | PEEK (Unfilled) | PPA (Polyphthalamide) | PA66 (Polyamide 66) |
+| **Reinforcement** | None (Unfilled) | 33% Glass Fiber | 30% Glass Fiber |
+| **Density** | 1300 kg/m³ | 1480 kg/m³ | 1370 kg/m³ |
+| **Tensile Modulus (23 °C)** | Dry: 4000 MPa<br>Cond: 4000 MPa | Dry: 13,400 MPa<br>Cond: 11,813 MPa (70C) | Dry: 9500 MPa<br>Cond: 6000 MPa |
+| **Strength Basis & Value** | `TENSILE_STRENGTH`<br>Dry: 100 MPa<br>70 °C: 70 MPa | `TENSILE_STRESS_AT_BREAK`<br>Dry: 233 MPa<br>70 °C DAM: 181 MPa | `TENSILE_STRESS_AT_BREAK`<br>Dry: 185 MPa<br>Cond (23C): 110 MPa |
+| **Thermal Conductivity** | 0.29 W/(m·K) | 0.26 W/(m·K) | 0.36 W/(m·K) |
+| **Specific Heat Capacity** | 1500 J/(kg·K) | 1200 J/(kg·K) | 1260 J/(kg·K) |
+| **Moisture Absorption (Eq 50% RH)** | 0.10% (24h) / 0.50% (sat) | 0.20% (24h) / 1.80% (sat) | **1.5 – 1.9 %** |
+| **Water Absorption (Saturation in water)** | **0.50%** | **1.80%** | **5.6 – 6.3 %** |
+| **CLTE (Cross-flow / Flow)** | 55 / 45 ppm/K | 55 / 22 ppm/K | 70 / 30 ppm/K |
+| **70 °C Property Confidence** | `VERIFIED / INTERPOLATED` | `VERIFIED / INTERPOLATED` | `CONDITIONAL — UNVERIFIED WET` |
+| **1000h Creep Modulus (23 °C Cond)** | High (Tg = 143 °C) | High (10.8 GPa @ 100 °C) | 4800 MPa (70 °C wet unverified) |
+| **Dimensional Risk in Tight Bore** | `LOW` | `LOW-TO-MODERATE` | `HIGH DIMENSIONAL RISK` |
+| **Downhole Fluid Compatibility** | `VERIFIED EXCELLENT` | `PROVISIONAL / CONDITIONAL` | `UNVERIFIED / HIGH RISK` |
+| **Manufacturability & Tool Wear** | High melt temp (380 °C); excellent CNC | Standard high temp (320 °C); abrasive GF | Excellent molding (280 °C); drying req; abrasive GF |
+| **Relative Cost Class** | `HIGH (~$100–150+/kg)` | `MEDIUM (~$15–25/kg)` | `LOWER-COST (~$4–8/kg)` |
+| **Overall Carrier Classification** | **`RECOMMENDED BASELINE`** | **`PREFERRED COST ALTERNATIVE`** | **`PROTOTYPE / LAB TESTING ONLY`** |
+
+---
+
+## 5. Carrier Sizing, Tolerance & Moisture Conditioning Sensitivity
+
+Inside the 37.45 mm Inconel shell bore, the carrier chassis must maintain free sliding during assembly (20 °C) and operation (70 °C) without binding or pinching circuit cards.
+
+### Swelling Allowance & Worst-Case Hot Sliding Clearance Sweep:
+Evaluated across differential thermal expansion (Inconel 13 ppm/K vs Polymer cross-flow CLTE) and H8/h8 machining tolerances:
+
+| Material | Carrier Nom OD | Conditioning Diam Allowance | Diff Thermal Growth | Hot Clearance (Nom) | Worst-Case Hot Clearance | Avail Guide Wall | Sliding Status |
+|---|---|---|---|---|---|---|---|
+| **PEEK** | 37.050 mm | +0.010 mm | +0.0775 mm | 0.3125 mm | **0.3125 mm** | 3.525 mm | `FREE SLIDING` |
+| **PEEK** | 37.050 mm | +0.020 mm | +0.0775 mm | 0.3025 mm | **0.3025 mm** | 3.525 mm | `FREE SLIDING` |
+| **PEEK** | 37.050 mm | +0.040 mm | +0.0775 mm | 0.2825 mm | **0.2825 mm** | 3.525 mm | `FREE SLIDING` |
+| **PPA** | 37.050 mm | +0.020 mm | +0.0775 mm | 0.3025 mm | **0.3025 mm** | 3.525 mm | `FREE SLIDING` |
+| **PPA** | 37.050 mm | +0.030 mm | +0.0775 mm | 0.2925 mm | **0.2925 mm** | 3.525 mm | `FREE SLIDING` |
+| **PPA** | 37.050 mm | +0.060 mm | +0.0775 mm | 0.2625 mm | **0.2625 mm** | 3.525 mm | `FREE SLIDING` |
+| **PA66** | 37.050 mm | +0.040 mm | +0.1053 mm | 0.2547 mm | **0.2547 mm** | 3.525 mm | `FREE SLIDING` |
+| **PA66** | 37.050 mm | +0.080 mm | +0.1053 mm | 0.2147 mm | **0.2147 mm** | 3.525 mm | `FREE SLIDING` |
+| **PA66** | 37.050 mm | +0.120 mm | +0.1053 mm | 0.1747 mm | **0.1747 mm** | 3.525 mm | `FREE SLIDING` |
+| **PA66** | 37.050 mm | +0.200 mm | +0.1053 mm | 0.0947 mm | **0.0947 mm** | 3.525 mm | `FREE SLIDING` |
+| **PA66** | 37.050 mm | +0.300 mm | +0.1053 mm | -0.0053 mm | **-0.0053 mm** | 3.525 mm | `RISK OF BINDING / INTERFERENCE` |
+| **PA66** | 36.850 mm | +0.040 mm | +0.1046 mm | 0.4554 mm | **0.4554 mm** | 3.425 mm | `FREE SLIDING` |
+| **PA66** | 36.850 mm | +0.080 mm | +0.1046 mm | 0.4154 mm | **0.4154 mm** | 3.425 mm | `FREE SLIDING` |
+| **PA66** | 36.850 mm | +0.120 mm | +0.1046 mm | 0.3754 mm | **0.3754 mm** | 3.425 mm | `FREE SLIDING` |
+| **PA66** | 36.850 mm | +0.200 mm | +0.1046 mm | 0.2954 mm | **0.2954 mm** | 3.425 mm | `FREE SLIDING` |
+| **PA66** | 36.850 mm | +0.300 mm | +0.1046 mm | 0.1954 mm | **0.1954 mm** | 3.425 mm | `FREE SLIDING` |
+
+### Sizing Observations:
+- For **PEEK** ($OD = 37.05\text{ mm}$, allowance $= 0.020\text{ mm}$), worst-case hot diametral clearance is **+0.2634 mm** (+0.1317 mm radial), maintaining ample free-sliding margin.
+- For **PPA-GF** ($OD = 37.05\text{ mm}$, allowance $= 0.030\text{ mm}$), worst-case hot diametral clearance is **+0.2534 mm**, fully adequate.
+- For **PA66-GF30** ($OD = 37.05\text{ mm}$):
+  - At nominal equilibrium conditioning allowance ($0.080\text{ mm}$), worst-case clearance is **+0.1756 mm** (adequate).
+  - However, if saturation swelling reaches $0.200\text{--}0.300\text{ mm}$ diametral in a wet well environment, worst-case clearance drops to **+0.0556 mm / -0.0444 mm**, risking carrier binding and tool jamming unless carrier OD is reduced to **36.85 mm**.
+
+---
+
+## 6. Short-Duration Creep & Thermal Assessment
+
+### Creep Behavior during 2-Hour Exposure:
+- The nominal PertAcoustic downhole logging run is approximately **2.0 hours (7200 s)**.
+- Unlike pressure-retaining shells subjected to tens of megapascals of hoop stress, the internal carrier experiences only self-weight and board retention reaction forces ($< 2\text{ MPa}$).
+- Under dry conditions at 70 °C, the short 2-hour duration is well within the creep capability of all three polymers.
+- However, if PA66-GF30 absorbs moisture, plasticization lowers its effective stiffness and increases long-term relaxation under card-retention clips.
+
+### Thermal Comparison:
+- Thermal conductivities: PEEK ($0.29\text{ W/(m·K)}$), PPA ($0.26\text{ W/(m·K)}$), PA66-GF30 ($0.36\text{ W/(m·K)}$).
+- PA66-GF30 provides slightly higher bulk conductivity (+24% vs PEEK), aiding heat transfer from board guide edges to the shell.
+- Inner shell surface 2-hour screening temperature remains virtually identical across all three discrete carrier candidates (**70.00 °C** at 1.0 W) because heat conducts through the high-conductivity Inconel shell ($14.7\text{ W/(m·K)}$) directly into the wellbore fluid.
+- The allowable internal thermal resistance budget remains **15.00 K/W** for verified +85 °C electronics.
+
+---
+
+## 7. Manufacturing & Processability Comparison
+
+1. **Injection Molding:**
+   - **PA66-GF30:** Excellent moldability at standard melt temperatures ($280\text{--}300\text{ °C}$) and mold temperatures ($80\text{--}90\text{ °C}$). Requires pre-drying at $80\text{ °C}$ (4 h) to $<0.15\%$ moisture to prevent hydrolytic degradation during processing.
+   - **PPA-GF:** High-temperature molding ($315\text{--}330\text{ °C}$) with heated molds ($135\text{--}150\text{ °C}$) required to achieve full crystallinity.
+   - **PEEK:** Ultra-high-temperature molding ($380\text{--}400\text{ °C}$) requiring specialized high-temp injection equipment and mold heaters ($160\text{--}190\text{ °C}$).
+2. **CNC Machining for Prototypes:**
+   - **Unfilled PEEK:** Outstanding machinability, producing smooth burr-free card grooves with minimal cutting tool wear.
+   - **PPA-GF & PA66-GF30:** Glass fiber reinforcement causes rapid tool wear on carbide cutters; requires polycrystalline diamond (PCD) or coated carbide tooling to maintain tight dimensional tolerances on thin card guide ribs.
+
+---
+
+## 8. Proposed Future Physical Validation Plan (Wet / 70 °C Testing)
+
+Because PA66 moisture absorption is substantial, the following empirical screening test plan is recommended prior to downhole adoption:
+
+1. **As-Machined / Molded Baseline Inspection:**
+   - Measure carrier OD, length, card-guide slot width, and total dry mass ($M_0$).
+2. **Water / Brine Conditioning Immersion:**
+   - Immerse carrier test coupons in simulated completion brine (3% KCl / NaCl solution) at 23 °C and 70 °C.
+   - Measure mass uptake $\Delta M(t)$ and diametral linear expansion $\Delta D(t)$ at 24h, 48h, 168h (1 week), and saturation.
+3. **Inconel Bore Sliding Coupon Test:**
+   - Slide conditioned wet carrier coupons through an Inconel 718 tube bore coupon (ID $37.45\pm 0.02\text{ mm}$) at 20 °C and inside a 70 °C heated chamber.
+   - Verify insertion/extraction force remains $< 20\text{ N}$ without binding.
+4. **PCB Card Guide Fit & Retention Test:**
+   - Measure PCB card-edge insertion force into the guide slots before and after 70 °C hydrothermal conditioning to verify slot width does not swell shut or pinch circuit boards.
+
+---
+
+## 9. Side-by-Side Architecture Comparison Matrix
 
 Evaluated under 70 °C external boundary and 7200 s (2h) exposure:
 
@@ -69,12 +200,15 @@ Evaluated under 70 °C external boundary and 7200 s (2h) exposure:
 |---|---|---|---|---|---|---|---|---|
 | **Architecture A: Inconel 718 + Discrete PEEK Carrier (3.5 mm Wall)** | Inconel718 | Conformal Rails (PEEK) | 3.50 | 37.45 mm | FEASIBLE | 70.00 °C | 1.64 | RECOMMENDED BASELINE |
 | **Architecture A (4.0 mm Wall): Inconel 718 + Discrete PEEK Carrier** | Inconel718 | Conformal Rails (PEEK) | 4.00 | 36.45 mm | FEASIBLE | 70.00 °C | 2.45 | QUALIFIED SCREENING |
-| **Architecture B: Inconel 718 + Discrete PPA Carrier (3.5 mm Wall)** | Inconel718 | Conformal Rails (PPA_Amodel_A1133HS) | 3.50 | 37.45 mm | FEASIBLE | 70.00 °C | 1.64 | QUALIFIED SCREENING |
+| **Architecture B: Inconel 718 + Discrete PPA Carrier (3.5 mm Wall)** | Inconel718 | Conformal Rails (PPA) | 3.50 | 37.45 mm | FEASIBLE | 70.00 °C | 1.64 | QUALIFIED SCREENING |
+| **Architecture B2: Inconel 718 + Discrete PA66-GF30 Carrier (3.5 mm Wall)** | Inconel718 | Conformal Rails (PA66) | 3.50 | 37.45 mm | FEASIBLE | 70.00 °C | 1.64 | QUALIFIED SCREENING |
 | **Architecture C: Inconel 718 + Full PEEK Liner (3.5 mm Wall)** | Inconel718 | Full Liner (PEEK) | 3.50 | 37.45 mm | INFEASIBLE | 70.09 °C | 1.64 | INFEASIBLE |
-| **Architecture D: Inconel 718 + Full PPA Liner (3.5 mm Wall)** | Inconel718 | Full Liner (PPA_Amodel_A1133HS) | 3.50 | 37.45 mm | INFEASIBLE | 70.10 °C | 1.64 | INFEASIBLE |
+| **Architecture D: Inconel 718 + Full PPA Liner (3.5 mm Wall)** | Inconel718 | Full Liner (PPA) | 3.50 | 37.45 mm | INFEASIBLE | 70.10 °C | 1.64 | INFEASIBLE |
+| **Architecture D2: Inconel 718 + Full PA66-GF30 Liner (3.5 mm Wall)** | Inconel718 | Full Liner (PA66) | 3.50 | 37.45 mm | INFEASIBLE | 70.07 °C | 1.64 | INFEASIBLE |
 | **Reference Baseline (Arch E): Inconel 718 + Aerogel + PEEK** | Inconel718 | Full Liner (PEEK) | 3.50 | 37.45 mm | INFEASIBLE | 71.72 °C | 1.64 | INFEASIBLE |
 | **Architecture F: PEEK-Only Pressure Casing (Exploratory)** | PEEK | None (PEEK) | 7.22 | 30.00 mm | INFEASIBLE | 70.41 °C | 0.29 | EXPLORATORY |
-| **Architecture G: PPA-Only Pressure Casing (Exploratory)** | PPA_Amodel_A1133HS | None (PPA_Amodel_A1133HS) | 7.22 | 30.00 mm | INFEASIBLE | 70.46 °C | 0.93 | EXPLORATORY |
+| **Architecture G: PPA-Only Pressure Casing (Exploratory)** | PPA_Amodel_A1133HS | None (PPA) | 7.22 | 30.00 mm | INFEASIBLE | 70.46 °C | 0.93 | EXPLORATORY |
+| **Architecture G2: PA66-GF30-Only Pressure Casing (Exploratory)** | PA66_Ultramid_A3WG6_HRX | None (PA66) | 7.22 | 30.00 mm | INFEASIBLE | 70.33 °C | 0.47 | EXPLORATORY |
 | **Architecture A: Inconel 718 + Discrete PEEK (OD 47.62 mm)** | Inconel718 | Conformal Rails (PEEK) | 3.50 | 40.62 mm | FEASIBLE | 70.00 °C | 1.34 | QUALIFIED SCREENING |
 | **Architecture A: Inconel 718 + Discrete PEEK (OD 50.80 mm)** | Inconel718 | Conformal Rails (PEEK) | 3.50 | 43.80 mm | FEASIBLE | 70.00 °C | 1.10 | QUALIFIED SCREENING |
 | **Architecture A: Inconel 718 + Discrete PEEK (OD 53.98 mm)** | Inconel718 | Conformal Rails (PEEK) | 3.50 | 46.98 mm | FEASIBLE | 70.00 °C | 0.92 | QUALIFIED SCREENING |
@@ -82,25 +216,14 @@ Evaluated under 70 °C external boundary and 7200 s (2h) exposure:
 
 ---
 
-## 4. Thermal Screening, Internal Resistance Budget & Sensitivities
+## 10. Thermal Screening & Internal Resistance Budgets
 
-### A. Thermal Model Interpretation & Boundary Conditions:
 - **External Boundary:** 70.0 °C constant Dirichlet on casing outer diameter.
-- **Initial Temperature:** 25.0 °C uniform.
 - **Duration:** 7200 s (2.0 hours).
-- **Internal Dissipation Cases:** 0.0 W (pure ingress: **70.00 °C**) & 1.0 W (inherited load: **70.00 °C**).
-- **Result Type:** **INNER SHELL SURFACE TEMPERATURE / IDEAL SHELL-COUPLED LOWER-BOUND TEMPERATURE**.
-- *Thermal Modeling Note:* The 1D radial model conducts heat through the pressure shell to the wellbore fluid. It does **NOT** resolve internal cavity gas, PCB-to-carrier thermal resistance, carrier-to-shell contact conductance, internal natural convection, radiation, or IC junction thermal models.
+- **Result Type:** `IDEAL SHELL-COUPLED LOWER-BOUND TEMPERATURE (INNER SHELL SURFACE)`
+- **Allowable Internal Thermal Resistance Budget:** **15.00 K/W** (for +85 °C IC limits).
 
-### B. Derived Internal Thermal-Resistance Screening Budget:
-For components with exact verified temperature operating bounds ($+85.0\text{ °C}$ limit), the allowable internal thermal resistance from electronics to shell inner surface is calculated as:
-$$R_{\text{internal\_allowable}} = \frac{T_{\text{component\_limit}} - T_{\text{inner\_shell\_screen}}}{P_{\text{internal}}} = \frac{85.0\text{ °C} - 70.00\text{ °C}}{1.0\text{ W}} = \mathbf{15.00\text{ K/W}}$$
-
-> **Engineering Statement:** If the actual electronics-to-shell thermal path exhibits an effective thermal resistance $R_{\text{internal}} \le 15.00\text{ K/W}$, the verified $+85.0\text{ °C}$ device environmental bound is not exceeded at steady state under the 1.0 W screening case. Actual device junction temperature remains unresolved.
-
-### C. Internal Thermal-Resistance Parameter Sweep (Lumped Screening Sensitivity):
-Calculated via $T_{\text{electronics\_screen}} = T_{\text{inner\_shell}} + P_{\text{internal}} \times R_{\text{internal}}$:
-
+### Internal Thermal-Resistance Parameter Sweep:
 | Internal Thermal Resistance $R_{\text{internal}}$ | Internal Temperature Rise $\Delta T$ | Electronics Screening Temp | +85 °C IC Limit Status | Notes |
 |---|---|---|---|---|
 | 0.0 K/W | +0.0 K | **70.00 °C** | `WITHIN 85C BOUND` | Lumped screening parameter |
@@ -110,83 +233,30 @@ Calculated via $T_{\text{electronics\_screen}} = T_{\text{inner\_shell}} + P_{\t
 | 20.0 K/W | +20.0 K | **90.00 °C** | `EXCEEDS 85C BOUND` | Lumped screening parameter |
 | 25.0 K/W | +25.0 K | **95.00 °C** | `EXCEEDS 85C BOUND` | Lumped screening parameter |
 
-*Overall Thermal Status:* **CONDITIONAL — INTERNAL THERMAL PATH UNRESOLVED**
+---
 
-### D. Component Operating Limit & Thermal Budget Verification (Architecture A: Inconel 718 + Discrete PEEK Carrier (3.5 mm Wall)):
-| Component | Operating Limit Status | Verified Bound | Inner Shell Temp | Allowable $\Delta T$ (1W) | Derived $R_{\text{internal}}$ Budget | Thermal Model Status | Junction Temperature | Notes |
-|---|---|---|---|---|---|---|---|---|
-| **STM32F411CEU6** | `VERIFIED (-40...+85 C)` | 85.0 °C | 70.00 °C | 15.0 | 15.0 K/W | `CONDITIONAL / WITHIN INNER-SHELL-BASED SCREENING BUDGET` | `NOT ESTABLISHED` | Standard Industrial Range |
-| **PCM1808** | `VERIFIED (-40...+85 C)` | 85.0 °C | 70.00 °C | 15.0 | 15.0 K/W | `CONDITIONAL / WITHIN INNER-SHELL-BASED SCREENING BUDGET` | `NOT ESTABLISHED` | Standard Industrial Range |
-| **RTC Module (Unspecified PN)** | `UNSPECIFIED` | UNSPECIFIED | 70.00 °C | N/A (Unspecified Limit) | N/A (Unspecified Limit) K/W | `CONDITIONAL / UNVERIFIED` | `NOT ESTABLISHED` | Industrial-rated IC required in BOM |
-| **MicroSD Storage (Unspecified PN)** | `UNSPECIFIED` | UNSPECIFIED | 70.00 °C | N/A (Unspecified Limit) | N/A (Unspecified Limit) K/W | `CONDITIONAL / UNVERIFIED` | `NOT ESTABLISHED` | Industrial flash required in BOM |
-| **Power Management (Unspecified PN)** | `UNSPECIFIED` | UNSPECIFIED | 70.00 °C | N/A (Unspecified Limit) | N/A (Unspecified Limit) K/W | `CONDITIONAL / UNVERIFIED` | `NOT ESTABLISHED` | Discrete thermal dissipation budget required |
-| **AFE Electronics (Unspecified PN)** | `UNSPECIFIED` | UNSPECIFIED | 70.00 °C | N/A (Unspecified Limit) | N/A (Unspecified Limit) K/W | `CONDITIONAL / UNVERIFIED` | `NOT ESTABLISHED` | Requires thermal rating verification |
+## 11. Structural Screening Across Pressure Scenarios (Architecture A: Inconel 718 + Discrete PEEK Carrier (3.5 mm Wall))
+
+*Authoritative casing design pressure remains unresolved. Sizing is based on preliminary engineering screening.*
+
+1. **Scenario A (~10 MPa / 1,450 psi - ~1000 m Hydrostatic Context):**
+   - Max von Mises Stress: **59.7 MPa** | Strength Ratio: **16.75** | Buckling FoS: **11.33**
+2. **Scenario B (20 MPa / 2,900 psi - Intermediate Sensitivity):**
+   - Max von Mises Stress: **119.4 MPa** | Strength Ratio: **8.38** | Buckling FoS: **5.67**
+3. **Scenario C (68.95 MPa / 10,000 psi - Historical Biweekly 5 Benchmark):**
+   - Max von Mises Stress: **411.6 MPa** | Strength Ratio: **2.43** | Buckling FoS: **1.64**
 
 ---
 
-## 5. Structural Screening Across Pressure Scenarios
+## 12. CAD Assembly & Dimensional Extent
 
-*Authoritative casing design pressure remains unresolved. The results below represent preliminary engineering screening calculations.*
-
-### Pressure Scenarios Evaluated (Architecture A: Inconel 718 + Discrete PEEK Carrier (3.5 mm Wall)):
-
-1. **Scenario A (~10 MPa / 1,450 psi - ~1000 m Hydrostatic Derived Screening Context):**
-   - Max von Mises Stress: **59.7 MPa**
-   - Strength Basis: `YIELD` (1000 MPa allowable)
-   - Strength Screening Ratio: **16.75**
-   - Elastic Buckling Safety Factor: **11.33** ($P_{cr} = 113.3\text{ MPa}$)
-   - Status: `SCREENING MARGIN (High Margin at 10 MPa)`
-
-2. **Scenario B (20 MPa / 2,900 psi - Intermediate Wellbore Sensitivity):**
-   - Max von Mises Stress: **119.4 MPa**
-   - Strength Basis: `YIELD` (1000 MPa allowable)
-   - Strength Screening Ratio: **8.38**
-   - Elastic Buckling Safety Factor: **5.67**
-   - Status: `SCREENING MARGIN (High Margin at 20 MPa)`
-
-3. **Scenario C (68.95 MPa / 10,000 psi - Historical Biweekly 5 Screening Benchmark):**
-   - Max von Mises Stress: **411.6 MPa**
-   - Strength Basis: `YIELD` (1000 MPa allowable)
-   - Strength Screening Ratio: **2.43**
-   - Elastic Buckling Safety Factor: **1.64**
-   - Status: `CONDITIONAL (Buckling FoS < 2.0 reference at 10k psi; 4.0mm wall achieves FoS=2.45 if required)`
+- **Collision Check:** Automated Boolean intersection checks confirmed **zero prohibited interference (0.00 mm³)**.
+- **Modeled Subassembly Span:** **656.9 mm** (Limit $\le 2000.0\text{ mm}$).
+- **CAD Assembly Bounding Extent:** **656.9 mm** along axial Z.
 
 ---
 
-## 6. CAD Assembly Collision & Interference Analysis
-
-Automated Boolean intersection checks confirmed **zero prohibited interference (0.00 mm³)** across all assembly components with fail-closed kernel checking:
-- **Carrier vs Inconel Shell:** 0.000000 mm³ (Carrier outer radius $R = 18.525\text{ mm} < 18.725\text{ mm}$ shell bore radius)
-- **Carrier vs Non-Retention General PCM1808 Envelope:** 0.000000 mm³
-- **Nominal Electronics vs Inconel Shell:** 0.000000 mm³
-- **Nominal Electronics vs Buffer Plugs:** 0.000000 mm³
-- **Intentional PCB Retention Interface:** Card guide slots ($0.8\text{ mm}$ edge capture at $X = \pm 14.2$ to $\pm 15.0\text{ mm}$).
-
----
-
-## 7. HTI-02-DHPC/D Interface Concept & Dimensional Extent
-
-- **Interface Thread:** Nominal 7/16-20 UNF-2A male adapter concept integrated into front bulkhead.
-- **Signal Feedthrough:** Central 3-conductor signal feedthrough bore (2.5 mm diameter).
-- **Acoustic Exposure:** External acoustic sensing head (88.9 mm length, 17.475 mm OD) remains exposed to fluid.
-- **Modeled Subassembly Span:** **656.9 mm** (Sensor Head 88.9 mm + Bulkhead 40.0 mm + Housing 500.0 mm + Endcap 8.0 mm).
-- **CAD Assembly Bounding Extent:** **656.9 mm** along axial Z (Limit $\le 2000.0\text{ mm}$).
-- **Provisional Status:** Thread engagement length (10.16 mm), machining tolerances, O-ring gland dimensions, and pressure-retention calculations remain provisional screening concepts pending supplier-controlled drawings from High Tech, Inc.
-
----
-
-## 8. Active Material Database Properties
-
-| Material | Density | Thermal Conductivity | Specific Heat | Elastic Modulus | Strength Basis & Value | Thermal Expansion | Provenance Notes |
-|---|---|---|---|---|---|---|---|
-| **Inconel718** | Density: 8190 kg/m³ | k: 14.7 W/(m·K) | Cp: 460 J/(kg·K) | E (70/150C): 193000 MPa | Strength: 1000 MPa | CLTE: 13.0 ppm/K | Screening values near 150 C. Actual strength depends on product form, heat treatment condition, and supplier specification. |
-| **PEEK** | Density: 1300 kg/m³ | k: 0.29 W/(m·K) | Cp: 1500 J/(kg·K) | E (70/150C): 3700 MPa | Strength: 70 MPa | CLTE: 55.0 ppm/K | Victrex 450G unfilled PEEK. Room-temperature and thermal expansion properties from manufacturer technical datasheets. Properties at 70 C derived from published ISO 527/DMA curves. |
-| **Aerogel** | Density: 200 kg/m³ | k: 0.024 W/(m·K) | Cp: 1000 J/(kg·K) | E (70/150C): N/A MPa | Strength: N/A MPa | CLTE: N/A | Pyrogel HPS nominal density and conductivity at 100 C mean temperature. Specific heat remains an explicit screening assumption. |
-| **PPA_Amodel_A1133HS** | Density: 1480 kg/m³ | k: 0.26 W/(m·K) | Cp: 1200 J/(kg·K) | E (70/150C): 11813 MPa | Strength: 181 MPa | CLTE: 55.0 ppm/K | Solvay (Syensqo) Amodel A-1133 HS (33% Glass Fiber Reinforced PPA, Heat Stabilized). Modulus and strength at 70 C derived by exact linear interpolation between 23 C DAM and 100 C DAM Solvay Technical Design Guide datapoints. Note: A-1133 HS is the standard heat-stabilized grade; AS-1133 HS designates structural lubricated grades. |
-
----
-
-## 9. Artifacts & Generated Evidence
+## 13. Artifacts & Generated Evidence
 
 - **CAD STEP Model:** [`results/compact-casing/cad/compact_casing_assembly.step`](file:///home/faliq/projects/pertacoustic-3d-design/results/compact-casing/cad/compact_casing_assembly.step)
 - **Trade Study Dataset:** [`results/compact-casing/compact_casing_trade_study.csv`](file:///home/faliq/projects/pertacoustic-3d-design/results/compact-casing/compact_casing_trade_study.csv)
