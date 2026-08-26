@@ -83,7 +83,7 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         self.assertIn("FEASIBLE", discrete_carrier["packaging_status"])
 
     def test_carrier_tolerance_budget_includes_thermal_expansion(self):
-        """Verify explicit carrier tolerance budget accounts for differential expansion, tolerances, and moisture swell."""
+        """Verify explicit carrier tolerance budget accounts for differential expansion, tolerances, and assumed screening allowance."""
         budget = compute_carrier_tolerance_budget(
             shell_bore_nom_mm=37.450, carrier_od_nom_mm=37.050, carrier_material_key="PEEK", t_assembly_c=20.0, t_max_c=70.0
         )
@@ -98,10 +98,11 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         # Diff growth: 0.1019 - 0.0243 = +0.0776 mm diametral (+0.0388 mm radial)
         self.assertAlmostEqual(budget["diff_thermal_growth_diametral_mm"], 0.0776, places=3)
         self.assertAlmostEqual(budget["diff_thermal_growth_radial_mm"], 0.0388, places=3)
+        self.assertEqual(budget["dim_uncertainty_allowance_diametral_mm"], 0.020)
         
-        # Hot operating clearance: 0.400 - 0.0776 - 0.015 (swell) = 0.3074 mm
-        self.assertAlmostEqual(budget["hot_clearance_diametral_mm"], 0.3074, places=3)
-        self.assertAlmostEqual(budget["hot_clearance_radial_mm"], 0.1537, places=3)
+        # Hot operating clearance: 0.400 - 0.0776 - 0.020 (allowance) = 0.3024 mm
+        self.assertAlmostEqual(budget["hot_clearance_diametral_mm"], 0.3024, places=3)
+        self.assertAlmostEqual(budget["hot_clearance_radial_mm"], 0.1512, places=3)
         self.assertTrue(budget["adequate_clearance"])
 
     def test_final_carrier_remains_inside_shell_at_nominal_geometry(self):
@@ -113,7 +114,7 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
 
     def test_interference_calculation_errors_fail_closed(self):
         """Verify that geometry kernel or solid calculation errors fail closed (passed=False, status='ERROR / NOT VERIFIED')."""
-        # Pass an invalid geometry dictionary missing required keys
+        # 1. Missing keys / exception
         invalid_geom = {"od_mm": 44.45}
         result = check_cad_assembly_interferences(invalid_geom)
         self.assertFalse(result["passed"])
@@ -121,24 +122,116 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         self.assertIsNotNone(result["error"])
         self.assertIn("KeyError", result["error"])
 
+    def test_invalid_boolean_shape_fails_closed(self):
+        """Verify that an invalid OCC Boolean result shape fails closed rather than silently returning 0.0."""
+        from unittest.mock import MagicMock, patch
+        
+        cand = size_architecture_candidate(
+            "Architecture A", od_mm=44.45, wall_mm=3.5, liner_mm=0.0, aerogel_mm=0.0, is_discrete_carrier=True
+        )
+        
+        # Mock an invalid CadQuery shape (val is not None, but isValid() is False)
+        mock_shape = MagicMock()
+        mock_shape.isValid.return_value = False
+        mock_shape.Volume.return_value = 0.0
+        
+        mock_workplane = MagicMock()
+        mock_workplane.objects = [mock_shape]
+        mock_workplane.val.return_value = mock_shape
+        
+        with patch.object(cq.Workplane, "intersect", return_value=mock_workplane):
+            res = check_cad_assembly_interferences(cand)
+            self.assertFalse(res["passed"])
+            self.assertEqual(res["status"], "ERROR / NOT VERIFIED")
+            self.assertIn("ValueError", res["error"])
+
     def test_recommendation_cannot_select_missing_or_failed_collision_evidence(self):
         """Verify that recommendation engine rejects candidates with missing, False, or ERROR collision status."""
         candidates, _ = run_architecture_trade_study()
         
-        # Test candidate with missing collision results
         bad_cand_1 = dict(candidates[0])
         bad_cand_1["collision_results"] = None
         
-        # Test candidate with failed collision results
         bad_cand_2 = dict(candidates[0])
         bad_cand_2["collision_results"] = {"passed": False, "status": "FAIL (1.200 mm³ collision)"}
         
-        # Test candidate with ERROR collision results
         bad_cand_3 = dict(candidates[0])
         bad_cand_3["collision_results"] = {"passed": False, "status": "ERROR / NOT VERIFIED", "error": "KernelCrash"}
         
         with self.assertRaises(ValueError):
             select_recommended_candidate([bad_cand_1, bad_cand_2, bad_cand_3])
+
+    def test_tolerance_budget_gate_in_recommendation_engine(self):
+        """Verify that discrete-carrier candidates with missing or inadequate tolerance budget are disqualified."""
+        candidates, _ = run_architecture_trade_study()
+        
+        # Inadequate clearance
+        bad_cand_tol = dict(candidates[0])
+        bad_cand_tol["packaging"] = dict(candidates[0]["packaging"])
+        bad_cand_tol["packaging"]["tolerance_budget"] = {"adequate_clearance": False}
+        
+        # Missing tolerance budget
+        bad_cand_no_tol = dict(candidates[0])
+        bad_cand_no_tol["packaging"] = dict(candidates[0]["packaging"])
+        bad_cand_no_tol["packaging"]["tolerance_budget"] = None
+        
+        with self.assertRaises(ValueError):
+            select_recommended_candidate([bad_cand_tol, bad_cand_no_tol])
+
+    def test_total_tool_length_gate_in_recommendation_engine(self):
+        """Verify that candidate exceeding total modeled tool length of 2000 mm is disqualified."""
+        cand_long = size_architecture_candidate(
+            "Architecture A: Long Housing", od_mm=44.45, wall_mm=3.5, liner_mm=0.0, aerogel_mm=0.0, is_discrete_carrier=True
+        )
+        cand_long["total_tool_length_mm"] = 2050.0  # Exceeds 2000 mm gate
+        
+        with self.assertRaises(ValueError):
+            select_recommended_candidate([cand_long])
+
+    def test_report_and_csv_consistency_for_recommended_candidate(self):
+        """Verify that generated Markdown report and CSV match 100% numerically for the recommended baseline."""
+        candidates, recommended = run_architecture_trade_study()
+        
+        with TemporaryDirectory() as tmpdir:
+            out_dir = Path(tmpdir)
+            from cosmo.compact_casing import export_trade_study_csv_and_report
+            export_trade_study_csv_and_report(candidates, recommended, out_dir)
+            
+            csv_path = out_dir / "compact_casing_trade_study.csv"
+            md_path = out_dir / "compact_casing_redesign_report.md"
+            
+            self.assertTrue(csv_path.exists())
+            self.assertTrue(md_path.exists())
+            
+            md_text = md_path.read_text(encoding="utf-8")
+            
+            # Read CSV recommended row
+            import csv
+            with open(csv_path, encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                rows = list(reader)
+                
+            rec_csv = next(r for r in rows if r["architecture"] == recommended["architecture"])
+            
+            # Verify OD, shell bore, wall thickness, 2h 1W temp in report text
+            self.assertIn(f"{float(rec_csv['od_mm']):.2f} mm", md_text)
+            self.assertIn(f"{float(rec_csv['wall_mm']):.2f} mm", md_text)
+            self.assertIn(f"{float(rec_csv['shell_bore_id_mm']):.2f} mm", md_text)
+            self.assertIn(f"{float(rec_csv['temp_2h_1w_C']):.2f} °C", md_text)
+
+    def test_wall_thickness_sensitivity_included_in_trade_study(self):
+        """Verify that 4.0 mm wall sensitivity candidate is evaluated and achieves higher buckling margin."""
+        candidates, _ = run_architecture_trade_study()
+        wall_4mm_cand = next((c for c in candidates if "4.0 mm Wall" in c["architecture"]), None)
+        self.assertIsNotNone(wall_4mm_cand)
+        self.assertEqual(wall_4mm_cand["wall_mm"], 4.0)
+        self.assertEqual(wall_4mm_cand["packaging"]["shell_bore_id_mm"], 36.45)
+        self.assertTrue(wall_4mm_cand["packaging"]["direct_fit"])
+        
+        # Buckling safety factor at 10k psi for 4.0mm wall should exceed 2.0 (2.45)
+        fos_buckle_10k = wall_4mm_cand["structural"]["buckling_historical"]["buckling_safety_factor"]
+        self.assertGreaterEqual(fos_buckle_10k, 2.0)
+        self.assertAlmostEqual(fos_buckle_10k, 2.45, places=2)
 
     def test_pcm1808_reserved_envelope_and_assembly_zero_prohibited_interference(self):
         """Verify automated Boolean intersection interference checks pass with zero collision volume."""
@@ -152,6 +245,13 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         self.assertEqual(collision["pcm_nominal_vs_shell_vol_mm3"], 0.0)
         self.assertEqual(collision["pcm_nominal_vs_buffer_vol_mm3"], 0.0)
         self.assertEqual(collision["max_interference_vol_mm3"], 0.0)
+
+    def test_ppa_strength_basis_is_explicit_and_not_mislabeled_as_yield(self):
+        """Verify that PPA strength basis is explicitly labeled as tensile stress at break and not yield."""
+        ppa_stress = lame_stress(od_mm=44.45, wall_mm=3.5, pressure_mpa=10.0, material_key="PPA_Amodel_A1133HS")
+        self.assertEqual(ppa_stress["strength_basis"], "TENSILE_STRESS_AT_BREAK_SCREENING")
+        self.assertEqual(ppa_stress["screening_strength_mpa"], 181.0)
+        self.assertNotIn("yield_strength_mpa_70c_screening", MATERIALS["PPA_Amodel_A1133HS"])
 
     def test_ppa_derived_70c_properties_match_solvay_source_and_interpolation(self):
         """Verify Solvay Amodel technical design guide source data and exact linear interpolation at 70 °C."""
@@ -234,11 +334,11 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         """Verify Inconel 718 metallic shell maintains high structural margin under ~1000 m and 20 MPa."""
         struct = structural_screening(od_mm=44.45, wall_mm=3.5, material_key="Inconel718")
         
-        fos_yield_1000m = struct["scenarios"]["scenario_1000m_10mpa"]["yield_safety_factor"]
+        fos_yield_1000m = struct["scenarios"]["scenario_1000m_10mpa"]["screening_strength_ratio"]
         fos_buckle_1000m = struct["buckling_1000m"]["buckling_safety_factor"]
-        fos_yield_20mpa = struct["scenarios"]["scenario_intermediate_20mpa"]["yield_safety_factor"]
+        fos_yield_20mpa = struct["scenarios"]["scenario_intermediate_20mpa"]["screening_strength_ratio"]
         fos_buckle_20mpa = struct["buckling_20mpa"]["buckling_safety_factor"]
-        fos_yield_hist = struct["scenarios"]["scenario_historical_68_9mpa"]["yield_safety_factor"]
+        fos_yield_hist = struct["scenarios"]["scenario_historical_68_9mpa"]["screening_strength_ratio"]
         
         self.assertGreaterEqual(fos_yield_1000m, 10.0)
         self.assertGreaterEqual(fos_buckle_1000m, 5.0)
@@ -252,7 +352,7 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         self.assertIsNone(COMPONENT_LIMITS["RTC Module (Unspecified PN)"]["max_C"])
         self.assertEqual(COMPONENT_LIMITS["RTC Module (Unspecified PN)"]["status"], "CONDITIONAL / UNVERIFIED")
         
-        assessment = zone_thermal_assessment(final_cavity_temp_C=70.57)
+        assessment = zone_thermal_assessment(final_cavity_temp_C=70.00)
         self.assertEqual(assessment["STM32F411CEU6"]["status"], "VERIFIED")
         self.assertEqual(assessment["PCM1808"]["status"], "VERIFIED")
         self.assertEqual(assessment["RTC Module (Unspecified PN)"]["status"], "CONDITIONAL / UNVERIFIED")
@@ -265,7 +365,7 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         self.assertGreaterEqual(len(candidates), 7)
         
         self.assertLessEqual(recommended["od_mm"], MAX_OD_MM)
-        self.assertLessEqual(recommended["housing_length_mm"], MAX_TOOL_LENGTH_MM)
+        self.assertLessEqual(recommended.get("total_tool_length_mm", 0.0), MAX_TOOL_LENGTH_MM)
         self.assertTrue(recommended["packaging"]["direct_fit"])
         self.assertLessEqual(recommended["thermal_1w"]["final_inner_temperature_C"], 85.0)
         self.assertIn("Inconel", recommended["casing_material"])
