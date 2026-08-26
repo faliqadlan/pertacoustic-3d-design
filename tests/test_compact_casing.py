@@ -145,6 +145,67 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
             self.assertEqual(res["status"], "ERROR / NOT VERIFIED")
             self.assertIn("ValueError", res["error"])
 
+    def test_non_empty_boolean_result_with_val_none_fails_closed(self):
+        """Verify that a non-empty Boolean objects list with val() == None fails closed."""
+        from unittest.mock import MagicMock, patch
+        
+        cand = size_architecture_candidate(
+            "Architecture A", od_mm=44.45, wall_mm=3.5, liner_mm=0.0, aerogel_mm=0.0, is_discrete_carrier=True
+        )
+        
+        # Mock non-empty objects list, but val() is None
+        mock_workplane = MagicMock()
+        mock_workplane.objects = [MagicMock()]
+        mock_workplane.val.return_value = None
+        
+        with patch.object(cq.Workplane, "intersect", return_value=mock_workplane):
+            res = check_cad_assembly_interferences(cand)
+            self.assertFalse(res["passed"])
+            self.assertEqual(res["status"], "ERROR / NOT VERIFIED")
+            self.assertIn("ValueError", res["error"])
+
+    def test_current_shell_thermal_result_is_not_labeled_cavity_temperature(self):
+        """Verify that 1D thermal simulation explicitly labels its result as inner shell surface temperature."""
+        cand = size_architecture_candidate(
+            "Architecture A", od_mm=44.45, wall_mm=3.5, liner_mm=0.0, aerogel_mm=0.0, is_discrete_carrier=True
+        )
+        t_res = cand["thermal_1w"]
+        self.assertIn("thermal_metric_label", t_res)
+        self.assertIn("INNER SHELL SURFACE", t_res["thermal_metric_label"])
+        self.assertIn("inner_shell_temperature_C", t_res)
+        self.assertAlmostEqual(t_res["final_inner_shell_temperature_C"], 70.00, places=1)
+
+    def test_internal_thermal_resistance_budget_derived_from_live_results(self):
+        """Verify allowable internal thermal resistance budget calculation: (85 - T_shell) / P."""
+        from cosmo.compact_casing import compute_internal_thermal_resistance_budget
+        budget = compute_internal_thermal_resistance_budget(inner_shell_temp_c=70.00, power_w=1.0)
+        
+        # For STM32F411CEU6 (limit 85 C): allowable delta T = 15 K, allowable R_internal = 15 K/W
+        stm = budget["STM32F411CEU6"]
+        self.assertEqual(stm["operating_limit_status"], "VERIFIED (-40...+85 C)")
+        self.assertEqual(stm["allowable_delta_T_K"], 15.00)
+        self.assertEqual(stm["allowable_r_internal_K_per_W"], 15.00)
+        self.assertEqual(stm["thermal_model_status"], "CONDITIONAL / WITHIN INNER-SHELL-BASED SCREENING BUDGET")
+        self.assertEqual(stm["junction_temperature"], "NOT ESTABLISHED")
+        
+        # Unspecified ICs remain CONDITIONAL / UNVERIFIED
+        rtc = budget["RTC Module (Unspecified PN)"]
+        self.assertEqual(rtc["operating_limit_status"], "UNSPECIFIED")
+        self.assertEqual(rtc["thermal_model_status"], "CONDITIONAL / UNVERIFIED")
+        self.assertEqual(rtc["junction_temperature"], "NOT ESTABLISHED")
+
+    def test_internal_thermal_sensitivity_sweep(self):
+        """Verify lumped parameter sweep across R_internal."""
+        from cosmo.compact_casing import compute_internal_thermal_sensitivity
+        rows = compute_internal_thermal_sensitivity(inner_shell_temp_c=70.00, power_w=1.0, r_values=[0.0, 5.0, 10.0, 15.0, 20.0])
+        self.assertEqual(len(rows), 5)
+        self.assertEqual(rows[0]["t_electronics_screen_C"], 70.00)
+        self.assertEqual(rows[0]["status"], "WITHIN 85C BOUND")
+        self.assertEqual(rows[3]["t_electronics_screen_C"], 85.00)
+        self.assertEqual(rows[3]["status"], "WITHIN 85C BOUND")
+        self.assertEqual(rows[4]["t_electronics_screen_C"], 90.00)
+        self.assertEqual(rows[4]["status"], "EXCEEDS 85C BOUND")
+
     def test_recommendation_cannot_select_missing_or_failed_collision_evidence(self):
         """Verify that recommendation engine rejects candidates with missing, False, or ERROR collision status."""
         candidates, _ = run_architecture_trade_study()
@@ -188,6 +249,27 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             select_recommended_candidate([cand_long])
 
+    def test_wall_selection_not_list_order_dependent(self):
+        """Verify that 3.5 mm baseline wall selection is governed by explicit packaging rule and not list order."""
+        candidates, _ = run_architecture_trade_study()
+        # Find 3.5mm and 4.0mm candidates
+        c_35 = next(c for c in candidates if "3.5 mm Wall" in c["architecture"])
+        c_40 = next(c for c in candidates if "4.0 mm Wall" in c["architecture"])
+        
+        # Put 4.0 mm first
+        reversed_order = [c_40, c_35]
+        selected = select_recommended_candidate(reversed_order)
+        self.assertEqual(selected["wall_mm"], 3.5)
+        self.assertIn("3.5 mm Wall", selected["architecture"])
+        self.assertIn("PRELIMINARY PACKAGING-FAVORABLE SCREENING BASELINE", selected["wall_status"])
+
+    def test_only_one_candidate_marked_recommended(self):
+        """Verify that exactly one candidate in the trade study has is_recommended_baseline == True."""
+        candidates, recommended = run_architecture_trade_study()
+        rec_flags = [c.get("is_recommended_baseline", False) for c in candidates]
+        self.assertEqual(sum(rec_flags), 1)
+        self.assertTrue(recommended["is_recommended_baseline"])
+
     def test_report_and_csv_consistency_for_recommended_candidate(self):
         """Verify that generated Markdown report and CSV match 100% numerically for the recommended baseline."""
         candidates, recommended = run_architecture_trade_study()
@@ -217,7 +299,49 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
             self.assertIn(f"{float(rec_csv['od_mm']):.2f} mm", md_text)
             self.assertIn(f"{float(rec_csv['wall_mm']):.2f} mm", md_text)
             self.assertIn(f"{float(rec_csv['shell_bore_id_mm']):.2f} mm", md_text)
-            self.assertIn(f"{float(rec_csv['temp_2h_1w_C']):.2f} °C", md_text)
+            self.assertIn(f"{float(rec_csv['inner_shell_temp_2h_1w_C']):.2f} °C", md_text)
+            self.assertEqual(rec_csv["is_recommended_baseline"], "True")
+            self.assertEqual(rec_csv["strength_basis"], "YIELD")
+
+    def test_polymer_csv_strength_values_not_mislabeled_as_yield(self):
+        """Verify that CSV output columns do not mislabel polymer strength as yield."""
+        candidates, recommended = run_architecture_trade_study()
+        with TemporaryDirectory() as tmpdir:
+            out_dir = Path(tmpdir)
+            from cosmo.compact_casing import export_trade_study_csv_and_report
+            export_trade_study_csv_and_report(candidates, recommended, out_dir)
+            
+            csv_path = out_dir / "compact_casing_trade_study.csv"
+            import csv
+            with open(csv_path, encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                rows = list(reader)
+                fieldnames = reader.fieldnames
+                
+            self.assertNotIn("fos_yield_1000m", fieldnames)
+            self.assertIn("strength_basis", fieldnames)
+            self.assertIn("strength_ratio_10mpa", fieldnames)
+            
+            inconel_row = next(r for r in rows if "Architecture A" in r["architecture"])
+            self.assertEqual(inconel_row["strength_basis"], "YIELD")
+            
+            ppa_only_row = next(r for r in rows if "Architecture G" in r["architecture"])
+            self.assertEqual(ppa_only_row["strength_basis"], "TENSILE_STRESS_AT_BREAK_SCREENING")
+            
+            peek_only_row = next(r for r in rows if "Architecture F" in r["architecture"])
+            self.assertEqual(peek_only_row["strength_basis"], "TENSILE_STRENGTH_SCREENING")
+
+    def test_cad_assembly_bounding_extent_matches_total_length(self):
+        """Verify that CAD solid assembly axial extent matches modeled length <= 2000 mm."""
+        cand = size_architecture_candidate(
+            "Architecture A", od_mm=44.45, wall_mm=3.5, liner_mm=0.0, aerogel_mm=0.0, is_discrete_carrier=True
+        )
+        parts = generate_compact_casing_cad(cand)
+        z_min = min(solid.val().BoundingBox().zmin for solid, _, _ in parts)
+        z_max = max(solid.val().BoundingBox().zmax for solid, _, _ in parts)
+        cad_span = round(z_max - z_min, 1)
+        self.assertAlmostEqual(cad_span, 656.9, places=1)
+        self.assertLessEqual(cad_span, MAX_TOOL_LENGTH_MM)
 
     def test_wall_thickness_sensitivity_included_in_trade_study(self):
         """Verify that 4.0 mm wall sensitivity candidate is evaluated and achieves higher buckling margin."""
@@ -352,12 +476,14 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         self.assertIsNone(COMPONENT_LIMITS["RTC Module (Unspecified PN)"]["max_C"])
         self.assertEqual(COMPONENT_LIMITS["RTC Module (Unspecified PN)"]["status"], "CONDITIONAL / UNVERIFIED")
         
-        assessment = zone_thermal_assessment(final_cavity_temp_C=70.00)
-        self.assertEqual(assessment["STM32F411CEU6"]["status"], "VERIFIED")
-        self.assertEqual(assessment["PCM1808"]["status"], "VERIFIED")
-        self.assertEqual(assessment["RTC Module (Unspecified PN)"]["status"], "CONDITIONAL / UNVERIFIED")
+        assessment = zone_thermal_assessment(final_inner_shell_temp_C=70.00)
+        self.assertEqual(assessment["STM32F411CEU6"]["operating_limit_status"], "VERIFIED (-40...+85 C)")
+        self.assertEqual(assessment["STM32F411CEU6"]["thermal_model_status"], "CONDITIONAL / WITHIN INNER-SHELL-BASED SCREENING BUDGET")
+        self.assertEqual(assessment["PCM1808"]["operating_limit_status"], "VERIFIED (-40...+85 C)")
+        self.assertEqual(assessment["PCM1808"]["thermal_model_status"], "CONDITIONAL / WITHIN INNER-SHELL-BASED SCREENING BUDGET")
+        self.assertEqual(assessment["RTC Module (Unspecified PN)"]["thermal_model_status"], "CONDITIONAL / UNVERIFIED")
         self.assertEqual(assessment["RTC Module (Unspecified PN)"]["margin_C"], "N/A (Unspecified Part Rating)")
-        self.assertEqual(assessment["MicroSD Storage (Unspecified PN)"]["status"], "CONDITIONAL / UNVERIFIED")
+        self.assertEqual(assessment["MicroSD Storage (Unspecified PN)"]["thermal_model_status"], "CONDITIONAL / UNVERIFIED")
 
     def test_recommendation_engine_rule_logic(self):
         """Verify that candidate recommendation is governed by explicit multi-gate engineering rules."""
@@ -374,6 +500,7 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         selected = select_recommended_candidate(candidates)
         self.assertEqual(selected["architecture"], recommended["architecture"])
         self.assertEqual(selected["od_mm"], PREFERRED_OD_MM)
+        self.assertTrue(selected["is_recommended_baseline"])
 
     def test_3d_cad_solid_watertight_and_step_export_conformal_carrier(self):
         """Verify watertight CadQuery solid generation for conformal carrier casing."""

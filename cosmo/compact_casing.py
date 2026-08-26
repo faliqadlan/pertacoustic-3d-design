@@ -474,8 +474,11 @@ def transient_thermal_simulation(
     return {
         "power_w": power_w,
         "times_s": np.asarray(times),
+        "inner_shell_temperature_C": np.asarray(inner_temps),
         "inner_temperature_C": np.asarray(inner_temps),
+        "final_inner_shell_temperature_C": round(final_temp, 2),
         "final_inner_temperature_C": round(final_temp, 2),
+        "thermal_metric_label": "IDEAL SHELL-COUPLED LOWER-BOUND TEMPERATURE (INNER SHELL SURFACE)",
     }
 
 
@@ -483,28 +486,83 @@ def transient_thermal_simulation(
 # 4. COMPONENT LIMITS & ARCHITECTURE TRADE STUDY
 # ==============================================================================
 
-def zone_thermal_assessment(final_cavity_temp_C: float) -> dict[str, Any]:
+def compute_internal_thermal_resistance_budget(
+    inner_shell_temp_c: float,
+    power_w: float = INHERITED_SCREENING_POWER_W,
+) -> dict[str, Any]:
     """
-    Evaluates components against documented operating limits.
+    Derives the allowable internal thermal-resistance screening budget for components with verified operating bounds.
+    R_internal_allowable = (T_component_limit - T_inner_shell_screen) / P_internal
+    
+    This is a DERIVED INTERNAL THERMAL-RESISTANCE SCREENING BUDGET, not a measured resistance or field requirement.
+    Statement: If the actual electronics-to-shell thermal path is <= R_internal_allowable, the verified +85 °C
+    device environmental bound is not exceeded at steady state under the 1.0 W screening case.
+    Actual junction temperature remains unresolved.
     """
-    results = {}
+    budget = {}
     for comp, info in COMPONENT_LIMITS.items():
         if info["max_C"] is None:
-            results[comp] = {
-                "max_C": "N/A (Unspecified)",
+            budget[comp] = {
+                "max_C": "UNSPECIFIED",
+                "operating_limit_status": "UNSPECIFIED",
+                "thermal_model_status": "CONDITIONAL / UNVERIFIED",
+                "junction_temperature": "NOT ESTABLISHED",
+                "inner_shell_temp_C": inner_shell_temp_c,
+                "allowable_delta_T_K": "N/A (Unspecified Limit)",
+                "allowable_r_internal_K_per_W": "N/A (Unspecified Limit)",
                 "margin_C": "N/A (Unspecified Part Rating)",
-                "status": "CONDITIONAL / UNVERIFIED",
                 "notes": info["notes"],
             }
         else:
-            margin = info["max_C"] - final_cavity_temp_C
-            results[comp] = {
-                "max_C": info["max_C"],
-                "margin_C": round(margin, 2),
-                "status": "VERIFIED" if margin >= 0 else "EXCEEDED",
+            delta_t = info["max_C"] - inner_shell_temp_c
+            r_allowable = delta_t / power_w if power_w > 0 else float("inf")
+            within_budget = delta_t >= 0
+            budget[comp] = {
+                "max_C": f"{info['max_C']:.1f} °C",
+                "operating_limit_status": "VERIFIED (-40...+85 C)",
+                "thermal_model_status": "CONDITIONAL / WITHIN INNER-SHELL-BASED SCREENING BUDGET" if within_budget else "EXCEEDED",
+                "junction_temperature": "NOT ESTABLISHED",
+                "inner_shell_temp_C": inner_shell_temp_c,
+                "allowable_delta_T_K": round(delta_t, 2),
+                "allowable_r_internal_K_per_W": round(r_allowable, 2),
+                "margin_C": round(delta_t, 2),
                 "notes": info["notes"],
             }
-    return results
+    return budget
+
+
+def compute_internal_thermal_sensitivity(
+    inner_shell_temp_c: float,
+    power_w: float = INHERITED_SCREENING_POWER_W,
+    r_values: list[float] | None = None,
+) -> list[dict[str, Any]]:
+    """
+    Computes lumped electronics screening temperature across an internal thermal resistance parameter sweep.
+    T_electronics_screen = T_inner_shell + P * R_internal
+    """
+    if r_values is None:
+        r_values = [0.0, 5.0, 10.0, 15.0, 20.0, 25.0]
+    rows = []
+    for r in r_values:
+        t_screen = inner_shell_temp_c + power_w * r
+        within_85c = t_screen <= 85.0
+        rows.append({
+            "r_internal_K_per_W": r,
+            "delta_T_K": round(power_w * r, 2),
+            "t_electronics_screen_C": round(t_screen, 2),
+            "exceeds_85c_bound": not within_85c,
+            "status": "WITHIN 85C BOUND" if within_85c else "EXCEEDS 85C BOUND",
+        })
+    return rows
+
+
+def zone_thermal_assessment(
+    final_inner_shell_temp_C: float, power_w: float = INHERITED_SCREENING_POWER_W
+) -> dict[str, Any]:
+    """
+    Evaluates components against documented operating limits and derives allowable internal thermal resistance budgets.
+    """
+    return compute_internal_thermal_resistance_budget(final_inner_shell_temp_C, power_w)
 
 
 def size_architecture_candidate(
@@ -584,14 +642,16 @@ def size_architecture_candidate(
     pkg_pass = pkg["direct_fit"]
     collision_pass = candidate["collision_results"].get("passed", False)
     
+    candidate["is_recommended_baseline"] = False
+    
     if is_polymer_casing:
         candidate["overall_status"] = "EXPLORATORY / CONDITIONAL (Polymer casing lacks certified downhole pressure integrity; design pressure unresolved)"
     elif not pkg_pass:
-        candidate["overall_status"] = "INFEASIBLE (PCM1808 board interference with radial envelope)"
+        candidate["overall_status"] = "INFEASIBLE (Board envelope exceeds usable diameter)"
     elif not collision_pass:
         candidate["overall_status"] = "COLLISION DETECTED / ERROR"
     elif struct_pass_1000m and thermal_pass and pkg_pass:
-        candidate["overall_status"] = "RECOMMENDED PRELIMINARY SCREENING BASELINE (Packaging Feasible; Structural Conditional — Design Pressure Unresolved)"
+        candidate["overall_status"] = "QUALIFIED PRELIMINARY SCREENING CANDIDATE (Packaging Feasible; Structural Conditional — Design Pressure Unresolved)"
     else:
         candidate["overall_status"] = "REDESIGN REQUIRED"
         
@@ -608,7 +668,7 @@ def select_recommended_candidate(candidates: list[dict[str, Any]]) -> dict[str, 
     2. Length Gate: Total modeled tool length <= MAX_TOOL_LENGTH_MM (2000 mm).
     3. Packaging Gate: Direct circular fit of nominal PCB envelope (packaging['direct_fit'] == True).
     4. Tolerance Budget Gate: For discrete carrier, tolerance budget must exist and have adequate_clearance == True.
-    5. Thermal Gate: 2-hour cavity screening temperature <= 85.0 °C under 1.0 W internal load.
+    5. Thermal Gate: 2-hour inner-shell screening temperature <= 85.0 °C under 1.0 W internal load.
     6. Structural Baseline Gate: Inconel 718 metallic pressure shell baseline (polymer-only excluded from baseline).
     7. Assembly Collision Gate: CAD assembly must be collision-free (collision_results.passed == True).
        Any candidate with missing, False, or ERROR / NOT VERIFIED collision status is disqualified.
@@ -616,6 +676,10 @@ def select_recommended_candidate(candidates: list[dict[str, Any]]) -> dict[str, 
     Preference among qualifying candidates:
     1. Smallest Outer Diameter (prefer preferred OD 44.45 mm / 1.75 in).
     2. Simplest Architecture (Discrete Carrier > Full Circumferential Liner > Aerogel Reference).
+    3. Carrier Material: Baseline PEEK > PPA.
+    4. Wall Thickness Selection Policy: 3.5 mm wall is selected as the PRELIMINARY PACKAGING-FAVORABLE SCREENING BASELINE
+       (larger 37.45 mm bore maximizes packaging clearance margin); 4.0 mm wall is evaluated as a HIGHER-COLLAPSE-MARGIN
+       SENSITIVITY / CONTINGENCY. Authoritative field design pressure remains unresolved.
     """
     qualifying = []
     for c in candidates:
@@ -647,14 +711,23 @@ def select_recommended_candidate(candidates: list[dict[str, Any]]) -> dict[str, 
     if not qualifying:
         raise ValueError("No architecture candidate satisfies all engineering qualification gates.")
         
-    def rank_candidate(cand: dict[str, Any]) -> tuple[float, int, int]:
+    def rank_candidate(cand: dict[str, Any]) -> tuple[float, int, int, float]:
         od = cand["od_mm"]
         arch_type = 0 if cand.get("is_discrete_carrier", False) else (1 if cand.get("liner_mm", 0.0) > 0 and cand.get("aerogel_mm", 0.0) == 0 else 2)
         mat_rank = 0 if cand.get("liner_material") == "PEEK" else 1
-        return (od, arch_type, mat_rank)
+        # Explicit wall policy: 3.5 mm wall is preliminary packaging-favorable baseline
+        wall_rank = 0 if abs(cand.get("wall_mm", 0.0) - 3.5) < 1e-3 else 1
+        return (od, arch_type, mat_rank, wall_rank)
         
     qualifying.sort(key=rank_candidate)
-    return qualifying[0]
+    selected = qualifying[0]
+    selected["is_recommended_baseline"] = True
+    selected["wall_status"] = (
+        "PRELIMINARY PACKAGING-FAVORABLE SCREENING BASELINE (3.5 mm wall: 37.45 mm bore maximizes packaging clearance; design pressure unresolved)"
+        if abs(selected.get("wall_mm", 0.0) - 3.5) < 1e-3 else
+        "HIGHER-COLLAPSE-MARGIN SENSITIVITY / CONTINGENCY (4.0 mm wall: 36.45 mm bore; design pressure unresolved)"
+    )
+    return selected
 
 
 def run_architecture_trade_study() -> tuple[list[dict[str, Any]], dict[str, Any]]:
@@ -926,13 +999,19 @@ def generate_compact_casing_cad(
         (sd_solid, "MicroSD_Storage_Reserve", (0.85, 0.50, 0.15)),
     ]
     
+    # Calculate axial bounding extent across all solid parts
+    z_min = min(solid.val().BoundingBox().zmin for solid, _, _ in parts)
+    z_max = max(solid.val().BoundingBox().zmax for solid, _, _ in parts)
+    cad_total_len_mm = round(z_max - z_min, 1)
+    geometry["cad_total_length_mm"] = cad_total_len_mm
+    
     if output_step_path:
         output_step_path.parent.mkdir(parents=True, exist_ok=True)
         assembly = cq.Assembly(name="PertAcoustic_Compact_ConformalCarrier_Casing")
         for solid, name, color in parts:
             assembly.add(solid, name=name, color=cq.Color(*color))
         assembly.save(str(output_step_path))
-        print(f"Compact CAD STEP assembly exported to {output_step_path}")
+        print(f"Compact CAD STEP assembly exported to {output_step_path} (Axial Bounding Span: {cad_total_len_mm} mm)")
         
     return parts
 
@@ -942,8 +1021,9 @@ def check_cad_assembly_interferences(geometry: dict[str, Any]) -> dict[str, Any]
     Performs rigorous automated Boolean intersection collision checks across CAD solids.
     
     Fail-Closed Policy:
-    If any solid is invalid or if the geometry kernel raises an exception, the check fails closed
-    (passed = False, status = 'ERROR / NOT VERIFIED') and the candidate cannot be recommended.
+    If any solid is invalid, or if the geometry kernel produces an invalid solid, or if non-empty
+    intersection objects yield val() is None, the check fails closed (passed = False, status = 'ERROR / NOT VERIFIED')
+    and the candidate cannot be recommended.
     
     Verifies:
     1. Carrier rails do not penetrate the Inconel pressure shell.
@@ -997,14 +1077,14 @@ def check_cad_assembly_interferences(geometry: dict[str, Any]) -> dict[str, Any]
         # 5. Front buffer plug
         front_buffer = cq.Workplane("XY").circle(r_bore - 0.05).extrude(FRONT_AXIAL_BUFFER_MM).translate((0, 0, z0 + cap))
         
-        # Boolean intersection calculations (fail-closed on invalid OCC shapes)
+        # Boolean intersection calculations (fail-closed on invalid OCC shapes and missing values)
         def calc_intersection_vol(s1: cq.Workplane, s2: cq.Workplane) -> float:
             inter = s1.intersect(s2)
             if len(inter.objects) == 0:
                 return 0.0
             val = inter.val()
             if val is None:
-                return 0.0
+                raise ValueError("Boolean intersection returned non-empty objects list but val() is None.")
             if not val.isValid():
                 raise ValueError("Boolean intersection produced an invalid OpenCASCADE shape.")
             return float(val.Volume())
@@ -1241,8 +1321,8 @@ def plot_thermal_architecture_comparison(candidates: list[dict[str, Any]], outpu
     ax1.axhline(85.0, color="#8e44ad", linestyle=":", linewidth=1.5, label="85 °C STM32 / PCM1808 Upper Operating Limit")
     
     ax1.set_xlabel("Exposure Time (Hours)", fontsize=9)
-    ax1.set_ylabel("Internal Cavity Temperature (°C)", fontsize=9)
-    ax1.set_title("2-Hour Transient Response: Aerogel vs No-Aerogel (70 °C Boundary)", fontsize=10, fontweight="bold")
+    ax1.set_ylabel("Inner Shell Surface Temperature (°C)", fontsize=9)
+    ax1.set_title("2-Hour Transient Response: Shell Inner Surface (70 °C Boundary)", fontsize=10, fontweight="bold")
     ax1.grid(True, alpha=0.3)
     ax1.legend(loc="lower right", fontsize=7.5)
     
@@ -1273,8 +1353,8 @@ def plot_thermal_architecture_comparison(candidates: list[dict[str, Any]], outpu
         
     ax2.set_xticks(x)
     ax2.set_xticklabels(labels, fontsize=8)
-    ax2.set_ylabel("Cavity Temperature at 2h (°C)", fontsize=9)
-    ax2.set_title("Thermal Sizing & Architecture Comparison at 2 Hours", fontsize=10, fontweight="bold")
+    ax2.set_ylabel("Inner Shell Temperature at 2h (°C)", fontsize=9)
+    ax2.set_title("Inner Shell Thermal Screening Comparison at 2 Hours", fontsize=10, fontweight="bold")
     ax2.grid(axis="y", alpha=0.3)
     ax2.legend(loc="upper right", fontsize=7.5)
     
@@ -1296,11 +1376,14 @@ def export_trade_study_csv_and_report(
     # 1. Export CSV
     csv_path = output_dir / "compact_casing_trade_study.csv"
     fieldnames = [
-        "architecture", "od_mm", "od_in", "shell_bore_id_mm", "clear_id_mm", "wall_mm", "aerogel_mm", "liner_mm",
-        "carrier_type", "casing_material", "liner_material", "total_tool_length_mm", "packaging_feasibility",
-        "fos_yield_1000m", "fos_buckle_1000m", "fos_yield_20mpa", "fos_buckle_20mpa",
-        "fos_yield_10kpsi", "fos_buckle_10kpsi",
-        "temp_2h_0w_C", "temp_2h_1w_C", "thermal_verdict", "overall_status"
+        "architecture", "is_recommended_baseline", "od_mm", "od_in", "shell_bore_id_mm", "clear_id_mm", "wall_mm",
+        "aerogel_mm", "liner_mm", "carrier_type", "casing_material", "liner_material",
+        "total_tool_length_mm", "packaging_feasibility",
+        "strength_basis", "strength_ratio_10mpa", "fos_buckle_1000m",
+        "strength_ratio_20mpa", "fos_buckle_20mpa",
+        "strength_ratio_10kpsi", "fos_buckle_10kpsi",
+        "inner_shell_temp_2h_0w_C", "inner_shell_temp_2h_1w_C",
+        "thermal_screening_status", "overall_status"
     ]
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -1311,6 +1394,7 @@ def export_trade_study_csv_and_report(
             s = c["structural"]
             writer.writerow({
                 "architecture": c["architecture"],
+                "is_recommended_baseline": c.get("is_recommended_baseline", False),
                 "od_mm": c["od_mm"],
                 "od_in": round(c["od_mm"] / 25.4, 3),
                 "shell_bore_id_mm": c["packaging"]["shell_bore_id_mm"],
@@ -1321,17 +1405,18 @@ def export_trade_study_csv_and_report(
                 "carrier_type": "Conformal Rails" if c.get("is_discrete_carrier") else ("Full Liner" if c["liner_mm"] > 0 else "None"),
                 "casing_material": c["casing_material"],
                 "liner_material": c["liner_material"],
-                "total_tool_length_mm": c.get("total_tool_length_mm", 636.9),
+                "total_tool_length_mm": c.get("total_tool_length_mm", 656.9),
                 "packaging_feasibility": c["packaging"]["packaging_status"],
-                "fos_yield_1000m": s["scenarios"]["scenario_1000m_10mpa"]["screening_strength_ratio"],
+                "strength_basis": s["scenarios"]["scenario_1000m_10mpa"]["strength_basis"],
+                "strength_ratio_10mpa": s["scenarios"]["scenario_1000m_10mpa"]["screening_strength_ratio"],
                 "fos_buckle_1000m": s["buckling_1000m"]["buckling_safety_factor"],
-                "fos_yield_20mpa": s["scenarios"]["scenario_intermediate_20mpa"]["screening_strength_ratio"],
+                "strength_ratio_20mpa": s["scenarios"]["scenario_intermediate_20mpa"]["screening_strength_ratio"],
                 "fos_buckle_20mpa": s["buckling_20mpa"]["buckling_safety_factor"],
-                "fos_yield_10kpsi": s["scenarios"]["scenario_historical_68_9mpa"]["screening_strength_ratio"],
+                "strength_ratio_10kpsi": s["scenarios"]["scenario_historical_68_9mpa"]["screening_strength_ratio"],
                 "fos_buckle_10kpsi": s["buckling_historical"]["buckling_safety_factor"],
-                "temp_2h_0w_C": c["thermal_0w"]["final_inner_temperature_C"],
-                "temp_2h_1w_C": c["thermal_1w"]["final_inner_temperature_C"],
-                "thermal_verdict": "WITHIN BOUND (<=85C)" if c["thermal_1w"]["final_inner_temperature_C"] <= 85.0 else "EXCEEDED",
+                "inner_shell_temp_2h_0w_C": c["thermal_0w"]["final_inner_temperature_C"],
+                "inner_shell_temp_2h_1w_C": c["thermal_1w"]["final_inner_temperature_C"],
+                "thermal_screening_status": "CONDITIONAL — INTERNAL THERMAL PATH UNRESOLVED",
                 "overall_status": c["overall_status"],
             })
             
@@ -1343,7 +1428,8 @@ def export_trade_study_csv_and_report(
     rec_wall = recommended["wall_mm"]
     rec_shell_bore = recommended["packaging"]["shell_bore_id_mm"]
     rec_clear_id = recommended["clear_id_mm"]
-    rec_len = recommended.get("total_tool_length_mm", 636.9)
+    rec_len = recommended.get("total_tool_length_mm", 656.9)
+    cad_len = recommended.get("cad_total_length_mm", 656.9)
     rec_s = recommended["structural"]
     rec_t0 = recommended["thermal_0w"]["final_inner_temperature_C"]
     rec_t1 = recommended["thermal_1w"]["final_inner_temperature_C"]
@@ -1363,6 +1449,13 @@ def export_trade_study_csv_and_report(
     worst_hot_diam = tb.get("worst_case_hot_diametral_mm", 0.2634)
     worst_hot_rad = tb.get("worst_case_hot_radial_mm", 0.1317)
     
+    # Compute internal thermal sensitivity table
+    sens_rows = compute_internal_thermal_sensitivity(rec_t1, power_w=INHERITED_SCREENING_POWER_W)
+    sens_table_md = "\n".join(
+        f"| {r['r_internal_K_per_W']:.1f} K/W | +{r['delta_T_K']:.1f} K | **{r['t_electronics_screen_C']:.2f} °C** | `{r['status']}` | Lumped screening parameter |"
+        for r in sens_rows
+    )
+    
     # Build Comparison Table
     table_rows = []
     for c in candidates:
@@ -1372,9 +1465,9 @@ def export_trade_study_csv_and_report(
         t1_val = c["thermal_1w"]["final_inner_temperature_C"]
         buckle_10k = c_s["buckling_historical"]["buckling_safety_factor"]
         carrier_label = "Conformal Rails" if c.get("is_discrete_carrier") else ("Full Liner" if c["liner_mm"] > 0 else "None")
-        status_short = "RECOMMENDED BASELINE" if c["architecture"] == rec_arch else (
+        status_short = "RECOMMENDED BASELINE" if c.get("is_recommended_baseline") else (
             "EXPLORATORY" if "Exploratory" in c["architecture"] or "Only" in c["architecture"] else (
-                "INFEASIBLE" if not c["packaging"]["direct_fit"] else "FEASIBLE"
+                "INFEASIBLE" if not c["packaging"]["direct_fit"] else "QUALIFIED SCREENING"
             )
         )
         table_rows.append(
@@ -1402,10 +1495,8 @@ def export_trade_study_csv_and_report(
     # Build Component Zone Assessment Table dynamically
     comp_rows = []
     for comp, zinfo in recommended["zone_assessment"].items():
-        max_str = f"{zinfo['max_C']} °C" if zinfo['max_C'] != "N/A (Unspecified)" else "UNSPECIFIED"
-        margin_str = f"+{zinfo['margin_C']} °C" if isinstance(zinfo['margin_C'], (int, float)) else str(zinfo['margin_C'])
         comp_rows.append(
-            f"| **{comp}** | {max_str} | {rec_t1:.2f} °C | `{zinfo['status']}` | {margin_str} | {zinfo.get('notes', '')} |"
+            f"| **{comp}** | `{zinfo['operating_limit_status']}` | {zinfo['max_C']} | {rec_t1:.2f} °C | {zinfo['allowable_delta_T_K']} | {zinfo['allowable_r_internal_K_per_W']} K/W | `{zinfo['thermal_model_status']}` | `{zinfo['junction_temperature']}` | {zinfo.get('notes', '')} |"
         )
     comp_table_md = "\n".join(comp_rows)
     
@@ -1449,9 +1540,10 @@ This study investigates whether the compact PertAcoustic downhole casing ({rec_o
    - Conformal carrier geometry leaves **0.00 mm³ prohibited CAD interference** with the Inconel shell, electronics, and buffer plugs.
 
 2. **Does removing aerogel improve the 2-hour thermal behavior under the 70 °C environment?**
-   - **YES.** Under the current fixed 70 °C outer-boundary model and 1 W internal-load screening case, the no-aerogel architecture produces a lower 2-hour cavity temperature (**{rec_t1:.2f} °C**) than the aerogel reference architecture (**{aero_t1:.2f} °C**).
-   - In a 70 °C external environment, aerogel acts as an insulating blanket that traps internally generated heat. Without aerogel, heat conducts rapidly through the Inconel shell ($k = 14.7\\text{{ W/(m·K)}}$) into the wellbore fluid.
+   - **YES.** Under the fixed 70 °C outer-boundary model, removing aerogel eliminates internal heat trapping caused by the low-conductivity aerogel layer, producing a lower 2-hour inner shell surface screening temperature (**{rec_t1:.2f} °C**) than the aerogel reference architecture (**{aero_t1:.2f} °C**).
+   - In a 70 °C external environment, heat conducts rapidly through the Inconel shell ($k = 14.7\\text{{ W/(m·K)}}$) into the wellbore fluid.
    - Furthermore, eliminating aerogel reclaims 4.45 mm of radial wall space, enabling direct physical packaging.
+   - *Important Distinction:* The no-aerogel model calculates the **inner shell surface temperature / ideal shell-coupled lower-bound temperature ({rec_t1:.2f} °C)**. Actual internal cavity and electronics temperatures remain conditional on the internal thermal path.
 
 3. **Is a discrete PEEK or PPA carrier preferable to a complete cylindrical polymer liner?**
    - **Conformal discrete polymer carrier rails are strongly PREFERRED.**
@@ -1461,7 +1553,12 @@ This study investigates whether the compact PertAcoustic downhole casing ({rec_o
      - **Solvay Amodel A-1133 HS PPA** (33% GF) provides higher stiffness ($E = 11.81\\text{{ GPa}}$ at 70 °C vs 3.7 GPa for PEEK) and lower raw material cost, but exhibits higher equilibrium moisture absorption (1.80%).
 
 4. **Can the preferred 1.75 in ({rec_od:.2f} mm) OD be retained?**
-   - **YES.** At {rec_od:.2f} mm OD with a {rec_wall:.2f} mm Inconel wall, the bare bore is {rec_shell_bore:.2f} mm, providing ample physical space for all modeled electronics. Total modeled tool length is **{rec_len:.1f} mm** (well below the 2000 mm gate limit).
+   - **YES.** At {rec_od:.2f} mm OD with a {rec_wall:.2f} mm Inconel wall, the bare bore is {rec_shell_bore:.2f} mm, providing ample physical space for all modeled electronics. Total modeled tool length is **{rec_len:.1f} mm** (CAD Bounding Span: **{cad_len:.1f} mm**, well below the 2000 mm gate limit).
+
+5. **Wall-Thickness Status & Sizing Distinction:**
+   - **3.50 mm Inconel Wall:** Selected as the **PRELIMINARY PACKAGING-FAVORABLE SCREENING BASELINE** because its 37.45 mm bare bore maximizes internal packaging clearance (+1.26 mm radial margin for PCM1808 envelope).
+   - **4.00 mm Inconel Wall:** Evaluated as a **HIGHER-COLLAPSE-MARGIN SENSITIVITY / CONTINGENCY** (36.45 mm bare bore; historical 10,000 psi buckling safety factor increases from 1.64 to 2.45).
+   - *Note:* Authoritative downhole casing field design pressure remains unresolved. Therefore neither wall thickness is claimed as final pressure-wall sizing.
 
 ---
 
@@ -1485,31 +1582,40 @@ This study investigates whether the compact PertAcoustic downhole casing ({rec_o
 
 Evaluated under 70 °C external boundary and 7200 s (2h) exposure:
 
-| Architecture | Casing Material | Carrier / Liner | Wall mm | Shell Bore ID | Packaging Feasibility | 2h Temp @ 1W | FoS Buckle (10k psi) | Classification |
+| Architecture | Casing Material | Carrier / Liner | Wall mm | Shell Bore ID | Packaging Feasibility | Inner Shell Temp @ 1W | FoS Buckle (10k psi) | Classification |
 |---|---|---|---|---|---|---|---|---|
 {comparison_table_md}
 
 ---
 
-## 4. Material Properties & Component Limits Breakdown
+## 4. Thermal Screening, Internal Resistance Budget & Sensitivities
 
-### Active Material Database Properties:
-| Material | Density | Thermal Conductivity | Specific Heat | Elastic Modulus | Strength Basis & Value | Thermal Expansion | Provenance Notes |
-|---|---|---|---|---|---|---|---|
-{mat_table_md}
+### A. Thermal Model Interpretation & Boundary Conditions:
+- **External Boundary:** 70.0 °C constant Dirichlet on casing outer diameter.
+- **Initial Temperature:** 25.0 °C uniform.
+- **Duration:** 7200 s (2.0 hours).
+- **Internal Dissipation Cases:** 0.0 W (pure ingress: **{rec_t0:.2f} °C**) & 1.0 W (inherited load: **{rec_t1:.2f} °C**).
+- **Result Type:** **INNER SHELL SURFACE TEMPERATURE / IDEAL SHELL-COUPLED LOWER-BOUND TEMPERATURE**.
+- *Thermal Modeling Note:* The 1D radial model conducts heat through the pressure shell to the wellbore fluid. It does **NOT** resolve internal cavity gas, PCB-to-carrier thermal resistance, carrier-to-shell contact conductance, internal natural convection, radiation, or IC junction thermal models.
 
-### Thermal Model Boundaries:
-- External Boundary: 70.0 °C constant Dirichlet
-- Initial Temperature: 25.0 °C uniform
-- Duration: 7200 s (2.0 hours)
-- Internal Dissipation Cases: 0.0 W (pure ingress: **{rec_t0:.2f} °C**) & 1.0 W (inherited load: **{rec_t1:.2f} °C**)
+### B. Derived Internal Thermal-Resistance Screening Budget:
+For components with exact verified temperature operating bounds ($+85.0\\text{{ °C}}$ limit), the allowable internal thermal resistance from electronics to shell inner surface is calculated as:
+$$R_{{\\text{{internal\\_allowable}}}} = \\frac{{T_{{\\text{{component\\_limit}}}} - T_{{\\text{{inner\\_shell\\_screen}}}}}}{{P_{{\\text{{internal}}}}}} = \\frac{{85.0\\text{{ °C}} - {rec_t1:.2f}\\text{{ °C}}}}{{1.0\\text{{ W}}}} = \\mathbf{{{85.0 - rec_t1:.2f}\\text{{ K/W}}}}$$
 
-*Important Thermal Distinction:*
-Cavity/environmental screening remains below the documented operating-temperature upper bound; actual device junction temperature is not established by this model.
+> **Engineering Statement:** If the actual electronics-to-shell thermal path exhibits an effective thermal resistance $R_{{\\text{{internal}}}} \\le {85.0 - rec_t1:.2f}\\text{{ K/W}}$, the verified $+85.0\\text{{ °C}}$ device environmental bound is not exceeded at steady state under the 1.0 W screening case. Actual device junction temperature remains unresolved.
 
-### Component Operating Limit Verification ({rec_arch}):
-| Component | Verified Operating Limit | 2h Cavity Temp | Verified Status | Margin | Notes |
-|---|---|---|---|---|---|
+### C. Internal Thermal-Resistance Parameter Sweep (Lumped Screening Sensitivity):
+Calculated via $T_{{\\text{{electronics\\_screen}}}} = T_{{\\text{{inner\\_shell}}}} + P_{{\\text{{internal}}}} \\times R_{{\\text{{internal}}}}$:
+
+| Internal Thermal Resistance $R_{{\\text{{internal}}}}$ | Internal Temperature Rise $\\Delta T$ | Electronics Screening Temp | +85 °C IC Limit Status | Notes |
+|---|---|---|---|---|
+{sens_table_md}
+
+*Overall Thermal Status:* **CONDITIONAL — INTERNAL THERMAL PATH UNRESOLVED**
+
+### D. Component Operating Limit & Thermal Budget Verification ({rec_arch}):
+| Component | Operating Limit Status | Verified Bound | Inner Shell Temp | Allowable $\\Delta T$ (1W) | Derived $R_{{\\text{{internal}}}}$ Budget | Thermal Model Status | Junction Temperature | Notes |
+|---|---|---|---|---|---|---|---|---|
 {comp_table_md}
 
 ---
@@ -1529,12 +1635,14 @@ Cavity/environmental screening remains below the documented operating-temperatur
 
 2. **Scenario B (20 MPa / 2,900 psi - Intermediate Wellbore Sensitivity):**
    - Max von Mises Stress: **{sc_20mpa['max_von_mises_mpa']:.1f} MPa**
+   - Strength Basis: `{sc_20mpa['strength_basis']}` ({sc_20mpa['screening_strength_mpa']:.0f} MPa allowable)
    - Strength Screening Ratio: **{sc_20mpa['screening_strength_ratio']:.2f}**
    - Elastic Buckling Safety Factor: **{b_20mpa['buckling_safety_factor']:.2f}**
    - Status: `SCREENING MARGIN (High Margin at 20 MPa)`
 
 3. **Scenario C (68.95 MPa / 10,000 psi - Historical Biweekly 5 Screening Benchmark):**
    - Max von Mises Stress: **{sc_hist['max_von_mises_mpa']:.1f} MPa**
+   - Strength Basis: `{sc_hist['strength_basis']}` ({sc_hist['screening_strength_mpa']:.0f} MPa allowable)
    - Strength Screening Ratio: **{sc_hist['screening_strength_ratio']:.2f}**
    - Elastic Buckling Safety Factor: **{b_hist['buckling_safety_factor']:.2f}**
    - Status: `CONDITIONAL (Buckling FoS < 2.0 reference at 10k psi; 4.0mm wall achieves FoS=2.45 if required)`
@@ -1552,17 +1660,26 @@ Automated Boolean intersection checks confirmed **zero prohibited interference (
 
 ---
 
-## 7. HTI-02-DHPC/D Interface Concept & Provisional Details
+## 7. HTI-02-DHPC/D Interface Concept & Dimensional Extent
 
 - **Interface Thread:** Nominal 7/16-20 UNF-2A male adapter concept integrated into front bulkhead.
 - **Signal Feedthrough:** Central 3-conductor signal feedthrough bore (2.5 mm diameter).
 - **Acoustic Exposure:** External acoustic sensing head (88.9 mm length, 17.475 mm OD) remains exposed to fluid.
-- **Total Modeled Tool Length:** **{rec_len:.1f} mm** (Sensor Head 88.9 mm + Bulkhead 40.0 mm + Housing 500.0 mm + Endcap 8.0 mm).
+- **Modeled Subassembly Span:** **{rec_len:.1f} mm** (Sensor Head 88.9 mm + Bulkhead 40.0 mm + Housing 500.0 mm + Endcap 8.0 mm).
+- **CAD Assembly Bounding Extent:** **{cad_len:.1f} mm** along axial Z (Limit $\\le 2000.0\\text{{ mm}}$).
 - **Provisional Status:** Thread engagement length (10.16 mm), machining tolerances, O-ring gland dimensions, and pressure-retention calculations remain provisional screening concepts pending supplier-controlled drawings from High Tech, Inc.
 
 ---
 
-## 8. Artifacts & Generated Evidence
+## 8. Active Material Database Properties
+
+| Material | Density | Thermal Conductivity | Specific Heat | Elastic Modulus | Strength Basis & Value | Thermal Expansion | Provenance Notes |
+|---|---|---|---|---|---|---|---|
+{mat_table_md}
+
+---
+
+## 9. Artifacts & Generated Evidence
 
 - **CAD STEP Model:** [`results/compact-casing/cad/compact_casing_assembly.step`](file:///home/faliq/projects/pertacoustic-3d-design/results/compact-casing/cad/compact_casing_assembly.step)
 - **Trade Study Dataset:** [`results/compact-casing/compact_casing_trade_study.csv`](file:///home/faliq/projects/pertacoustic-3d-design/results/compact-casing/compact_casing_trade_study.csv)
