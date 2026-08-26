@@ -4,11 +4,13 @@ This module implements the comparative engineering study for the PertAcoustic
 compact downhole casing under the confirmed 70 °C / 2-hour design envelope.
 
 Architectures evaluated:
-1. Architecture A: Inconel 718 pressure shell + PEEK liner/carrier (No Aerogel) [RECOMMENDED]
-2. Architecture B: Inconel 718 pressure shell + PPA (Solvay Amodel A-1133 HS) liner/carrier (No Aerogel)
-3. Architecture C (Exploratory): PEEK-only casing / pressure body
-4. Architecture D (Exploratory): PPA-only casing / pressure body
-5. Reference Baseline: Inconel 718 + Pyrogel HPS Aerogel + PEEK (Historical Baseline)
+1. Architecture A: Inconel 718 pressure shell + discrete PEEK carrier rails (No Aerogel, No Full Liner) [RECOMMENDED]
+2. Architecture B: Inconel 718 pressure shell + discrete PPA carrier rails (No Aerogel, No Full Liner)
+3. Architecture C: Inconel 718 pressure shell + full circumferential PEEK liner (No Aerogel) [Comparison Case]
+4. Architecture D: Inconel 718 pressure shell + full circumferential PPA liner (No Aerogel) [Comparison Case]
+5. Reference Baseline (Arch E): Inconel 718 + Pyrogel HPS Aerogel + PEEK (Historical Baseline)
+6. Architecture F (Exploratory): PEEK-only casing / pressure body
+7. Architecture G (Exploratory): PPA-only casing / pressure body
 
 All structural results are preliminary engineering screening calculations.
 Historical Biweekly 5 artifacts remain preserved and unmodified.
@@ -23,6 +25,7 @@ from pathlib import Path
 from typing import Any
 
 import cadquery as cq
+import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
@@ -63,7 +66,7 @@ SD_ENVELOPE_MM = (25.0, 15.0, 6.0)  # MicroSD storage module
 AFE_ENVELOPE_MM = (30.0, 16.0, 8.0)  # Analog front-end pre-amp
 
 # Radial clearance
-BOARD_ASSEMBLY_CLEARANCE_MM = 1.0
+BOARD_ASSEMBLY_CLEARANCE_MM = 1.0  # 1.0 mm per side
 
 # Axial Component Thermal Zones along local Z (mm from front internal datum)
 THERMAL_ZONES_LOCAL_MM = {
@@ -96,54 +99,61 @@ MATERIALS = json.loads((ROOT / "cosmo" / "material_library.json").read_text(enco
 def compute_radial_budget(
     od_mm: float,
     wall_mm: float,
-    liner_mm: float,
+    liner_mm: float = 0.0,
     aerogel_mm: float = 0.0,
+    is_discrete_carrier: bool = False,
 ) -> dict[str, Any]:
     """
     Computes available clear ID and assesses packaging feasibility.
     
-    Formula: Clear ID = OD - 2 * (wall_thickness + aerogel_thickness + liner_thickness)
+    For full circumferential liner:
+      Clear ID = OD - 2 * (wall_mm + aerogel_mm + liner_mm)
+    For discrete carrier architecture:
+      Shell Bore ID = OD - 2 * wall_mm
+      Effective Containment ID = Shell Bore ID (carrier rails hold PCB without full circumferential thickness)
+      Clear ID = Shell Bore ID
     """
-    clear_id_mm = od_mm - 2.0 * (wall_mm + aerogel_mm + liner_mm)
+    shell_bore_id_mm = od_mm - 2.0 * wall_mm
     
-    # Check PCM1808 rectangular cross-section fit
-    # PCM1808 width = 30 mm, height = 12 mm
+    if is_discrete_carrier:
+        clear_id_mm = shell_bore_id_mm
+    else:
+        clear_id_mm = od_mm - 2.0 * (wall_mm + aerogel_mm + liner_mm)
+        
+    # PCM1808 nominal cross-section: 30.0 mm width x 12.0 mm height
     w_pcm, h_pcm = PCM1808_ENVELOPE_MM[1], PCM1808_ENVELOPE_MM[2]
-    eff_w = w_pcm + 2.0 * BOARD_ASSEMBLY_CLEARANCE_MM  # 32 mm
-    eff_h = h_pcm + 2.0 * BOARD_ASSEMBLY_CLEARANCE_MM  # 14 mm
-    diagonal_pcm = math.hypot(eff_w, eff_h)  # 34.93 mm
+    eff_w = w_pcm + 2.0 * BOARD_ASSEMBLY_CLEARANCE_MM  # 32.0 mm
+    eff_h = h_pcm + 2.0 * BOARD_ASSEMBLY_CLEARANCE_MM  # 14.0 mm
+    diagonal_pcm = math.hypot(eff_w, eff_h)  # sqrt(32^2 + 14^2) = sqrt(1220) ≈ 34.928 mm ≈ 34.93 mm
     
-    # Direct circular bore fit (board fits without needing carrier slotting)
+    # Direct circular fit condition: clear diameter >= enclosing bounding diameter
     direct_fit = clear_id_mm >= diagonal_pcm
     
-    # Low-profile header fit (if board height is 10 mm with clearance 12 mm: diagonal = hypot(32, 12) = 34.18 mm)
-    direct_fit_low_profile = clear_id_mm >= math.hypot(eff_w, 10.0 + 2.0 * BOARD_ASSEMBLY_CLEARANCE_MM)
+    # Radial clearance margin relative to diagonal
+    clearance_margin_mm = (clear_id_mm - diagonal_pcm) / 2.0 if clear_id_mm > 0 else -diagonal_pcm / 2.0
     
-    # Slotted carrier fit (chord width inside circular bore)
-    radius = clear_id_mm / 2.0 if clear_id_mm > 0 else 0
-    half_h = eff_h / 2.0
-    if half_h < radius:
-        max_chord = 2.0 * math.sqrt(radius**2 - half_h**2)
+    if direct_fit and is_discrete_carrier:
+        pkg_status = "FEASIBLE (Direct circular fit inside shell bore with discrete carrier rails)"
+    elif direct_fit:
+        pkg_status = "FEASIBLE (Direct circular fit inside full polymer liner)"
+    elif is_discrete_carrier and shell_bore_id_mm >= diagonal_pcm:
+        pkg_status = "FEASIBLE (Direct circular fit inside shell bore)"
     else:
-        max_chord = 0.0
-    slotted_fit = (eff_w <= max_chord) and (clear_id_mm >= eff_h)
-    
-    if direct_fit or direct_fit_low_profile:
-        pkg_status = "FEASIBLE (Direct circular fit with assembly clearance)"
-    elif slotted_fit:
-        pkg_status = "CONDITIONAL (Requires slotted PEEK/PPA carrier rails)"
-    else:
-        pkg_status = "INFEASIBLE (Insufficient radial clearance for PCM1808)"
+        pkg_status = f"INFEASIBLE (Clear ID {clear_id_mm:.2f} mm < {diagonal_pcm:.2f} mm PCM1808 envelope)"
         
     return {
         "od_mm": od_mm,
         "wall_mm": wall_mm,
         "aerogel_mm": aerogel_mm,
         "liner_mm": liner_mm,
+        "is_discrete_carrier": is_discrete_carrier,
+        "shell_bore_id_mm": round(shell_bore_id_mm, 2),
         "clear_id_mm": round(clear_id_mm, 2),
+        "effective_w_mm": eff_w,
+        "effective_h_mm": eff_h,
         "pcm1808_diagonal_mm": round(diagonal_pcm, 2),
-        "direct_fit": direct_fit or direct_fit_low_profile,
-        "slotted_fit": slotted_fit,
+        "clearance_margin_mm": round(clearance_margin_mm, 2),
+        "direct_fit": direct_fit,
         "packaging_status": pkg_status,
     }
 
@@ -209,6 +219,13 @@ def elastic_buckling(od_mm: float, wall_mm: float, pressure_mpa: float, material
 def structural_screening(od_mm: float, wall_mm: float, material_key: str = "Inconel718") -> dict[str, Any]:
     """
     Evaluates casing structural safety across explicit screening scenarios.
+    
+    Scenarios evaluated:
+    - ~10 MPa: Derived screening context (~1000 m hydrostatic depth)
+    - 20 MPa: Sensitivity scenario
+    - 68.95 MPa: Historical Biweekly 5 screening comparison (10,000 psi)
+    
+    Authoritative field casing design pressure remains unresolved.
     """
     scenarios = {
         "scenario_1000m_10mpa": lame_stress(od_mm, wall_mm, PRESSURE_SCENARIO_1000M_MPA, material_key),
@@ -217,6 +234,7 @@ def structural_screening(od_mm: float, wall_mm: float, material_key: str = "Inco
     }
     
     buckling_1000m = elastic_buckling(od_mm, wall_mm, PRESSURE_SCENARIO_1000M_MPA, material_key)
+    buckling_20mpa = elastic_buckling(od_mm, wall_mm, PRESSURE_SCENARIO_INTERMEDIATE_MPA, material_key)
     buckling_historical = elastic_buckling(od_mm, wall_mm, PRESSURE_SCENARIO_HISTORICAL_MPA, material_key)
     
     fos_yield_1000m = scenarios["scenario_1000m_10mpa"]["yield_safety_factor"]
@@ -227,14 +245,14 @@ def structural_screening(od_mm: float, wall_mm: float, material_key: str = "Inco
     is_polymer = material_key in {"PEEK", "PPA_Amodel_A1133HS"}
     
     if is_polymer:
-        status = "EXPLORATORY / INFEASIBLE (Polymer creep, hydrothermal aging, and seal limitations preclude unlined pressure containment)"
+        status = "EXPLORATORY / CONDITIONAL (Polymer creep, hydrothermal aging, and thread limitations preclude unlined pressure containment; requires authoritative pressure and collapse requirements)"
     elif fos_yield_1000m >= 2.0 and fos_buckling_1000m >= 2.0:
         if fos_yield_hist >= 2.0 and fos_buckling_hist >= 2.0:
-            status = "PASS (Screening FoS >= 2.0 across both 1000 m and 10,000 psi scenarios)"
+            status = "SCREENING MARGIN (FoS >= 2.0 screening reference across 1000m, 20MPa, and 10k psi; design pressure unresolved)"
         else:
-            status = "PASS (Screening FoS >= 2.0 for ~1000 m scenario; Conditional at 10,000 psi)"
+            status = "SCREENING MARGIN (FoS >= 2.0 for ~1000m and 20MPa screening; Conditional at 10,000 psi; design pressure unresolved)"
     else:
-        status = "FAIL (Screening FoS < 2.0)"
+        status = "CONDITIONAL / INSUFFICIENT MARGIN (FoS < 2.0 screening reference)"
         
     return {
         "od_mm": od_mm,
@@ -242,6 +260,7 @@ def structural_screening(od_mm: float, wall_mm: float, material_key: str = "Inco
         "material": material_key,
         "scenarios": scenarios,
         "buckling_1000m": buckling_1000m,
+        "buckling_20mpa": buckling_20mpa,
         "buckling_historical": buckling_historical,
         "status": status,
     }
@@ -261,7 +280,7 @@ def _discretize_thermal_layers(
     
     layer_defs = []
     # From inside to outside:
-    if geometry.get("liner_mm", 0.0) > 0:
+    if geometry.get("liner_mm", 0.0) > 0 and not geometry.get("is_discrete_carrier", False):
         layer_defs.append((geometry.get("liner_material", "PEEK"), geometry["liner_mm"] / 1000.0))
     if geometry.get("aerogel_mm", 0.0) > 0:
         layer_defs.append(("Aerogel", geometry["aerogel_mm"] / 1000.0))
@@ -291,7 +310,7 @@ def transient_thermal_simulation(
     1D radial finite-difference transient thermal conduction model.
     Boundary condition: 70 °C constant Dirichlet on outer surface.
     Initial condition: 25 °C uniform.
-    Internal heat: power_w applied at inner carrier surface.
+    Internal heat: power_w applied at inner cavity/carrier surface.
     """
     edges, names = _discretize_thermal_layers(geometry, cells_per_layer)
     centers = np.sqrt(edges[:-1] * edges[1:])
@@ -351,7 +370,7 @@ def transient_thermal_simulation(
     
     # Classification
     if final_temp <= 85.0:
-        classification = f"PASS (Cavity temperature {final_temp:.2f} °C <= 85 °C verified IC limit)"
+        classification = f"PASS (Cavity temperature {final_temp:.2f} °C <= 85 °C documented operating bound)"
     else:
         classification = f"FAIL (Cavity temperature {final_temp:.2f} °C > 85 °C limit)"
         
@@ -369,6 +388,7 @@ def transient_thermal_simulation(
 def zone_thermal_assessment(final_cavity_temp_C: float) -> dict[str, Any]:
     """
     Evaluates temperature zones and verifies against component operating limits.
+    Distinguishes verified IC operating bounds from conditional unverified parts.
     """
     zone_results = {}
     for comp, data in COMPONENT_LIMITS.items():
@@ -380,7 +400,7 @@ def zone_thermal_assessment(final_cavity_temp_C: float) -> dict[str, Any]:
         zone_results[comp] = {
             "max_limit_C": max_c,
             "cavity_temp_C": round(final_cavity_temp_C, 2),
-            "margin_C": round(margin, 2),
+            "margin_C": round(margin, 2) if status == "VERIFIED" else "N/A (Unverified Part)",
             "passes": passes,
             "status": status if passes else "EXCEEDED",
             "source": data["source"],
@@ -396,8 +416,9 @@ def size_architecture_candidate(
     architecture_name: str,
     od_mm: float = PREFERRED_OD_MM,
     wall_mm: float = 3.5,
-    liner_mm: float = 1.5,
+    liner_mm: float = 0.0,
     aerogel_mm: float = 0.0,
+    is_discrete_carrier: bool = True,
     casing_material: str = "Inconel718",
     liner_material: str = "PEEK",
 ) -> dict[str, Any]:
@@ -405,7 +426,9 @@ def size_architecture_candidate(
     Builds and evaluates a specific architecture candidate across packaging,
     structural screening, and 2-hour thermal response.
     """
-    pkg = compute_radial_budget(od_mm=od_mm, wall_mm=wall_mm, liner_mm=liner_mm, aerogel_mm=aerogel_mm)
+    pkg = compute_radial_budget(
+        od_mm=od_mm, wall_mm=wall_mm, liner_mm=liner_mm, aerogel_mm=aerogel_mm, is_discrete_carrier=is_discrete_carrier
+    )
     clear_id_mm = pkg["clear_id_mm"]
     
     if clear_id_mm <= 15.0:
@@ -425,6 +448,7 @@ def size_architecture_candidate(
         "wall_mm": wall_mm,
         "aerogel_mm": aerogel_mm,
         "liner_mm": liner_mm,
+        "is_discrete_carrier": is_discrete_carrier,
         "casing_material": casing_material,
         "liner_material": liner_material,
         "housing_length_mm": HOUSING_LENGTH_MM,
@@ -444,17 +468,17 @@ def size_architecture_candidate(
     candidate["zone_assessment"] = zone_thermal_assessment(candidate["thermal_1w"]["final_inner_temperature_C"])
     
     # Overall classification
-    is_polymer_casing = casing_material in {"PEEK", "PPA_Amodel_A1133HS"} or "Polymer" in architecture_name
-    struct_pass = candidate["structural"]["scenarios"]["scenario_1000m_10mpa"]["yield_safety_factor"] >= 2.0
+    is_polymer_casing = casing_material in {"PEEK", "PPA_Amodel_A1133HS"} or "Polymer" in architecture_name or "Only" in architecture_name
+    struct_pass_1000m = candidate["structural"]["scenarios"]["scenario_1000m_10mpa"]["yield_safety_factor"] >= 2.0
     thermal_pass = candidate["thermal_1w"]["final_inner_temperature_C"] <= 85.0
-    pkg_pass = pkg["direct_fit"] or pkg["slotted_fit"]
+    pkg_pass = pkg["direct_fit"]
     
     if is_polymer_casing:
-        candidate["overall_status"] = "EXPLORATORY / INFEASIBLE (Polymer casing lacks certified downhole pressure integrity)"
-    elif struct_pass and thermal_pass and pkg["direct_fit"]:
-        candidate["overall_status"] = "PASS (Recommended Feasible Architecture)"
-    elif struct_pass and thermal_pass and pkg_pass:
-        candidate["overall_status"] = "CONDITIONAL (Requires slotted carrier / board customization)"
+        candidate["overall_status"] = "EXPLORATORY / CONDITIONAL (Polymer casing lacks certified downhole pressure integrity)"
+    elif not pkg_pass:
+        candidate["overall_status"] = "INFEASIBLE (PCM1808 board interference with radial envelope)"
+    elif struct_pass_1000m and thermal_pass and pkg_pass:
+        candidate["overall_status"] = "FEASIBLE SCREENING CANDIDATE (Direct Fit, Thermal <=85C, Inconel Shell Baseline)"
     else:
         candidate["overall_status"] = "REDESIGN REQUIRED"
         
@@ -464,51 +488,65 @@ def size_architecture_candidate(
 def run_architecture_trade_study() -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """
     Runs the multi-architecture trade study comparing:
-    - Architecture A: Inconel 718 + PEEK (No Aerogel) [Preferred]
-    - Architecture B: Inconel 718 + PPA (No Aerogel)
-    - Architecture C: PEEK-only casing (Exploratory)
-    - Architecture D: PPA-only casing (Exploratory)
-    - Reference Baseline: Inconel 718 + Aerogel + PEEK (Historical Baseline)
+    - Architecture A: Inconel 718 + discrete PEEK carrier rails (No Aerogel, No Full Liner) [Preferred]
+    - Architecture B: Inconel 718 + discrete PPA carrier rails (No Aerogel, No Full Liner)
+    - Architecture C: Inconel 718 + full circumferential PEEK liner (No Aerogel) [Comparison]
+    - Architecture D: Inconel 718 + full circumferential PPA liner (No Aerogel) [Comparison]
+    - Reference Baseline (Arch E): Inconel 718 + Aerogel + PEEK (Historical Baseline)
+    - Architecture F (Exploratory): PEEK-only pressure casing
+    - Architecture G (Exploratory): PPA-only pressure casing
     """
     candidates = [
-        # Architecture A (Recommended Preferred)
+        # Architecture A (Recommended Preferred: Discrete PEEK Rails)
         size_architecture_candidate(
-            "Architecture A: Inconel 718 + PEEK (No Aerogel)",
-            od_mm=PREFERRED_OD_MM, wall_mm=3.5, liner_mm=1.5, aerogel_mm=0.0,
+            "Architecture A: Inconel 718 + Discrete PEEK Carrier (No Aerogel)",
+            od_mm=PREFERRED_OD_MM, wall_mm=3.5, liner_mm=0.0, aerogel_mm=0.0, is_discrete_carrier=True,
             casing_material="Inconel718", liner_material="PEEK"
         ),
-        # Architecture B (PPA Liner)
+        # Architecture B (Discrete PPA Rails)
         size_architecture_candidate(
-            "Architecture B: Inconel 718 + PPA (No Aerogel)",
-            od_mm=PREFERRED_OD_MM, wall_mm=3.5, liner_mm=1.5, aerogel_mm=0.0,
+            "Architecture B: Inconel 718 + Discrete PPA Carrier (No Aerogel)",
+            od_mm=PREFERRED_OD_MM, wall_mm=3.5, liner_mm=0.0, aerogel_mm=0.0, is_discrete_carrier=True,
             casing_material="Inconel718", liner_material="PPA_Amodel_A1133HS"
         ),
-        # Architecture C (PEEK-Only Exploratory)
+        # Architecture C (Full Circumferential PEEK Liner - Comparison Case)
         size_architecture_candidate(
-            "Architecture C: PEEK-Only Pressure Casing (Exploratory)",
-            od_mm=PREFERRED_OD_MM, wall_mm=7.225, liner_mm=0.0, aerogel_mm=0.0,
+            "Architecture C: Inconel 718 + Full PEEK Liner (No Aerogel)",
+            od_mm=PREFERRED_OD_MM, wall_mm=3.5, liner_mm=1.5, aerogel_mm=0.0, is_discrete_carrier=False,
+            casing_material="Inconel718", liner_material="PEEK"
+        ),
+        # Architecture D (Full Circumferential PPA Liner - Comparison Case)
+        size_architecture_candidate(
+            "Architecture D: Inconel 718 + Full PPA Liner (No Aerogel)",
+            od_mm=PREFERRED_OD_MM, wall_mm=3.5, liner_mm=1.5, aerogel_mm=0.0, is_discrete_carrier=False,
+            casing_material="Inconel718", liner_material="PPA_Amodel_A1133HS"
+        ),
+        # Reference Baseline (Arch E - Historical Aerogel Baseline)
+        size_architecture_candidate(
+            "Reference Baseline (Arch E): Inconel 718 + Aerogel + PEEK",
+            od_mm=PREFERRED_OD_MM, wall_mm=3.5, liner_mm=1.5, aerogel_mm=2.225, is_discrete_carrier=False,
+            casing_material="Inconel718", liner_material="PEEK"
+        ),
+        # Architecture F (PEEK-Only Exploratory)
+        size_architecture_candidate(
+            "Architecture F: PEEK-Only Pressure Casing (Exploratory)",
+            od_mm=PREFERRED_OD_MM, wall_mm=7.225, liner_mm=0.0, aerogel_mm=0.0, is_discrete_carrier=False,
             casing_material="PEEK", liner_material="PEEK"
         ),
-        # Architecture D (PPA-Only Exploratory)
+        # Architecture G (PPA-Only Exploratory)
         size_architecture_candidate(
-            "Architecture D: PPA-Only Pressure Casing (Exploratory)",
-            od_mm=PREFERRED_OD_MM, wall_mm=7.225, liner_mm=0.0, aerogel_mm=0.0,
+            "Architecture G: PPA-Only Pressure Casing (Exploratory)",
+            od_mm=PREFERRED_OD_MM, wall_mm=7.225, liner_mm=0.0, aerogel_mm=0.0, is_discrete_carrier=False,
             casing_material="PPA_Amodel_A1133HS", liner_material="PPA_Amodel_A1133HS"
-        ),
-        # Reference Baseline (Historical Aerogel Design)
-        size_architecture_candidate(
-            "Reference Baseline: Inconel 718 + Aerogel + PEEK",
-            od_mm=PREFERRED_OD_MM, wall_mm=3.5, liner_mm=1.5, aerogel_mm=2.225,
-            casing_material="Inconel718", liner_material="PEEK"
         ),
     ]
     
-    # Add parametric OD variations for Architecture A (44.45 to 57.15 mm OD)
+    # Add parametric OD variations for Architecture A (47.625 to 57.15 mm OD)
     for od in [47.625, 50.80, 53.975, 57.15]:
         candidates.append(
             size_architecture_candidate(
-                f"Architecture A: Inconel 718 + PEEK (OD {od:.2f} mm)",
-                od_mm=od, wall_mm=3.5, liner_mm=1.5, aerogel_mm=0.0,
+                f"Architecture A: Inconel 718 + Discrete PEEK (OD {od:.2f} mm)",
+                od_mm=od, wall_mm=3.5, liner_mm=0.0, aerogel_mm=0.0, is_discrete_carrier=True,
                 casing_material="Inconel718", liner_material="PEEK"
             )
         )
@@ -518,23 +556,21 @@ def run_architecture_trade_study() -> tuple[list[dict[str, Any]], dict[str, Any]
 
 
 # ==============================================================================
-# 5. 3D PARAMETRIC CAD MODELING (NO-AEROGEL ARCHITECTURE)
+# 5. 3D PARAMETRIC CAD MODELING (DISCRETE CARRIER ARCHITECTURE)
 # ==============================================================================
 
 def generate_compact_casing_cad(
     geometry: dict[str, Any], output_step_path: Path | None = None
 ) -> list[tuple[cq.Workplane, str, tuple[float, float, float]]]:
     """
-    Builds a complete, watertight 3D CAD assembly for the simplified no-aerogel casing.
+    Builds a complete, watertight 3D CAD assembly for the simplified no-aerogel casing
+    with discrete polymer carrier rails holding the PCB modules inside the Inconel bore.
     """
     od = geometry["od_mm"]
     wall = geometry["wall_mm"]
-    liner = geometry["liner_mm"]
-    clear_id = geometry["clear_id_mm"]
+    shell_id = od - 2.0 * wall  # 37.45 mm for 44.45 OD / 3.5 wall
     housing_len = geometry["housing_length_mm"]
     cap = geometry["endcap_thickness_mm"]
-    
-    shell_id = od - 2.0 * wall
     
     z0 = 40.0
     internal_length = housing_len - 2.0 * cap
@@ -548,19 +584,37 @@ def generate_compact_casing_cad(
         .translate((0, 0, z0))
     )
     
-    # 2. PEEK / PPA Chassis Carrier Liner (No Aerogel)
-    carrier = (
+    # 2. Discrete PEEK / PPA Carrier Rails (Dual guide rails holding boards inside 37.45 mm bore)
+    # Rail width = 3.0 mm along X, extending from Y = -8.0 to +8.0 mm at X = +16.0..18.5 mm and X = -18.5..-16.0 mm
+    # Left and right card-guide rail ribs
+    rail_right = (
         cq.Workplane("XY")
-        .circle(shell_id / 2.0)
-        .circle(clear_id / 2.0)
+        .workplane(offset=z0 + cap)
+        .rect(3.0, 16.0)
         .extrude(internal_length)
-        .translate((0, 0, z0 + cap))
+        .translate((17.0, 0, 0))
     )
+    rail_left = (
+        cq.Workplane("XY")
+        .workplane(offset=z0 + cap)
+        .rect(3.0, 16.0)
+        .extrude(internal_length)
+        .translate((-17.0, 0, 0))
+    )
+    # Bottom support tray runner (thin 1.2 mm cradle at Y = -10.0 mm)
+    cradle_tray = (
+        cq.Workplane("XY")
+        .workplane(offset=z0 + cap)
+        .rect(26.0, 2.0)
+        .extrude(internal_length)
+        .translate((0, -8.0, 0))
+    )
+    carrier_rails = rail_right.union(rail_left).union(cradle_tray)
     
     # 3. Front and Rear Axial Buffer Plugs (PEEK / Polymer)
     front_buffer = (
         cq.Workplane("XY")
-        .circle(clear_id / 2.0)
+        .circle(shell_id / 2.0)
         .extrude(FRONT_AXIAL_BUFFER_MM)
         .translate((0, 0, z0 + cap))
     )
@@ -570,7 +624,7 @@ def generate_compact_casing_cad(
     
     rear_buffer = (
         cq.Workplane("XY")
-        .circle(clear_id / 2.0)
+        .circle(shell_id / 2.0)
         .extrude(REAR_AXIAL_BUFFER_MM)
         .translate((0, 0, z0 + housing_len - cap - REAR_AXIAL_BUFFER_MM))
     )
@@ -611,12 +665,12 @@ def generate_compact_casing_cad(
     )
     rear_endcap = rear_plug.union(rear_shoulder)
     
-    # 6. Internal Electronic Envelopes (Direct fit inside 34.45 mm clear bore!)
+    # 6. Internal Electronic Envelopes (Nominal boards inside 37.45 mm shell bore)
     z_afe_start = z0 + THERMAL_ZONES_LOCAL_MM["Analog front-end"][0]
     afe_solid = cq.Workplane("XY").box(16, 8, 30, centered=(True, True, False)).translate((0, 0, z_afe_start))
     
     z_pcm_start = z0 + THERMAL_ZONES_LOCAL_MM["PCM1808 ADC"][0]
-    # Modeled with actual PCM1808 board dimensions (30 mm width x 12 mm height)
+    # Modeled with actual PCM1808 board dimensions (30 mm width x 12 mm height x 50 mm length)
     pcm_solid = cq.Workplane("XY").box(30, 12, 50, centered=(True, True, False)).translate((0, 0, z_pcm_start))
     
     z_stm_start = z0 + THERMAL_ZONES_LOCAL_MM["STM32F411 MCU"][0]
@@ -636,7 +690,7 @@ def generate_compact_casing_cad(
         (adapter, "HTI_Front_Bulkhead_Adapter", (0.55, 0.58, 0.62)),
         (shell, "Inconel718_Pressure_Shell", (0.50, 0.52, 0.56)),
         (rear_endcap, "Rear_Pressure_Endcap", (0.55, 0.58, 0.62)),
-        (carrier, "PEEK_Chassis_Carrier_Liner", (0.70, 0.45, 0.18)),
+        (carrier_rails, "PEEK_Discrete_Carrier_Rails", (0.70, 0.45, 0.18)),
         (front_buffer.union(rear_buffer), "Axial_Buffer_Plugs", (0.75, 0.50, 0.22)),
         (afe_solid, "Analog_Front_End_AFE", (0.60, 0.25, 0.65)),
         (pcm_solid, "PCM1808_ADC_Module_DirectFit", (0.18, 0.55, 0.22)),
@@ -647,7 +701,7 @@ def generate_compact_casing_cad(
     
     if output_step_path:
         output_step_path.parent.mkdir(parents=True, exist_ok=True)
-        assembly = cq.Assembly(name="PertAcoustic_Compact_NoAerogel_Casing")
+        assembly = cq.Assembly(name="PertAcoustic_Compact_DiscreteCarrier_Casing")
         for solid, name, color in parts:
             assembly.add(solid, name=name, color=cq.Color(*color))
         assembly.save(str(output_step_path))
@@ -670,7 +724,7 @@ def render_compact_cad(parts: list[tuple[cq.Workplane, str, tuple[float, float, 
     
     def draw_solids(ax, selected_parts, shell_alpha=0.15):
         for solid, name, color in selected_parts:
-            if name in {"PEEK_Chassis_Carrier_Liner", "Axial_Buffer_Plugs"}:
+            if name in {"Axial_Buffer_Plugs"}:
                 continue
             try:
                 vertices, triangles = solid.val().tessellate(0.8)
@@ -697,23 +751,108 @@ def render_compact_cad(parts: list[tuple[cq.Workplane, str, tuple[float, float, 
     ax_full.set_ylim(-30, 30)
     ax_full.set_zlim(-100, 600)
     ax_full.set_box_aspect((60, 60, 700))
-    ax_full.set_title("Simplified No-Aerogel Assembly (1.75\" / 44.45 mm OD)", fontsize=10, fontweight="bold", pad=8)
+    ax_full.set_title("Simplified No-Aerogel Discrete Carrier Assembly (1.75\" / 44.45 mm OD)", fontsize=10, fontweight="bold", pad=8)
     
     front_parts = [p for p in parts if p[1] in {
-        "HTI_Acoustic_Head_Reference", "HTI_Front_Bulkhead_Adapter", "Analog_Front_End_AFE", "PCM1808_ADC_Module_DirectFit"
+        "HTI_Acoustic_Head_Reference", "HTI_Front_Bulkhead_Adapter", "PEEK_Discrete_Carrier_Rails", "Analog_Front_End_AFE", "PCM1808_ADC_Module_DirectFit"
     }]
     draw_solids(ax_detail, front_parts, shell_alpha=0.25)
     ax_detail.set_xlim(-25, 25)
     ax_detail.set_ylim(-25, 25)
     ax_detail.set_zlim(-90, 220)
     ax_detail.set_box_aspect((50, 50, 310))
-    ax_detail.set_title("Front Hydrophone Bulkhead & Direct PCM1808 Fit", fontsize=10, fontweight="bold", pad=8)
+    ax_detail.set_title("Front Hydrophone Bulkhead & Direct PCM1808 Rail Fit", fontsize=10, fontweight="bold", pad=8)
     
-    fig.suptitle("PertAcoustic Simplified Compact Casing Redesign (Inconel 718 + PEEK, No Aerogel)", fontsize=12, fontweight="bold", y=0.98)
+    fig.suptitle("PertAcoustic Compact Casing Redesign (Inconel 718 + Discrete PEEK Rails, No Aerogel)", fontsize=12, fontweight="bold", y=0.98)
     fig.tight_layout()
     fig.subplots_adjust(top=0.92)
     output_png.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output_png, dpi=200)
+    plt.close(fig)
+
+
+def render_transverse_pcm1808_cross_section(output_png: Path) -> None:
+    """
+    Renders 2D transverse cross-section through the limiting PCM1808 section,
+    providing reviewable geometric proof of physical clearance inside the 37.45 mm shell bore.
+    """
+    fig, ax = plt.subplots(figsize=(8, 8), dpi=200)
+    
+    od = PREFERRED_OD_MM  # 44.45 mm
+    wall = 3.5  # mm
+    shell_id = od - 2.0 * wall  # 37.45 mm
+    r_shell_out = od / 2.0  # 22.225 mm
+    r_shell_in = shell_id / 2.0  # 18.725 mm
+    
+    # 1. Inconel Pressure Shell ring
+    inconel_outer = patches.Circle((0, 0), r_shell_out, facecolor="#7d828a", edgecolor="#2c3e50", linewidth=1.5, label="Inconel 718 Pressure Shell (OD 44.45 mm)")
+    ax.add_patch(inconel_outer)
+    inconel_bore = patches.Circle((0, 0), r_shell_in, facecolor="#f8f9fa", edgecolor="#2980b9", linewidth=2.0, linestyle="-", label=f"Inconel Shell Bore (ID {shell_id:.2f} mm)")
+    ax.add_patch(inconel_bore)
+    
+    # 2. Discrete PEEK Carrier Guide Rails (Left & Right ribs)
+    # Right rail at X = +15.5 to +18.5, Y = -8 to +8
+    rail_r = patches.Rectangle((15.5, -8.0), 3.0, 16.0, facecolor="#d35400", edgecolor="#962d00", linewidth=1.0, alpha=0.85, label="Discrete PEEK Carrier Guide Rails")
+    ax.add_patch(rail_r)
+    rail_l = patches.Rectangle((-18.5, -8.0), 3.0, 16.0, facecolor="#d35400", edgecolor="#962d00", linewidth=1.0, alpha=0.85)
+    ax.add_patch(rail_l)
+    
+    # Bottom cradle rib
+    cradle = patches.Rectangle((-13.0, -9.0), 26.0, 2.0, facecolor="#d35400", edgecolor="#962d00", linewidth=0.8, alpha=0.85)
+    ax.add_patch(cradle)
+    
+    # 3. PCM1808 Assembly Clearance Envelope (32.0 x 14.0 mm)
+    pcm_clearance_rect = patches.Rectangle(
+        (-16.0, -7.0), 32.0, 14.0, facecolor="#e8f8f5", edgecolor="#16a085", linewidth=1.5, linestyle="--", label="PCM1808 + 1mm Assembly Clearance (32 x 14 mm)"
+    )
+    ax.add_patch(pcm_clearance_rect)
+    
+    # 4. Enclosing diagonal containment circle (Diameter = 34.93 mm, Radius = 17.464 mm)
+    pcm_diag = math.hypot(32.0, 14.0)  # 34.93 mm
+    diag_circle = patches.Circle((0, 0), pcm_diag / 2.0, facecolor="none", edgecolor="#e74c3c", linewidth=1.2, linestyle=":", label=f"Enclosing Envelope Circle (Dia {pcm_diag:.2f} mm)")
+    ax.add_patch(diag_circle)
+    
+    # 5. PCM1808 Nominal PCB (30.0 x 12.0 mm)
+    pcm_pcb = patches.Rectangle(
+        (-15.0, -6.0), 30.0, 12.0, facecolor="#27ae60", edgecolor="#1e8449", linewidth=1.5, alpha=0.9, label="PCM1808 Nominal PCB (30 x 12 mm)"
+    )
+    ax.add_patch(pcm_pcb)
+    
+    # Annotations and dimension callouts
+    ax.text(0, 0, "PCM1808 ADC\n(30 x 12 mm Nominal)", ha="center", va="center", color="white", fontsize=8.5, fontweight="bold")
+    
+    # Radial clearance dimension callout
+    # Corner at (16, 7): r = 17.46 mm. Shell bore r = 18.725 mm. Margin = +1.26 mm
+    ax.annotate(
+        f"+1.26 mm Radial Clearance Margin\n(Bore ID {shell_id:.2f} mm > Envelope {pcm_diag:.2f} mm)",
+        xy=(16.0, 7.0), xytext=(12.0, 16.0),
+        arrowprops=dict(arrowstyle="->", color="#c0392b", lw=1.5),
+        fontsize=8.5, fontweight="bold", color="#c0392b", bbox=dict(boxstyle="round,pad=0.3", fc="#fdedec", ec="#c0392b", lw=1.0)
+    )
+    
+    # Wiring / cable channel annotation
+    ax.annotate(
+        "Top Wiring & Connector Corridor\n(Clearance = 11.7 mm)",
+        xy=(0, 7.0), xytext=(0, 13.0),
+        ha="center",
+        arrowprops=dict(arrowstyle="<->", color="#2980b9", lw=1.2),
+        fontsize=8, color="#2980b9"
+    )
+    
+    ax.set_xlim(-26, 26)
+    ax.set_ylim(-26, 26)
+    ax.set_aspect("equal", adjustable="box")
+    ax.set_xlabel("Transverse X (mm)", fontsize=9)
+    ax.set_ylabel("Transverse Y (mm)", fontsize=9)
+    ax.set_title("Transverse Cross-Section at PCM1808 ADC (Direct Fit in 37.45 mm Shell Bore)", fontsize=10, fontweight="bold", pad=10)
+    ax.grid(True, linestyle=":", alpha=0.4)
+    
+    handles, labels = ax.get_legend_handles_labels()
+    ax.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, -0.08), ncol=2, fontsize=7.5)
+    
+    fig.tight_layout()
+    output_png.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(output_png, dpi=200, bbox_inches="tight")
     plt.close(fig)
 
 
@@ -726,17 +865,18 @@ def render_longitudinal_cross_section(geometry: dict[str, Any], output_png: Path
     housing_len = geometry["housing_length_mm"]
     od = geometry["od_mm"]
     wall = geometry["wall_mm"]
-    liner = geometry["liner_mm"]
-    clear_id = geometry["clear_id_mm"]
+    shell_id = od - 2.0 * wall
     
     r_outer = od / 2.0
-    r_shell_in = r_outer - wall
-    r_liner_in = clear_id / 2.0
+    r_shell_in = shell_id / 2.0
     
     # Layer patches
     ax.add_patch(plt.Rectangle((z0, -r_outer), housing_len, 2 * r_outer, color="#7d828a", label="Inconel 718 Pressure Shell (3.5 mm)", zorder=1))
-    ax.add_patch(plt.Rectangle((z0, -r_shell_in), housing_len, 2 * r_shell_in, color="#9c6027", label="PEEK Chassis Liner (1.5 mm, No Aerogel)", zorder=2))
-    ax.add_patch(plt.Rectangle((z0, -r_liner_in), housing_len, 2 * r_liner_in, color="#ffffff", label=f"Expanded Internal Bore (ID {clear_id:.2f} mm)", zorder=3))
+    ax.add_patch(plt.Rectangle((z0, -r_shell_in), housing_len, 2 * r_shell_in, color="#f8f9fa", label=f"Bare Shell Bore (ID {shell_id:.2f} mm - Discrete Rails)", zorder=2))
+    
+    # Discrete carrier rail strip
+    ax.add_patch(plt.Rectangle((z0 + ENDCAP_THICKNESS_MM, -r_shell_in), housing_len - 2*ENDCAP_THICKNESS_MM, 2.0, color="#d35400", label="Discrete PEEK Carrier Rails", zorder=3))
+    ax.add_patch(plt.Rectangle((z0 + ENDCAP_THICKNESS_MM, r_shell_in - 2.0), housing_len - 2*ENDCAP_THICKNESS_MM, 2.0, color="#d35400", zorder=3))
     
     # Axial electronics modules
     modules = [
@@ -759,7 +899,7 @@ def render_longitudinal_cross_section(geometry: dict[str, Any], output_png: Path
     ax.set_aspect("equal", adjustable="box")
     ax.set_xlabel("Axial Position Z (mm)", fontsize=9)
     ax.set_ylabel("Radius (mm)", fontsize=9)
-    ax.set_title(f"Simplified No-Aerogel Longitudinal Layout (OD {od:.2f} mm, Clear ID {clear_id:.2f} mm - Direct PCM1808 Fit)", fontsize=10, fontweight="bold")
+    ax.set_title(f"Simplified No-Aerogel Discrete Carrier Layout (OD {od:.2f} mm, Shell Bore ID {shell_id:.2f} mm - Direct PCM1808 Fit)", fontsize=10, fontweight="bold")
     
     handles, labels_list = ax.get_legend_handles_labels()
     unique_legend = dict(zip(labels_list, handles))
@@ -795,7 +935,7 @@ def plot_thermal_architecture_comparison(candidates: list[dict[str, Any]], outpu
     ax1.plot(hours, arch_ref["thermal_0w"]["inner_temperature_C"], color="#e67e22", linewidth=1.5, linestyle=":", label=f"With Aerogel @ 0W -> {arch_ref['thermal_0w']['final_inner_temperature_C']:.2f} °C")
     
     ax1.axhline(70.0, color="#d35400", linestyle="--", linewidth=1.2, label="70 °C External Ambient Boundary")
-    ax1.axhline(85.0, color="#8e44ad", linestyle=":", linewidth=1.5, label="85 °C STM32 / PCM1808 Max Operating Limit")
+    ax1.axhline(85.0, color="#8e44ad", linestyle=":", linewidth=1.5, label="85 °C STM32 / PCM1808 Upper Operating Limit")
     
     ax1.set_xlabel("Exposure Time (Hours)", fontsize=9)
     ax1.set_ylabel("Internal Cavity Temperature (°C)", fontsize=9)
@@ -804,8 +944,10 @@ def plot_thermal_architecture_comparison(candidates: list[dict[str, Any]], outpu
     ax1.legend(loc="lower right", fontsize=7.5)
     
     # 2. Side-by-Side Bar Comparison across Architectures
-    labels = ["Inconel+PEEK\n(No Aerogel)", "Inconel+PPA\n(No Aerogel)", "PEEK-Only\n(Exploratory)", "PPA-Only\n(Exploratory)", "Inconel+Aerogel\n(Baseline)"]
-    selected_archs = [arch_a, arch_b, candidates[2], candidates[3], arch_ref]
+    labels = ["Inconel+PEEK\n(Discrete Rails)", "Inconel+PPA\n(Discrete Rails)", "Inconel+PEEK\n(Full Liner)", "PEEK-Only\n(Exploratory)", "Inconel+Aerogel\n(Baseline)"]
+    arch_c = next(c for c in candidates if "Architecture C" in c["architecture"])
+    arch_f = next(c for c in candidates if "Architecture F" in c["architecture"])
+    selected_archs = [arch_a, arch_b, arch_c, arch_f, arch_ref]
     
     temps_0w = [c["thermal_0w"]["final_inner_temperature_C"] for c in selected_archs]
     temps_1w = [c["thermal_1w"]["final_inner_temperature_C"] for c in selected_archs]
@@ -850,9 +992,10 @@ def export_trade_study_csv_and_report(
     # 1. Export CSV
     csv_path = output_dir / "compact_casing_trade_study.csv"
     fieldnames = [
-        "architecture", "od_mm", "od_in", "clear_id_mm", "wall_mm", "aerogel_mm", "liner_mm",
-        "casing_material", "liner_material", "packaging_feasibility",
-        "fos_yield_1000m", "fos_buckle_1000m", "fos_yield_10kpsi", "fos_buckle_10kpsi",
+        "architecture", "od_mm", "od_in", "shell_bore_id_mm", "clear_id_mm", "wall_mm", "aerogel_mm", "liner_mm",
+        "carrier_type", "casing_material", "liner_material", "packaging_feasibility",
+        "fos_yield_1000m", "fos_buckle_1000m", "fos_yield_20mpa", "fos_buckle_20mpa",
+        "fos_yield_10kpsi", "fos_buckle_10kpsi",
         "temp_2h_0w_C", "temp_2h_1w_C", "thermal_verdict", "overall_status"
     ]
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
@@ -866,15 +1009,19 @@ def export_trade_study_csv_and_report(
                 "architecture": c["architecture"],
                 "od_mm": c["od_mm"],
                 "od_in": round(c["od_mm"] / 25.4, 3),
+                "shell_bore_id_mm": c["packaging"]["shell_bore_id_mm"],
                 "clear_id_mm": c["clear_id_mm"],
                 "wall_mm": c["wall_mm"],
                 "aerogel_mm": c["aerogel_mm"],
                 "liner_mm": c["liner_mm"],
+                "carrier_type": "Discrete Rails" if c.get("is_discrete_carrier") else ("Full Liner" if c["liner_mm"] > 0 else "None"),
                 "casing_material": c["casing_material"],
                 "liner_material": c["liner_material"],
                 "packaging_feasibility": c["packaging"]["packaging_status"],
                 "fos_yield_1000m": s["scenarios"]["scenario_1000m_10mpa"]["yield_safety_factor"],
                 "fos_buckle_1000m": s["buckling_1000m"]["buckling_safety_factor"],
+                "fos_yield_20mpa": s["scenarios"]["scenario_intermediate_20mpa"]["yield_safety_factor"],
+                "fos_buckle_20mpa": s["buckling_20mpa"]["buckling_safety_factor"],
                 "fos_yield_10kpsi": s["scenarios"]["scenario_historical_68_9mpa"]["yield_safety_factor"],
                 "fos_buckle_10kpsi": s["buckling_historical"]["buckling_safety_factor"],
                 "temp_2h_0w_C": c["thermal_0w"]["final_inner_temperature_C"],
@@ -894,137 +1041,166 @@ def export_trade_study_csv_and_report(
 
 **Document ID:** PERT-REP-COMPACT-002  
 **Design Direction:** Simplified 70 °C Operational Environment  
-**Status:** Engineering Screening Complete (PASS / Simplified Architecture Validated)  
-**Governing Task:** `.agents/tasks/compact-downhole-casing-redesign.md`
+**Status:** Engineering Screening Complete (Discrete Carrier Architecture Validated)  
+**Governing Task:** `.agents/tasks/compact-downhole-casing-redesign.md` @ `ad24d9146815f88368d8f6b1d635831d57aed13d`
 
 ---
 
 ## 1. Executive Summary & Core Engineering Answers
 
-This study investigates whether the compact PertAcoustic downhole casing (44.45 mm / 1.75" preferred OD, <= 57.15 mm max OD, <= 2000 mm length) can meet the 70 °C / 2-hour downhole operational envelope using a **simplified material architecture without aerogel**.
+This study investigates whether the compact PertAcoustic downhole casing (44.45 mm / 1.75" preferred OD, <= 57.15 mm max OD, <= 2000 mm length) can meet the 70 °C / 2-hour downhole operational envelope using a **simplified architecture consisting of an Inconel 718 pressure shell with discrete polymer carrier rails and no aerogel**.
 
 ### Primary Technical Conclusions:
 
-1. **Is aerogel still beneficial at 70 °C?**
-   - **NO. Aerogel is not beneficial and is actually detrimental at 70 °C.**
-   - In a 70 °C external environment with 1.0 W continuous internal electronics self-heating, aerogel traps internally generated heat, causing the internal cavity to reach **71.72 °C**.
-   - Without aerogel, heat conducts efficiently through the Inconel shell (k = 14.7 W/(m·K)) into the external fluid, maintaining the cavity at **70.57 °C** (well below the verified +85 °C IC limit with **+14.43 °C safety margin**).
-   - Crucially, eliminating aerogel reclaims **4.45 mm of radial thickness**, expanding internal clear ID from 30.0 mm to **34.45 mm**.
+1. **Can the selected electronics fit directly inside the preferred 44.45 mm OD casing?**
+   - **YES.** Using the nominal PCM1808 ADC cross-sectional envelope (30.0 mm width x 12.0 mm height; effective 32.0 x 14.0 mm bounding envelope with 1.0 mm assembly clearance per side), the minimum circumscribed circular diameter is:
+     $$\\sqrt{{32.0^2 + 14.0^2}} = \\sqrt{{1024 + 196}} = \\sqrt{{1220}} \\approx 34.93\\text{{ mm}}$$
+   - Inside the preferred 44.45 mm OD Inconel 718 casing (3.50 mm screening wall), the **bare shell bore is 37.45 mm**.
+   - With **discrete PEEK or PPA carrier rails**, the 34.93 mm enclosing diagonal fits directly inside the 37.45 mm shell bore with **+2.52 mm diameter clearance margin (+1.26 mm radial clearance)**.
+   - A full 1.5 mm circumferential liner (Clear ID = 34.45 mm) would cause corner interference; therefore, **discrete carrier rails are preferred over a full circumferential polymer sleeve**.
+   - *Screening fit based on nominal board envelope; actual PCB component-level verification is required upon physical hardware receipt.*
 
-2. **What is the preferred no-aerogel geometry?**
-   - **Architecture A (Inconel 718 Pressure Shell + PEEK Liner, No Aerogel)** at **44.45 mm (1.75 in) Outer Diameter**.
-   - Radial stack: **34.45 mm Clear ID + 1.50 mm PEEK Liner + 3.50 mm Inconel 718 Wall = 44.45 mm OD**.
-   - Modeled casing length: **520.0 mm**; Total tool assembly length: **~620 mm** (<= 2000 mm limit).
+2. **Does removing aerogel improve the 2-hour thermal behavior under the 70 °C environment?**
+   - **YES.** Under the current fixed 70 °C outer-boundary model and 1 W internal-load screening case, the no-aerogel architecture produces a lower 2-hour cavity temperature (**70.57 °C**) than the aerogel reference architecture (**71.72 °C**).
+   - In a 70 °C external environment, aerogel acts as an insulating blanket that traps internally generated heat. Without aerogel, heat conducts rapidly through the Inconel shell ($k = 14.7\\text{{ W/(m·K)}}$) into the wellbore fluid.
+   - Furthermore, eliminating aerogel reclaims 4.45 mm of radial wall space, enabling direct physical packaging.
 
-3. **Can the electronics fit without slotted packaging?**
-   - **YES.** With clear ID expanded to **34.45 mm**, the standard rectangular cross-sectional envelope of the PCM1808 ADC (30.0 mm wide x 12.0 mm high; diagonal with 1 mm clearance = 34.18 mm) **fits directly inside the circular bore** with full assembly clearance, completely eliminating artificial slotted-carrier workarounds.
+3. **Is a discrete PEEK or PPA carrier preferable to a complete cylindrical polymer liner?**
+   - **Discrete polymer carrier rails are strongly PREFERRED.**
+   - Discrete rails support the electronics along side-guide tracks without taking up radial wall thickness around the entire 360° perimeter, expanding the usable internal diagonal from 34.45 mm to 37.45 mm.
+   - Between carrier materials:
+     - **Victrex 450G PEEK** is the baseline recommendation due to exceptional hydrolytic stability (0.10% 24h moisture absorption) and long-term chemical inertness.
+     - **Solvay Amodel A-1133 HS PPA** (33% GF) provides higher stiffness ($E = 8.0\\text{{ GPa}}$ at 70 °C vs 3.7 GPa for PEEK) and lower raw material cost, but exhibits higher equilibrium moisture absorption (1.80%).
 
-4. **Is PEEK or PPA preferable as the polymer liner?**
-   - **Victrex 450G PEEK is PREFERRED** for long-term downhole service due to superior chemical inertness, near-zero moisture absorption (0.1%), and high continuous service temperature (260 °C).
-   - **Solvay Amodel A-1133 HS PPA** is a fully viable, high-modulus (E = 11 GPa) alternative, but undergoes higher equilibrium moisture absorption (1.8%) in aqueous downhole fluids. Both materials perform identically from a thermal standpoint.
+4. **Can the preferred 1.75 in (44.45 mm) OD be retained?**
+   - **YES.** At 44.45 mm OD with a 3.5 mm Inconel wall, the bare bore is 37.45 mm, providing ample physical space for all modeled electronics. Tool length is ~620 mm total (<= 2000 mm limit).
 
-5. **Is a polymer-only casing credible, or should the Inconel pressure shell remain?**
-   - **The metallic (Inconel 718) pressure shell MUST BE RETAINED.**
-   - Polymer-only casings (PEEK-only or PPA-only) have elastic moduli 24x to 52x lower than Inconel (3.7 to 8.0 GPa vs 193 GPa), suffer catastrophic elastic collapse (FoS_buckle = 0.29 to 0.61 << 1.0) under historical 10,000 psi screening, risk time-dependent viscoelastic creep failure under sustained hydrostatic pressure at 70 °C, and cannot provide certified thread retention for the HTI-02-DHPC/D interface.
+5. **What are the limitations of polymer-only PEEK/PPA pressure-body concepts?**
+   - **Inconel 718 remains the recommended pressure-shell baseline under current evidence.**
+   - Polymer-only pressure housings remain **exploratory pending authoritative pressure, creep-duration, hydrothermal conditioning, and collapse requirements**.
+   - Under historical 10,000 psi screening, polymer casings suffer catastrophic elastic collapse (PEEK buckling FoS = 0.29; PPA buckling FoS = 0.61). Even at ~10 MPa screening, viscoelastic creep and thread sealing reliability present unresolved long-term risks.
+
+6. **What remains conditional?**
+   - Authoritative field casing design pressure remains unresolved.
+   - Component BOM operating ratings for unspecified parts (RTC, MicroSD, Power, AFE) remain conditional.
+   - HTI supplier-controlled engagement length, O-ring gland geometry, and thread tolerances remain provisional.
 
 ---
 
 ## 2. Side-by-Side Architecture Comparison Matrix
 
-The table below presents the side-by-side evaluation of all investigated configurations at 44.45 mm (1.75") OD:
+Evaluated at 44.45 mm (1.75") Outer Diameter under 70 °C external boundary and 7200 s (2h) exposure:
 
-| Architecture | Casing Material | Liner Material | Aerogel mm | Clear ID mm | Packaging Feasibility | 2h Temp @ 0W | 2h Temp @ 1W | FoS Yield (~1000m) | FoS Buckle (~1000m) | FoS Buckle (10k psi) | Classification |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Architecture A [Recommended]** | **Inconel 718 (3.5mm)** | **PEEK (1.5mm)** | **0.0** | **34.45** | **Direct Circular Fit** | **70.0 °C** | **70.6 °C** | **16.8** | **11.3** | **1.64** | **PASS (Simplified Feasible Design)** |
-| **Architecture B** | Inconel 718 (3.5mm) | PPA Amodel (1.5mm) | 0.0 | 34.45 | Direct Circular Fit | 70.0 °C | 70.6 °C | 16.8 | 11.3 | 1.64 | **PASS (Alternative Polymer Liner)** |
-| **Architecture C (Exploratory)** | PEEK-Only (7.2mm) | None | 0.0 | 30.00 | Infeasible (Clear ID 30mm) | 70.0 °C | 70.8 °C | 2.1 | 2.0 | 0.29 | **INFEASIBLE (Polymer Casing Collapse)** |
-| **Architecture D (Exploratory)** | PPA-Only (7.2mm) | None | 0.0 | 30.00 | Infeasible (Clear ID 30mm) | 70.0 °C | 70.8 °C | 3.9 | 4.2 | 0.61 | **INFEASIBLE (Polymer Casing Collapse)** |
-| **Reference Baseline** | Inconel 718 (3.5mm) | PEEK (1.5mm) | 2.225 | 30.00 | Infeasible (Clear ID 30mm) | 69.1 °C | 71.7 °C | 16.8 | 11.3 | 1.64 | **CONDITIONAL (Aerogel Heat Trapping)** |
-
----
-
-## 3. Material Properties & Characterization
-
-### A. Metallic Pressure Shell: Inconel 718
-- **Datasheet / Standard:** Special Metals Technical Bulletin / AMS 5662
-- **Density:** 8190 kg/m³
-- **Thermal Conductivity:** 14.7 W/(m·K)
-- **Specific Heat:** 460 J/(kg·K)
-- **Elastic Modulus at 70-150 °C:** 193,000 MPa
-- **Poisson's Ratio:** 0.28
-- **Yield Strength (Screening at 70 °C):** 1050 MPa
-
-### B. Polymer Chassis Liner Option 1: Victrex 450G PEEK (Unfilled)
-- **Datasheet:** Victrex 450G Technical Data Sheet
-- **Density:** 1300 kg/m³
-- **Thermal Conductivity:** 0.29 W/(m·K)
-- **Specific Heat:** 1500 J/(kg·K)
-- **Elastic Modulus at 70 °C:** ~3700 MPa
-- **Poisson's Ratio:** 0.40
-- **Yield Strength at 70 °C:** ~70 MPa
-- **Water Absorption (24h / Saturation):** 0.1% / 0.5% (Excellent hydrolytic stability)
-
-### C. Polymer Chassis Liner Option 2: Solvay Amodel A-1133 HS PPA
-- **Datasheet:** Solvay Specialty Polymers (Syensqo) Amodel A-1133 HS Bulletin
-- **Reinforcement:** 33% Glass Fiber Reinforced, Heat Stabilized
-- **Density:** 1450 kg/m³
-- **Thermal Conductivity:** 0.26 W/(m·K)
-- **Specific Heat:** 1200 J/(kg·K)
-- **Elastic Modulus at 70 °C:** ~8000 MPa (DAM) / ~6500 MPa (Conditioned)
-- **Poisson's Ratio:** 0.36
-- **Yield Strength at 70 °C:** ~135 MPa (DAM) / ~110 MPa (Conditioned)
-- **Water Absorption (24h / Saturation):** 0.30% / 1.80% (Good retention of stiffness, moderate moisture uptake)
+| Architecture | Casing Material | Carrier / Liner | Full Liner mm | Aerogel mm | Shell Bore ID | Packaging Status | 2h Temp @ 0W | 2h Temp @ 1W | FoS Yield (~10MPa) | FoS Buckle (~10MPa) | FoS Buckle (10k psi) | Classification |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **Architecture A [Recommended]** | **Inconel 718 (3.5mm)** | **Discrete PEEK Rails** | **0.0** | **0.0** | **37.45 mm** | **Direct Fit (+1.26mm margin)** | **70.0 °C** | **70.6 °C** | **16.8** | **11.3** | **1.64** | **FEASIBLE SCREENING CANDIDATE** |
+| **Architecture B** | Inconel 718 (3.5mm) | Discrete PPA Rails | 0.0 | 0.0 | 37.45 mm | Direct Fit (+1.26mm margin) | 70.0 °C | 70.6 °C | 16.8 | 11.3 | 1.64 | **FEASIBLE SCREENING CANDIDATE** |
+| **Architecture C** | Inconel 718 (3.5mm) | Full PEEK Liner (1.5mm) | 1.5 | 0.0 | 37.45 mm | Infeasible (Clear ID 34.45mm) | 70.0 °C | 70.6 °C | 16.8 | 11.3 | 1.64 | **INFEASIBLE (Liner Corner Clashing)** |
+| **Architecture D** | Inconel 718 (3.5mm) | Full PPA Liner (1.5mm) | 1.5 | 0.0 | 37.45 mm | Infeasible (Clear ID 34.45mm) | 70.0 °C | 70.6 °C | 16.8 | 11.3 | 1.64 | **INFEASIBLE (Liner Corner Clashing)** |
+| **Reference Baseline (Arch E)** | Inconel 718 (3.5mm) | Aerogel + PEEK Liner | 1.5 | 2.225 | 37.45 mm | Infeasible (Clear ID 30.00mm) | 69.1 °C | 71.7 °C | 16.8 | 11.3 | 1.64 | **CONDITIONAL (Aerogel Heat Trapping)** |
+| **Architecture F (Exploratory)** | PEEK-Only (7.2mm) | Integral Polymer Body | 0.0 | 0.0 | 30.00 mm | Infeasible (Clear ID 30.00mm) | 70.0 °C | 70.8 °C | 2.4 | 2.0 | 0.29 | **EXPLORATORY / CONDITIONAL** |
+| **Architecture G (Exploratory)** | PPA-Only (7.2mm) | Integral Polymer Body | 0.0 | 0.0 | 30.00 mm | Infeasible (Clear ID 30.00mm) | 70.0 °C | 70.8 °C | 4.6 | 4.3 | 0.61 | **EXPLORATORY / CONDITIONAL** |
 
 ---
 
-## 4. Component Operating Limit Verification
+## 3. Material Properties & Provenance Breakdown
 
-Evaluated against verified manufacturer limits under the 1.0 W screening case (70.57 °C peak cavity temperature):
+| Material | Property | Value | Unit | Provenance Classification & Source Notes |
+|---|---|---|---|---|
+| **Inconel 718** | Density | 8190 | kg/m³ | `VERIFIED MANUFACTURER VALUE` (Special Metals bulletin) |
+| | Conductivity | 14.7 | W/(m·K) | `VERIFIED MANUFACTURER VALUE` (Special Metals bulletin) |
+| | Specific Heat | 460 | J/(kg·K) | `VERIFIED MANUFACTURER VALUE` (Special Metals bulletin) |
+| | Modulus @ 150 °C | 193,000 | MPa | `VERIFIED MANUFACTURER VALUE` (Special Metals bulletin) |
+| | Poisson's Ratio | 0.28 | - | `VERIFIED MANUFACTURER VALUE` |
+| | Yield Strength @ 70-150 °C | 1000 | MPa | `ASSUMED SCREENING VALUE` (Subject to AMS 5662 heat treatment & product form) |
+| **Victrex 450G PEEK** | Density | 1300 | kg/m³ | `VERIFIED MANUFACTURER VALUE` (Victrex 450G TDS) |
+| | Conductivity | 0.29 | W/(m·K) | `VERIFIED MANUFACTURER VALUE` (Victrex 450G TDS) |
+| | Specific Heat | 1500 | J/(kg·K) | `VERIFIED MANUFACTURER VALUE` (Victrex 450G TDS) |
+| | Modulus @ 70 °C | 3700 | MPa | `DERIVED / INTERPOLATED SCREENING VALUE` (DMA / ISO 527 curve at 70 °C) |
+| | Yield Strength @ 70 °C | 70 | MPa | `DERIVED / INTERPOLATED SCREENING VALUE` (Tensile curve at 70 °C) |
+| | Poisson's Ratio | 0.40 | - | `ASSUMED SCREENING VALUE` |
+| | Water Absorption (24h / Sat) | 0.10 / 0.50 | % | `VERIFIED MANUFACTURER VALUE` (ASTM D570) |
+| **Amodel A-1133 HS PPA** | Density | 1450 | kg/m³ | `VERIFIED MANUFACTURER VALUE` (ISO 1183, Solvay technical bulletin) |
+| | Conductivity | 0.26 | W/(m·K) | `VERIFIED MANUFACTURER VALUE` (ASTM C177) |
+| | Specific Heat | 1200 | J/(kg·K) | `ASSUMED SCREENING VALUE` (Typical for 33% GF PPA) |
+| | Modulus @ 23 °C (DAM) | 11,000 | MPa | `VERIFIED MANUFACTURER VALUE` (DAM ISO 527-2) |
+| | Modulus @ 70 °C | 8000 | MPa | `DERIVED / INTERPOLATED SCREENING VALUE` (Interpolated between 23 °C [11 GPa] & 100 °C [6.5 GPa]) |
+| | Yield Strength @ 70 °C | 135 | MPa | `DERIVED / INTERPOLATED SCREENING VALUE` (Tensile stress interpolated: 23 °C [195 MPa] & 100 °C [110 MPa]) |
+| | Poisson's Ratio | 0.36 | - | `ASSUMED SCREENING VALUE` |
+| | Water Absorption (24h / Sat) | 0.30 / 1.80 | % | `VERIFIED MANUFACTURER VALUE` (ASTM D570 equilibrium) |
 
-| Component | Part Number / Source | Verified Operating Limit | Cavity Temp @ 2h | Thermal Margin | Status |
+---
+
+## 4. Thermal Screening & Operating Limit Verification
+
+**Thermal Model Boundaries:**
+- External Boundary: 70.0 °C constant Dirichlet
+- Initial Temperature: 25.0 °C uniform
+- Duration: 7200 s (2.0 hours)
+- Internal Dissipation Cases: 0.0 W (pure ingress) & 1.0 W (inherited screening baseline)
+
+**Modeled 2-Hour Cavity Temperature (Architecture A):** **70.57 °C**
+
+*Important Thermal Distinction:*
+Cavity/environmental screening remains below the documented operating-temperature upper bound; actual device junction temperature is not established by this model.
+
+### Component Operating Limit Verification:
+
+| Component | Part Number / Reference | Verified Operating Limit | 2h Cavity Temp | Verified Status | Margin / Notes |
 |---|---|---|---|---|---|
-| **MCU** | **STM32F411CEU6** (ST Datasheet / MoM) | -40 to +85.0 °C | 70.57 °C | +14.43 °C | `VERIFIED PASS` |
-| **ADC** | **PCM1808** (TI Datasheet / MoM) | -40 to +85.0 °C | 70.57 °C | +14.43 °C | `VERIFIED PASS` |
-| **RTC** | Generic RTC (Unfinalized PN) | -40 to +85.0 °C | 70.57 °C | +14.43 °C | `CONDITIONAL (Industrial PN required)` |
-| **Storage** | Generic MicroSD (Unfinalized PN) | -40 to +85.0 °C | 70.57 °C | +14.43 °C | `CONDITIONAL (Industrial Flash required)` |
-| **Power** | Generic LDO (Unfinalized PN) | -40 to +85.0 °C | 70.57 °C | +14.43 °C | `CONDITIONAL` |
-| **AFE** | Discrete Front-End (Unfinalized BOM) | -40 to +85.0 °C | 70.57 °C | +14.43 °C | `CONDITIONAL` |
-
-*Note: Cavity temperature is the bulk carrier temperature; chip junction temperature will be slightly higher depending on internal package thermal resistance theta_ja.*
+| **MCU** | **STM32F411CEU6** | -40.0 to +85.0 °C | 70.57 °C | `VERIFIED PASS` | +14.43 °C screening margin below +85 °C datasheet bound |
+| **ADC** | **PCM1808** | -40.0 to +85.0 °C | 70.57 °C | `VERIFIED PASS` | +14.43 °C screening margin below +85 °C datasheet bound |
+| **RTC** | Generic RTC Module | -40.0 to +85.0 °C (req) | 70.57 °C | `CONDITIONAL` | Unverified part; Industrial-rated IC required in BOM |
+| **Storage** | Generic MicroSD Card | -40.0 to +85.0 °C (req) | 70.57 °C | `CONDITIONAL` | Unverified part; Industrial SLC/pSLC flash required |
+| **Power** | Generic LDO / Regulator | -40.0 to +85.0 °C (req) | 70.57 °C | `CONDITIONAL` | Unverified part; thermal dissipation budget required |
+| **AFE** | Discrete Front-End | -40.0 to +85.0 °C (req) | 70.57 °C | `CONDITIONAL` | Unverified discrete passive/op-amp BOM selection |
 
 ---
 
-## 5. Structural Screening & Pressure Scenarios
+## 5. Structural Screening Across Pressure Scenarios
 
-*Authoritative casing design pressure remains unresolved. Calculations below represent engineering screening across explicit scenarios.*
+*Authoritative casing design pressure remains unresolved. The results below represent preliminary engineering screening calculations.*
 
-- **Scenario A (~1000 m Hydrostatic Derived Scenario, 10.0 MPa / 1,450 psi):**
-  - Inconel 718 (t_wall = 3.5 mm): Max von Mises = 59.7 MPa -> **Yield FoS = 16.75**; **Buckling FoS = 11.33**.
-- **Scenario B (Intermediate Wellbore Scenario, 20.0 MPa / 2,900 psi):**
-  - Inconel 718 (t_wall = 3.5 mm): Max von Mises = 119.5 MPa -> **Yield FoS = 8.37**; **Buckling FoS = 5.66**.
-- **Scenario C (Historical 10,000 psi / 68.95 MPa Screening Benchmark):**
-  - Inconel 718 (t_wall = 3.5 mm): Max von Mises = 411.8 MPa -> **Yield FoS = 2.43**; **Buckling FoS = 1.64**.
-  - *(Note: If 10,000 psi buckling FoS >= 2.0 is desired, increasing wall to 4.0 mm achieves Buckling FoS = 2.45 with Clear ID = 33.45 mm, which still fits PCM1808).*
+### Pressure Scenarios Evaluated (Inconel 718, OD 44.45 mm, Wall 3.50 mm):
+
+1. **Scenario A (~10 MPa / 1,450 psi - ~1000 m Hydrostatic Derived Scenario):**
+   - Max von Mises Stress: **59.7 MPa**
+   - Yield Safety Factor: **16.75** (vs 1000 MPa yield screening value)
+   - Elastic Buckling Safety Factor: **11.33** ($P_{{cr}} = 113.3\\text{{ MPa}}$)
+   - Classification: `SCREENING MARGIN (High Margin at 10 MPa)`
+
+2. **Scenario B (20 MPa / 2,900 psi - Intermediate Wellbore Sensitivity):**
+   - Max von Mises Stress: **119.5 MPa**
+   - Yield Safety Factor: **8.37**
+   - Elastic Buckling Safety Factor: **5.66**
+   - Classification: `SCREENING MARGIN (High Margin at 20 MPa)`
+
+3. **Scenario C (68.95 MPa / 10,000 psi - Historical Biweekly 5 Benchmark):**
+   - Max von Mises Stress: **411.8 MPa**
+   - Yield Safety Factor: **2.43**
+   - Elastic Buckling Safety Factor: **1.64**
+   - Classification: `CONDITIONAL (Buckling FoS < 2.0 reference at 10k psi; 4.0mm wall achieves FoS=2.45 if required)`
 
 ---
 
 ## 6. HTI-02-DHPC/D Interface Concept & Provisional Details
 
-- Nominal 7/16-20 UNF-2A male adapter concept preserved.
-- Central 3-conductor signal routing feedthrough (2.5 mm bore) integrated into front bulkhead.
-- Acoustic sensing head (88.9 mm long, 17.475 mm OD) remains externally exposed.
-- Engagement length (10.16 mm), thread machining tolerances, and O-ring seal glands remain provisional screening geometry.
+- **Interface Thread:** Nominal 7/16-20 UNF-2A male adapter concept integrated into front bulkhead.
+- **Signal Feedthrough:** Central 3-conductor signal feedthrough bore (2.5 mm diameter).
+- **Acoustic Exposure:** External acoustic sensing head (88.9 mm length, 17.475 mm OD) remains exposed to fluid.
+- **Provisional Status:** Thread engagement length (10.16 mm), machining tolerances, O-ring gland dimensions, and pressure-retention calculations remain provisional screening concepts pending supplier-controlled drawings from High Tech, Inc.
 
 ---
 
 ## 7. Artifacts & Generated Evidence
 
-- **CAD STEP File:** [`results/compact-casing/cad/compact_casing_assembly.step`](file:///home/faliq/projects/pertacoustic-3d-design/results/compact-casing/cad/compact_casing_assembly.step)
-- **Trade Study Data:** [`results/compact-casing/compact_casing_trade_study.csv`](file:///home/faliq/projects/pertacoustic-3d-design/results/compact-casing/compact_casing_trade_study.csv)
+- **CAD STEP Model:** [`results/compact-casing/cad/compact_casing_assembly.step`](file:///home/faliq/projects/pertacoustic-3d-design/results/compact-casing/cad/compact_casing_assembly.step)
+- **Trade Study Dataset:** [`results/compact-casing/compact_casing_trade_study.csv`](file:///home/faliq/projects/pertacoustic-3d-design/results/compact-casing/compact_casing_trade_study.csv)
 - **Visualizations:**
-  - Assembly Render: [`results/compact-casing/figures/compact_cad_assembly.png`](file:///home/faliq/projects/pertacoustic-3d-design/results/compact-casing/figures/compact_cad_assembly.png)
+  - 3D CAD Assembly Render: [`results/compact-casing/figures/compact_cad_assembly.png`](file:///home/faliq/projects/pertacoustic-3d-design/results/compact-casing/figures/compact_cad_assembly.png)
+  - Transverse Cross-Section (PCM1808 Clearance): [`results/compact-casing/figures/compact_transverse_pcm1808_section.png`](file:///home/faliq/projects/pertacoustic-3d-design/results/compact-casing/figures/compact_transverse_pcm1808_section.png)
   - Longitudinal Section: [`results/compact-casing/figures/compact_longitudinal_section.png`](file:///home/faliq/projects/pertacoustic-3d-design/results/compact-casing/figures/compact_longitudinal_section.png)
-  - Thermal History Curves: [`results/compact-casing/figures/compact_thermal_trade_study.png`](file:///home/faliq/projects/pertacoustic-3d-design/results/compact-casing/figures/compact_thermal_trade_study.png)
+  - Thermal History & Comparison: [`results/compact-casing/figures/compact_thermal_trade_study.png`](file:///home/faliq/projects/pertacoustic-3d-design/results/compact-casing/figures/compact_thermal_trade_study.png)
 """
     with open(md_path, "w", encoding="utf-8") as f:
         f.write(report)
@@ -1052,7 +1228,7 @@ def run_compact_study_pipeline() -> dict[str, Any]:
     candidates, recommended = run_architecture_trade_study()
     print(f"[1/4] Evaluated {len(candidates)} architecture configurations.")
     print(f"      Recommended Architecture: {recommended['architecture']}")
-    print(f"      OD: {recommended['od_mm']} mm, Clear ID: {recommended['clear_id_mm']} mm, Wall: {recommended['wall_mm']} mm.")
+    print(f"      OD: {recommended['od_mm']} mm, Shell Bore: {recommended['packaging']['shell_bore_id_mm']} mm, Wall: {recommended['wall_mm']} mm.")
     print(f"      Packaging: {recommended['packaging']['packaging_status']}")
     print(f"      2h Temp @ 0W: {recommended['thermal_0w']['final_inner_temperature_C']} °C | @ 1W: {recommended['thermal_1w']['final_inner_temperature_C']} °C.")
     
@@ -1064,6 +1240,9 @@ def run_compact_study_pipeline() -> dict[str, Any]:
     # 3. Visualization renders
     cad_png = FIG_DIR / "compact_cad_assembly.png"
     render_compact_cad(cad_parts, cad_png)
+    
+    transverse_png = FIG_DIR / "compact_transverse_pcm1808_section.png"
+    render_transverse_pcm1808_cross_section(transverse_png)
     
     section_png = FIG_DIR / "compact_longitudinal_section.png"
     render_longitudinal_cross_section(recommended, section_png)
@@ -1089,3 +1268,4 @@ def run_compact_study_pipeline() -> dict[str, Any]:
 
 if __name__ == "__main__":
     run_compact_study_pipeline()
+
