@@ -86,23 +86,25 @@
     "conductivity": 0.26,
     "specific_heat": 1200,
     "elastic_modulus_mpa_23c": 11000,
-    "elastic_modulus_mpa_70c": 8000,
+    "elastic_modulus_mpa_70c": 8253,
     "poisson_ratio": 0.36,
-    "yield_strength_mpa_70c_screening": 135,
+    "screening_tensile_strength_mpa_70c": 143,
+    "yield_strength_mpa_70c_screening": 143,
     "water_absorption_24h_percent": 0.30,
     "water_absorption_sat_percent": 1.80,
     "provenance": {
       "density": "VERIFIED MANUFACTURER VALUE (ISO 1183)",
       "conductivity": "VERIFIED MANUFACTURER VALUE (ASTM C177)",
       "specific_heat": "ASSUMED SCREENING VALUE (Typical for 33% GF PPA)",
-      "elastic_modulus_mpa_23c": "VERIFIED MANUFACTURER VALUE (DAM ISO 527-2)",
-      "elastic_modulus_mpa_70c": "DERIVED / INTERPOLATED SCREENING VALUE (Interpolated between 23 C DAM 11 GPa and 100 C DAM 6.5 GPa)",
+      "elastic_modulus_mpa_23c": "VERIFIED MANUFACTURER VALUE (DAM ISO 527-2: 11000 MPa)",
+      "elastic_modulus_mpa_70c": "DERIVED / INTERPOLATED SCREENING VALUE (Exact linear interpolation: 11000 - (47/77)*(11000-6500) = 8253.25 MPa)",
       "poisson_ratio": "ASSUMED SCREENING VALUE",
-      "yield_strength_mpa_70c_screening": "DERIVED / INTERPOLATED SCREENING VALUE (Tensile stress interpolated between 23 C DAM 195 MPa and 100 C DAM 110 MPa)",
+      "screening_tensile_strength_mpa_70c": "DERIVED / INTERPOLATED SCREENING VALUE (Tensile stress at break: 195 - (47/77)*(195-110) = 143.12 MPa; note: glass-fiber reinforced PPA does not exhibit ductile yield)",
+      "yield_strength_mpa_70c_screening": "DERIVED / INTERPOLATED SCREENING VALUE (Tensile stress at break used for screening allowable: 143 MPa)",
       "water_absorption_24h_percent": "VERIFIED MANUFACTURER VALUE (ASTM D570)",
       "water_absorption_sat_percent": "VERIFIED MANUFACTURER VALUE (ASTM D570 equilibrium immersion)"
     },
-    "notes": "Solvay (Syensqo) Amodel A-1133 HS (33% Glass Fiber Reinforced PPA, Heat Stabilized). Modulus and strength at 70 C derived by interpolation from manufacturer technical bulletin datapoints.",
+    "notes": "Solvay (Syensqo) Amodel A-1133 HS (33% Glass Fiber Reinforced PPA, Heat Stabilized). Modulus and strength at 70 C derived by exact linear interpolation between 23 C DAM and 100 C DAM manufacturer technical bulletin datapoints.",
     "datasheet_url": "https://www.syensqo.com/en/product/amodel-a-1133-hs"
   }
 }

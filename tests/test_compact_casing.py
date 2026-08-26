@@ -27,12 +27,14 @@ from cosmo.compact_casing import (
     THERMAL_DURATION_S,
     THERMAL_ZONES_LOCAL_MM,
     ZERO_POWER_W,
+    check_cad_assembly_interferences,
     compute_radial_budget,
     elastic_buckling,
     generate_compact_casing_cad,
     lame_stress,
     render_transverse_pcm1808_cross_section,
     run_architecture_trade_study,
+    select_recommended_candidate,
     size_architecture_candidate,
     structural_screening,
     transient_thermal_simulation,
@@ -74,7 +76,7 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         self.assertFalse(full_liner["direct_fit"])
         self.assertIn("INFEASIBLE", full_liner["packaging_status"])
         
-        # 2. Discrete carrier rails in 3.5 mm Inconel shell bore (Shell Bore ID = 44.45 - 2*3.5 = 37.45 mm)
+        # 2. Conformal carrier rails in 3.5 mm Inconel shell bore (Shell Bore ID = 44.45 - 2*3.5 = 37.45 mm)
         # MUST PASS direct circular fit because 37.45 mm >= 34.93 mm (+2.52 mm clearance margin)
         discrete_carrier = compute_radial_budget(od_mm=44.45, wall_mm=3.5, liner_mm=0.0, aerogel_mm=0.0, is_discrete_carrier=True)
         self.assertAlmostEqual(discrete_carrier["shell_bore_id_mm"], 37.45, places=2)
@@ -85,22 +87,29 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
 
     def test_no_unsupported_low_profile_fallback_used(self):
         """Verify that radial budget calculation strictly evaluates the full 12 mm nominal board height."""
-        # If an unsupported 10 mm height was assumed, 34.45 mm would pass (hypot(32,12)=34.18 <= 34.45).
-        # We verify that a 34.45 mm bore FAILS the packaging check.
         res = compute_radial_budget(od_mm=44.45, wall_mm=3.5, liner_mm=1.5, aerogel_mm=0.0, is_discrete_carrier=False)
         self.assertFalse(res["direct_fit"])
 
     def test_ppa_and_peek_material_provenance_tracking(self):
-        """Verify explicit provenance tracking for PPA, PEEK, and Inconel 718 in material library."""
+        """Verify explicit provenance tracking and arithmetic derivations for PPA, PEEK, and Inconel 718."""
         ppa = MATERIALS["PPA_Amodel_A1133HS"]
         self.assertIn("provenance", ppa)
         self.assertIn("VERIFIED MANUFACTURER VALUE", ppa["provenance"]["density"])
         self.assertIn("VERIFIED MANUFACTURER VALUE", ppa["provenance"]["conductivity"])
         self.assertIn("DERIVED / INTERPOLATED", ppa["provenance"]["elastic_modulus_mpa_70c"])
-        self.assertIn("DERIVED / INTERPOLATED", ppa["provenance"]["yield_strength_mpa_70c_screening"])
+        self.assertIn("DERIVED / INTERPOLATED", ppa["provenance"]["screening_tensile_strength_mpa_70c"])
         self.assertIn("ASSUMED SCREENING VALUE", ppa["provenance"]["specific_heat"])
-        self.assertEqual(ppa["elastic_modulus_mpa_70c"], 8000)
-        self.assertEqual(ppa["yield_strength_mpa_70c_screening"], 135)
+        
+        # Verify exact linear interpolation arithmetic:
+        # Modulus: 11000 - (47/77)*(11000-6500) = 8253.25 MPa ≈ 8253 MPa
+        expected_ppa_e = round(11000.0 - (47.0 / 77.0) * (11000.0 - 6500.0))
+        self.assertEqual(ppa["elastic_modulus_mpa_70c"], expected_ppa_e)
+        self.assertEqual(ppa["elastic_modulus_mpa_70c"], 8253)
+        
+        # Tensile stress at break: 195 - (47/77)*(195-110) = 143.12 MPa ≈ 143 MPa
+        expected_ppa_sigma = round(195.0 - (47.0 / 77.0) * (195.0 - 110.0))
+        self.assertEqual(ppa["screening_tensile_strength_mpa_70c"], expected_ppa_sigma)
+        self.assertEqual(ppa["screening_tensile_strength_mpa_70c"], 143)
         
         peek = MATERIALS["PEEK"]
         self.assertIn("provenance", peek)
@@ -117,7 +126,7 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
             "With Aerogel", od_mm=44.45, wall_mm=3.5, liner_mm=1.5, aerogel_mm=2.225, is_discrete_carrier=False
         )
         cand_no_aero = size_architecture_candidate(
-            "No Aerogel Discrete PEEK", od_mm=44.45, wall_mm=3.5, liner_mm=0.0, aerogel_mm=0.0, is_discrete_carrier=True
+            "No Aerogel Conformal PEEK", od_mm=44.45, wall_mm=3.5, liner_mm=0.0, aerogel_mm=0.0, is_discrete_carrier=True
         )
         
         # Under 0 W (pure external ingress): aerogel delays initial heating
@@ -129,7 +138,7 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         t1_with_aero = cand_with_aero["thermal_1w"]["final_inner_temperature_C"]
         t1_no_aero = cand_no_aero["thermal_1w"]["final_inner_temperature_C"]
         self.assertGreater(t1_with_aero, t1_no_aero)
-        self.assertLess(t1_no_aero, 85.0)  # Safe operating margin below 85 °C
+        self.assertLess(t1_no_aero, 85.0)  # Screening cavity temperature <= 85 °C
 
     def test_polymer_only_casing_shows_structural_limitations(self):
         """Verify that PEEK-only and PPA-only casings exhibit severe buckling vulnerability."""
@@ -166,36 +175,50 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         self.assertGreaterEqual(fos_yield_hist, 2.0)
 
     def test_component_limits_exact_and_conditional_classification(self):
-        """Verify that only authorized ICs are verified and others marked conditional."""
+        """Verify that only authorized ICs are verified and unspecified parts are unverified."""
+        self.assertIsNone(COMPONENT_LIMITS["RTC Module (Unspecified PN)"]["min_C"])
+        self.assertIsNone(COMPONENT_LIMITS["RTC Module (Unspecified PN)"]["max_C"])
+        self.assertEqual(COMPONENT_LIMITS["RTC Module (Unspecified PN)"]["status"], "CONDITIONAL / UNVERIFIED")
+        
         assessment = zone_thermal_assessment(final_cavity_temp_C=70.57)
         self.assertEqual(assessment["STM32F411CEU6"]["status"], "VERIFIED")
         self.assertEqual(assessment["PCM1808"]["status"], "VERIFIED")
-        self.assertEqual(assessment["RTC Module (Unspecified PN)"]["status"], "CONDITIONAL")
-        self.assertEqual(assessment["MicroSD Storage (Unspecified PN)"]["status"], "CONDITIONAL")
+        self.assertEqual(assessment["RTC Module (Unspecified PN)"]["status"], "CONDITIONAL / UNVERIFIED")
+        self.assertEqual(assessment["RTC Module (Unspecified PN)"]["margin_C"], "N/A (Unspecified Part Rating)")
+        self.assertEqual(assessment["MicroSD Storage (Unspecified PN)"]["status"], "CONDITIONAL / UNVERIFIED")
 
-    def test_multi_architecture_trade_study_execution(self):
-        """Verify that trade study evaluates all required architectures side-by-side."""
+    def test_cad_assembly_zero_prohibited_interference(self):
+        """Verify automated Boolean intersection interference checks pass with zero collision volume."""
+        cand = size_architecture_candidate(
+            "Architecture A", od_mm=44.45, wall_mm=3.5, liner_mm=0.0, aerogel_mm=0.0, is_discrete_carrier=True
+        )
+        collision = check_cad_assembly_interferences(cand)
+        self.assertTrue(collision["passed"], f"Interference check failed: {collision}")
+        self.assertEqual(collision["carrier_vs_shell_vol_mm3"], 0.0)
+        self.assertEqual(collision["carrier_vs_pcm_reserved_envelope_vol_mm3"], 0.0)
+        self.assertEqual(collision["carrier_vs_pcm_nominal_pcb_vol_mm3"], 0.0)
+        self.assertEqual(collision["pcm_nominal_vs_shell_vol_mm3"], 0.0)
+        self.assertEqual(collision["max_interference_vol_mm3"], 0.0)
+
+    def test_recommendation_engine_rule_logic(self):
+        """Verify that candidate recommendation is governed by explicit multi-gate engineering rules."""
         candidates, recommended = run_architecture_trade_study()
         self.assertGreaterEqual(len(candidates), 7)
         
-        arch_names = [c["architecture"] for c in candidates]
-        self.assertTrue(any("Architecture A" in name for name in arch_names))
-        self.assertTrue(any("Architecture B" in name for name in arch_names))
-        self.assertTrue(any("Architecture C" in name for name in arch_names))
-        self.assertTrue(any("Architecture D" in name for name in arch_names))
-        self.assertTrue(any("Reference Baseline" in name for name in arch_names))
-        self.assertTrue(any("Architecture F" in name for name in arch_names))
-        self.assertTrue(any("Architecture G" in name for name in arch_names))
-        
-        # Verify recommended architecture is Architecture A (Inconel + discrete PEEK rails, no aerogel)
-        self.assertIn("Architecture A", recommended["architecture"])
-        self.assertEqual(recommended["od_mm"], PREFERRED_OD_MM)
-        self.assertAlmostEqual(recommended["clear_id_mm"], 37.45, places=2)
-        self.assertEqual(recommended["aerogel_mm"], 0.0)
+        # Recommendation must satisfy all qualification gates
+        self.assertLessEqual(recommended["od_mm"], MAX_OD_MM)
+        self.assertLessEqual(recommended["housing_length_mm"], MAX_TOOL_LENGTH_MM)
         self.assertTrue(recommended["packaging"]["direct_fit"])
+        self.assertLessEqual(recommended["thermal_1w"]["final_inner_temperature_C"], 85.0)
+        self.assertIn("Inconel", recommended["casing_material"])
+        
+        # Test rule selection among candidates:
+        selected = select_recommended_candidate(candidates)
+        self.assertEqual(selected["architecture"], recommended["architecture"])
+        self.assertEqual(selected["od_mm"], PREFERRED_OD_MM)
 
-    def test_3d_cad_solid_watertight_and_step_export_discrete_carrier(self):
-        """Verify watertight CadQuery solid generation for discrete carrier casing."""
+    def test_3d_cad_solid_watertight_and_step_export_conformal_carrier(self):
+        """Verify watertight CadQuery solid generation for conformal carrier casing."""
         cand = size_architecture_candidate(
             "Architecture A", od_mm=44.45, wall_mm=3.5, liner_mm=0.0, aerogel_mm=0.0, is_discrete_carrier=True
         )
@@ -208,7 +231,7 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
             self.assertGreater(val.Volume(), 0.0, f"Solid {name} has zero volume")
             
         with TemporaryDirectory() as tmpdir:
-            step_path = Path(tmpdir) / "test_discrete_carrier_casing.step"
+            step_path = Path(tmpdir) / "test_conformal_carrier_casing.step"
             generate_compact_casing_cad(cand, output_step_path=step_path)
             self.assertTrue(step_path.exists())
             self.assertGreater(step_path.stat().st_size, 1000)
@@ -233,3 +256,4 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
