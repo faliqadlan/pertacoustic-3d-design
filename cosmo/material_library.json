@@ -151,10 +151,14 @@
     "water_absorption_sat_23c_min_percent": 5.6,
     "water_absorption_sat_23c_max_percent": 6.3,
     "water_absorption_sat_range_percent": "5.6 - 6.3%",
-    "volume_resistivity_ohm_m_dry": 1e13,
-    "volume_resistivity_ohm_m_cond": 1e10,
-    "surface_resistivity_ohm_dry": 1e12,
-    "surface_resistivity_ohm_cond": 1e10,
+    "volume_resistivity_ohm_m": 8e10,
+    "volume_resistivity_ohm_m_dry": null,
+    "volume_resistivity_ohm_m_cond": null,
+    "volume_resistivity_status": "VERIFIED MANUFACTURER VALUE (BASF Product Information Feb 2026: 8E10 Ohm·m; dry/conditioned coverage incomplete in published table)",
+    "surface_resistivity_ohm": 8e12,
+    "surface_resistivity_ohm_dry": null,
+    "surface_resistivity_ohm_cond": null,
+    "surface_resistivity_status": "VERIFIED MANUFACTURER VALUE (BASF Product Information Feb 2026: 8E12 Ohm; dry/conditioned coverage incomplete in published table)",
     "elastic_modulus_mpa_70c": null,
     "elastic_modulus_mpa_70c_status": "CONDITIONAL — EXACT 70 C CONDITIONED PROPERTY NOT VERIFIED",
     "screening_tensile_strength_mpa_70c": null,
@@ -165,7 +169,8 @@
       "mold_temperature_range_c": [80, 90],
       "predrying_temperature_c": 80,
       "predrying_time_hours": 4,
-      "max_moisture_content_percent": 0.15
+      "recommended_pellet_moisture_range_percent": [0.025, 0.045],
+      "recommended_pellet_moisture_range_str": "0.025 - 0.045%"
     },
     "provenance": {
       "grade": "VERIFIED MANUFACTURER VALUE (BASF Ultramid A3WG6 HRX BK23591)",
@@ -191,14 +196,12 @@
       "thermal_expansion_cross_flow_per_c": "VERIFIED MANUFACTURER VALUE (ISO 11359-2 Cross-flow: 70 ppm/K)",
       "moisture_absorption_equilibrium_range_percent": "VERIFIED MANUFACTURER VALUE (ISO 62: 1.5 - 1.9% at 23 C / 50% RH)",
       "water_absorption_sat_range_percent": "VERIFIED MANUFACTURER VALUE (ISO 62: 5.6 - 6.3% saturation in water at 23 C)",
-      "volume_resistivity_ohm_m_dry": "VERIFIED MANUFACTURER VALUE (IEC 62631-3-1 Dry: 1e13 Ohm·m)",
-      "volume_resistivity_ohm_m_cond": "VERIFIED MANUFACTURER VALUE (IEC 62631-3-1 Conditioned: 1e10 Ohm·m)",
-      "surface_resistivity_ohm_dry": "VERIFIED MANUFACTURER VALUE (IEC 62631-3-2 Dry: 1e12 Ohm)",
-      "surface_resistivity_ohm_cond": "VERIFIED MANUFACTURER VALUE (IEC 62631-3-2 Conditioned: 1e10 Ohm)",
+      "volume_resistivity_ohm_m": "VERIFIED MANUFACTURER VALUE (IEC 62631-3-1: 8E10 Ohm·m, BASF Feb 2026 Product Information; dry/conditioned coverage incomplete in published table)",
+      "surface_resistivity_ohm": "VERIFIED MANUFACTURER VALUE (IEC 62631-3-2: 8E12 Ohm, BASF Feb 2026 Product Information; dry/conditioned coverage incomplete in published table)",
       "elastic_modulus_mpa_70c": "CONDITIONAL — EXACT 70 C CONDITIONED PROPERTY NOT VERIFIED (Not reported on manufacturer datasheet; requires dynamic mechanical analysis / hot wet test)",
       "screening_tensile_strength_mpa_70c": "CONDITIONAL — EXACT 70 C CONDITIONED PROPERTY NOT VERIFIED (Not reported on manufacturer datasheet; requires hot wet test)"
     },
-    "notes": "BASF Ultramid A3WG6 HRX BK23591 (PA66-GF30, 30% Glass Fiber Reinforced, Hydrolysis-Resistant & Heat-Aged Grade). Designed for enhanced resistance to hydrolysis in automotive cooling circuits. Downhole wellbore fluid, sour gas, and hot brine compatibility remain unverified.",
+    "notes": "BASF Ultramid A3WG6 HRX BK23591 (PA66-GF30, 30% Glass Fiber Reinforced, Hydrolysis-Resistant & Heat-Aged Grade). Designed for enhanced resistance to hydrolysis in automotive cooling circuits. Downhole wellbore fluid, sour gas, and hot brine compatibility remain unverified. Feedstock is injection molding granules; additive manufacturing / 3D printing is unsupported for exact grade.",
     "datasheet_url": "https://plastics-rubber.basf.com/global/en/performance_polymers/products/ultramid.html"
   }
 }

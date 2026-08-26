@@ -562,15 +562,25 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         self.assertEqual(pa66["water_absorption_sat_23c_min_percent"], 5.6)
         self.assertEqual(pa66["water_absorption_sat_23c_max_percent"], 6.3)
         
-        # 70 C status and unverified fluids
+        # 70 C status
         self.assertEqual(pa66["elastic_modulus_mpa_70c_status"], "CONDITIONAL — EXACT 70 C CONDITIONED PROPERTY NOT VERIFIED")
         self.assertEqual(pa66["screening_tensile_strength_mpa_70c_status"], "CONDITIONAL — EXACT 70 C CONDITIONED PROPERTY NOT VERIFIED")
         
-        # Electrical insulation
-        self.assertEqual(pa66["volume_resistivity_ohm_m_dry"], 1e13)
-        self.assertEqual(pa66["volume_resistivity_ohm_m_cond"], 1e10)
-        self.assertEqual(pa66["surface_resistivity_ohm_dry"], 1e12)
-        self.assertEqual(pa66["surface_resistivity_ohm_cond"], 1e10)
+        # Electrical insulation (BASF Feb 2026 Product Information)
+        self.assertEqual(pa66["volume_resistivity_ohm_m"], 8e10)
+        self.assertEqual(pa66["surface_resistivity_ohm"], 8e12)
+        self.assertIsNone(pa66["volume_resistivity_ohm_m_dry"])
+        self.assertIsNone(pa66["volume_resistivity_ohm_m_cond"])
+        self.assertIsNone(pa66["surface_resistivity_ohm_dry"])
+        self.assertIsNone(pa66["surface_resistivity_ohm_cond"])
+        
+        # Processing parameters (BASF Processing Data Sheet)
+        proc = pa66["processing"]
+        self.assertEqual(proc["predrying_temperature_c"], 80)
+        self.assertEqual(proc["predrying_time_hours"], 4)
+        self.assertEqual(proc["recommended_pellet_moisture_range_percent"], [0.025, 0.045])
+        self.assertEqual(proc["recommended_pellet_moisture_range_str"], "0.025 - 0.045%")
+        self.assertNotIn("max_moisture_content_percent", proc)
 
     def test_carrier_material_trade_matrix_content(self):
         """Verify carrier material trade matrix contains all three material families with correct classification."""
@@ -586,14 +596,17 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         ppa = next(m for m in matrix if "Amodel" in m["exact_grade"])
         pa66 = next(m for m in matrix if "Ultramid" in m["exact_grade"])
         
-        self.assertIn("RECOMMENDED", peek["overall_screening_classification"])
-        self.assertEqual(ppa["overall_screening_classification"], "PREFERRED HIGH-PERFORMANCE COST-REDUCTION ALTERNATIVE")
-        self.assertIn("PROTOTYPE / LAB TESTING ONLY", pa66["overall_screening_classification"])
-        self.assertIn("dry sealed cavity", pa66["overall_screening_classification"].lower())
+        self.assertEqual(peek["overall_screening_classification"], "RECOMMENDED BASELINE / STRONGEST CURRENT EVIDENCE")
+        self.assertEqual(ppa["overall_screening_classification"], "PREFERRED HIGH-PERFORMANCE COST-REDUCTION CANDIDATE — procurement and exact carrier qualification pending")
+        self.assertEqual(pa66["overall_screening_classification"], "PROTOTYPE / VALIDATION CANDIDATE — exact 70 C wet properties and downhole-fluid compatibility unresolved")
         
-        self.assertIn("HIGH DIMENSIONAL RISK", pa66["carrier_dimensional_risk"])
-        self.assertIn("UNVERIFIED", pa66["downhole_fluid_compatibility"])
-        self.assertIn("LOWER-COST", pa66["relative_cost_class"])
+        self.assertEqual(peek["relative_cost_class"], "HIGH COST CLASS")
+        self.assertEqual(ppa["relative_cost_class"], "EXPECTED LOWER-COST CANDIDATE — PROCUREMENT UNVERIFIED")
+        self.assertEqual(pa66["relative_cost_class"], "EXPECTED LOWER-COST CANDIDATE — PROCUREMENT UNVERIFIED")
+        
+        for item in matrix:
+            self.assertNotIn("$", item["relative_cost_class"])
+            self.assertNotIn("/kg", item["relative_cost_class"])
 
     def test_carrier_dimensional_sensitivity_sweep(self):
         """Verify carrier dimensional sensitivity sweep across assumed swelling allowances."""
@@ -620,8 +633,8 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         self.assertLess(pa66_sat["worst_case_hot_diametral_mm"], 0.0)
         self.assertEqual(pa66_sat["sliding_status"], "RISK OF BINDING / INTERFERENCE")
 
-    def test_pa66_pressure_shell_rejection(self):
-        """Verify PA66 is completely rejected as a pressure-retaining casing material."""
+    def test_pa66_not_eligible_as_current_pressure_shell_baseline(self):
+        """Verify PA66 is not eligible as the current pressure-shell baseline."""
         pa66_shell = size_architecture_candidate(
             "Architecture G2: PA66-Only", od_mm=44.45, wall_mm=7.225, liner_mm=0.0, aerogel_mm=0.0, is_discrete_carrier=False,
             casing_material="PA66_Ultramid_A3WG6_HRX", liner_material="PA66_Ultramid_A3WG6_HRX"
@@ -643,8 +656,17 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         self.assertIn("Victrex 450G PEEK", content)
         self.assertIn("Solvay Amodel A-1133 HS", content)
         self.assertIn("CONDITIONAL — EXACT 70 C CONDITIONED PROPERTY NOT VERIFIED", content)
+        self.assertIn("STRONGEST CURRENT MATERIAL EVIDENCE", content)
+        self.assertIn("0.025 – 0.045 %", content)
+        self.assertIn("NOT ELIGIBLE AS THE CURRENT PRESSURE-SHELL BASELINE", content)
         self.assertIn("Proposed Future Physical Validation Plan", content)
         self.assertIn("Which material should we manufacture for the first physical carrier prototype?", content)
+        
+        # Verify no unsourced numeric cost assertions in report
+        self.assertNotIn("~$100–150+/kg", content)
+        self.assertNotIn("~$15–25/kg", content)
+        self.assertNotIn("~$4–8/kg", content)
+        self.assertNotIn("zero-risk", content)
         
         csv_content = csv_path.read_text(encoding="utf-8")
         self.assertIn("Architecture B2", csv_content)

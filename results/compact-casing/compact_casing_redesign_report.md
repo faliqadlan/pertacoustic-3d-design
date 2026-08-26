@@ -23,17 +23,17 @@ This engineering screening trade study evaluates whether alternative polymer mat
 
 1. **"Can we replace the PEEK electronics carrier with a lower-cost nylon-based material for the current 70 °C / 2-hour PertAcoustic downhole tool?"**
    - **For PPA-GF (Solvay Amodel A-1133 HS, 33% GF):**  
-     **YES — PREFERRED HIGH-PERFORMANCE COST-REDUCTION ALTERNATIVE.**  
-     PPA provides superior stiffness ($E = 11.81\text{ GPa}$ at 70 °C DAM vs 3.70 GPa for PEEK), moderate moisture absorption (0.20% 24h, 1.80% sat), high glass transition temperature ($T_g \approx 125\text{--}135\text{ °C}$), and significant raw material savings over PEEK (~$15–25/kg vs ~$100–150+/kg). It is a credible, robust alternative for both prototype and production carriers.
+     **PREFERRED HIGH-PERFORMANCE COST-REDUCTION CANDIDATE (procurement and exact carrier qualification pending).**  
+     PPA provides superior stiffness ($E = 11.81\text{ GPa}$ at 70 °C DAM vs 3.70 GPa for PEEK), moderate moisture absorption (0.20% 24h, 1.80% sat), high glass transition temperature ($T_g \approx 125\text{--}135\text{ °C}$), and is an expected lower-cost candidate compared to PEEK. Note that published downhole qualification evidence often cites structural lubricated AS-1133 HS rather than standard A-1133 HS.
    - **For PA66-GF30 (BASF Ultramid A3WG6 HRX BK23591):**  
-     **PROTOTYPE / LAB TESTING ONLY (CONDITIONAL ON DRY SEALED CAVITY).**  
-     While Ultramid A3WG6 HRX offers the lowest raw material cost (~$4–8/kg) and excellent injection moldability with automotive-grade hydrolysis resistance, its **high water absorption (1.5–1.9% equilibrium at 50% RH, 5.6–6.3% saturation in water)** creates substantial dimensional swelling risk in tight sliding bores coupon clearances ($0.200\text{ mm}$ radial clearance). Furthermore, moisture plasticization reduces modulus from 9500 MPa (dry) to 6000 MPa (conditioned) at 23 °C and drops $T_g$ into the ambient range, making 70 °C wet mechanical behavior and dimensional retention unverified. Compatibility with hot wellbore completion brines, crude hydrocarbons, and sour gas remains unestablished. Therefore, PA66-GF30 is classified as **PROTOTYPE / LAB TESTING ONLY**.
+     **PROTOTYPE / VALIDATION CANDIDATE (exact 70 °C wet properties and downhole-fluid compatibility unresolved).**  
+     While Ultramid A3WG6 HRX offers expected lower material cost and excellent injection moldability with automotive-grade hydrolysis resistance, its **high water absorption (1.5–1.9% equilibrium at 50% RH, 5.6–6.3% saturation in water)** creates substantial dimensional swelling risk in tight sliding bores ($0.200\text{ mm}$ nominal radial clearance). Moisture conditioning substantially reduces 23 °C modulus and stress at break; exact 70 °C conditioned mechanical behavior remains unresolved. Compatibility with hot wellbore completion brines, crude hydrocarbons, and sour gas remains unestablished. Therefore, PA66-GF30 is classified as a prototype/validation candidate only.
 
 2. **"Which material should we manufacture for the first physical carrier prototype?"**
-   - **For Primary Tool Functional / Downhole Qualification Prototype:**  
-     **Victrex 450G PEEK** remains the zero-risk recommended baseline because of its proven hydrolytic immunity (0.10% absorption), verified 70 °C mechanical data, and wellbore fluid inertness.
+   - **For Downhole Qualification / Primary Functional Tool Baseline:**  
+     **Victrex 450G PEEK** provides the **STRONGEST CURRENT MATERIAL EVIDENCE** and remains the **RECOMMENDED CARRIER BASELINE** (actual PertAcoustic carrier still requires physical validation).
    - **For Low-Cost Benchtop / Assembly / Fit Verification Prototype:**  
-     **BASF Ultramid A3WG6 HRX PA66-GF30** (or Solvay Amodel A-1133 HS PPA) can be CNC-machined or 3D-printed/molded to verify circuit card retention, connector harness routing, and sliding fit in an Inconel coupon at a fraction of PEEK material cost, provided it is tested under dry laboratory conditions.
+     **BASF Ultramid A3WG6 HRX PA66-GF30** (or Solvay Amodel A-1133 HS PPA) can be injection molded or CNC-machined from exact-grade molded stock/coupons to verify circuit card retention, connector harness routing, and sliding fit in an Inconel coupon under dry laboratory conditions (note: additive manufacturing / 3D printing is unsupported for the exact A3WG6 HRX granule grade).
 
 ---
 
@@ -64,12 +64,16 @@ The candidate nylon material is based strictly on the official manufacturer data
 - **Coefficient of Linear Thermal Expansion (CLTE, ISO 11359-2):**
   - Along flow: $30\times 10^{-6}\text{ /K}$ ($30\text{ ppm/K}$)
   - Cross-flow: $70\times 10^{-6}\text{ /K}$ ($70\text{ ppm/K}$)
-- **Electrical Properties (IEC 62631):**
-  - Volume Resistivity: Dry = $1\times 10^{13}\text{ }\Omega\cdot\text{m}$; Conditioned = $1\times 10^{10}\text{ }\Omega\cdot\text{m}$
-  - Surface Resistivity: Dry = $1\times 10^{12}\text{ }\Omega$; Conditioned = $1\times 10^{10}\text{ }\Omega$
+- **Electrical Properties (IEC 62631, BASF Feb 2026 Product Information):**
+  - Volume Resistivity: $8\times 10^{10}\text{ }\Omega\cdot\text{m}$ (published table has incomplete dry/conditioned breakdown; separate dry/conditioned values UNAVAILABLE / NOT PUBLISHED)
+  - Surface Resistivity: $8\times 10^{12}\text{ }\Omega$ (published table has incomplete dry/conditioned breakdown; separate dry/conditioned values UNAVAILABLE / NOT PUBLISHED)
+- **Processing Conditions (BASF Processing Data Sheet):**
+  - Melt Temperature: $280\text{--}300\text{ °C}$ | Mold Temperature: $80\text{--}90\text{ °C}$
+  - Pre-drying: $80\text{ °C}$ for 4 hours
+  - Recommended Pellet Moisture: **0.025 – 0.045 %**
 - **70 °C Property Classification:**  
   `CONDITIONAL — EXACT 70 C CONDITIONED PROPERTY NOT VERIFIED`  
-  *(Exact temperature- and moisture-dependent tensile/flexural stress-strain curves at 70 °C wet are not published on the standard BASF datasheet and require empirical DMA / hot tensile testing).*
+  *(Moisture conditioning substantially reduces 23 °C modulus and stress at break; exact 70 °C conditioned mechanical behavior remains unresolved).*
 
 ---
 
@@ -105,19 +109,19 @@ The following downhole environmental exposures remain **UNVERIFIED** for PA66-GF
 | **70 °C Property Confidence** | `VERIFIED / INTERPOLATED` | `VERIFIED / INTERPOLATED` | `CONDITIONAL — UNVERIFIED WET` |
 | **1000h Creep Modulus (23 °C Cond)** | High (Tg = 143 °C) | High (10.8 GPa @ 100 °C) | 4800 MPa (70 °C wet unverified) |
 | **Dimensional Risk in Tight Bore** | `LOW` | `LOW-TO-MODERATE` | `HIGH DIMENSIONAL RISK` |
-| **Downhole Fluid Compatibility** | `VERIFIED EXCELLENT` | `PROVISIONAL / CONDITIONAL` | `UNVERIFIED / HIGH RISK` |
-| **Manufacturability & Tool Wear** | High melt temp (380 °C); excellent CNC | Standard high temp (320 °C); abrasive GF | Excellent molding (280 °C); drying req; abrasive GF |
-| **Relative Cost Class** | `HIGH (~$100–150+/kg)` | `MEDIUM (~$15–25/kg)` | `LOWER-COST (~$4–8/kg)` |
-| **Overall Carrier Classification** | **`RECOMMENDED BASELINE`** | **`PREFERRED COST ALTERNATIVE`** | **`PROTOTYPE / LAB TESTING ONLY`** |
+| **Downhole Fluid Compatibility** | `STRONGEST EVIDENCE` | `PROVISIONAL / CONDITIONAL` | `UNVERIFIED / HIGH RISK` |
+| **Manufacturability & Processing** | High melt temp (380 °C); excellent CNC | Standard high temp (320 °C); abrasive GF | Excellent molding (280 °C); drying req (0.025-0.045%); GF abrasive |
+| **Relative Cost Class** | `HIGH COST CLASS` | `EXPECTED LOWER-COST CANDIDATE — PROCUREMENT UNVERIFIED` | `EXPECTED LOWER-COST CANDIDATE — PROCUREMENT UNVERIFIED` |
+| **Overall Carrier Classification** | **`RECOMMENDED BASELINE / STRONGEST CURRENT EVIDENCE`** | **`PREFERRED HIGH-PERFORMANCE COST-REDUCTION CANDIDATE`** | **`PROTOTYPE / VALIDATION CANDIDATE`** |
 
 ---
 
-## 5. Carrier Sizing, Tolerance & Moisture Conditioning Sensitivity
+## 5. Carrier Sizing, Tolerance & Dimensional Conditioning Sensitivity
 
 Inside the 37.45 mm Inconel shell bore, the carrier chassis must maintain free sliding during assembly (20 °C) and operation (70 °C) without binding or pinching circuit cards.
 
-### Swelling Allowance & Worst-Case Hot Sliding Clearance Sweep:
-Evaluated across differential thermal expansion (Inconel 13 ppm/K vs Polymer cross-flow CLTE) and H8/h8 machining tolerances:
+### Assumed Dimensional-Conditioning Sensitivity Sweep:
+*Note: Dimensional-conditioning allowances represent an explicit sensitivity sweep over assumed radial growth, NOT a direct conversion from water-absorption mass percentage.*
 
 | Material | Carrier Nom OD | Conditioning Diam Allowance | Diff Thermal Growth | Hot Clearance (Nom) | Worst-Case Hot Clearance | Avail Guide Wall | Sliding Status |
 |---|---|---|---|---|---|---|---|
@@ -142,18 +146,16 @@ Evaluated across differential thermal expansion (Inconel 13 ppm/K vs Polymer cro
 - For **PEEK** ($OD = 37.05\text{ mm}$, allowance $= 0.020\text{ mm}$), worst-case hot diametral clearance is **+0.2634 mm** (+0.1317 mm radial), maintaining ample free-sliding margin.
 - For **PPA-GF** ($OD = 37.05\text{ mm}$, allowance $= 0.030\text{ mm}$), worst-case hot diametral clearance is **+0.2534 mm**, fully adequate.
 - For **PA66-GF30** ($OD = 37.05\text{ mm}$):
-  - At nominal equilibrium conditioning allowance ($0.080\text{ mm}$), worst-case clearance is **+0.1756 mm** (adequate).
-  - However, if saturation swelling reaches $0.200\text{--}0.300\text{ mm}$ diametral in a wet well environment, worst-case clearance drops to **+0.0556 mm / -0.0444 mm**, risking carrier binding and tool jamming unless carrier OD is reduced to **36.85 mm**.
+  - At nominal assumed conditioning allowance ($0.080\text{ mm}$), worst-case clearance is **+0.1756 mm** (adequate).
+  - However, if assumed saturation swelling reaches $0.200\text{--}0.300\text{ mm}$ diametral in a wet well environment, worst-case clearance drops to **+0.0556 mm / -0.0444 mm**, risking carrier binding and tool jamming unless carrier OD is reduced to **36.85 mm**.
 
 ---
 
 ## 6. Short-Duration Creep & Thermal Assessment
 
-### Creep Behavior during 2-Hour Exposure:
-- The nominal PertAcoustic downhole logging run is approximately **2.0 hours (7200 s)**.
-- Unlike pressure-retaining shells subjected to tens of megapascals of hoop stress, the internal carrier experiences only self-weight and board retention reaction forces ($< 2\text{ MPa}$).
-- Under dry conditions at 70 °C, the short 2-hour duration is well within the creep capability of all three polymers.
-- However, if PA66-GF30 absorbs moisture, plasticization lowers its effective stiffness and increases long-term relaxation under card-retention clips.
+### Creep Assessment during 2-Hour Exposure:
+- 23 °C conditioned creep evidence exists for PA66-GF30 ($4800\text{ MPa}$ at 1000h, ISO 899-1); 70 °C wet creep remains unresolved.
+- For the nominal **2.0 hours (7200 s)** PertAcoustic logging run, the short duration reduces concern under internal self-weight and card-retention loads, but does not establish formal creep qualification.
 
 ### Thermal Comparison:
 - Thermal conductivities: PEEK ($0.29\text{ W/(m·K)}$), PPA ($0.26\text{ W/(m·K)}$), PA66-GF30 ($0.36\text{ W/(m·K)}$).
@@ -166,12 +168,12 @@ Evaluated across differential thermal expansion (Inconel 13 ppm/K vs Polymer cro
 ## 7. Manufacturing & Processability Comparison
 
 1. **Injection Molding:**
-   - **PA66-GF30:** Excellent moldability at standard melt temperatures ($280\text{--}300\text{ °C}$) and mold temperatures ($80\text{--}90\text{ °C}$). Requires pre-drying at $80\text{ °C}$ (4 h) to $<0.15\%$ moisture to prevent hydrolytic degradation during processing.
+   - **PA66-GF30:** Excellent moldability at standard melt temperatures ($280\text{--}300\text{ °C}$) and mold temperatures ($80\text{--}90\text{ °C}$). Requires pre-drying at $80\text{ °C}$ (4 h) to recommended pellet moisture of $0.025\text{--}0.045\%$ to prevent hydrolytic degradation during processing.
    - **PPA-GF:** High-temperature molding ($315\text{--}330\text{ °C}$) with heated molds ($135\text{--}150\text{ °C}$) required to achieve full crystallinity.
    - **PEEK:** Ultra-high-temperature molding ($380\text{--}400\text{ °C}$) requiring specialized high-temp injection equipment and mold heaters ($160\text{--}190\text{ °C}$).
-2. **CNC Machining for Prototypes:**
-   - **Unfilled PEEK:** Outstanding machinability, producing smooth burr-free card grooves with minimal cutting tool wear.
-   - **PPA-GF & PA66-GF30:** Glass fiber reinforcement causes rapid tool wear on carbide cutters; requires polycrystalline diamond (PCD) or coated carbide tooling to maintain tight dimensional tolerances on thin card guide ribs.
+2. **Prototype Manufacturing:**
+   - **Unfilled PEEK:** Outstanding machinability from standard stock plate/rod, producing smooth burr-free card grooves.
+   - **PPA-GF & PA66-GF30:** Injection molded exact grade, or CNC machining of exact-grade molded stock/coupons using polycrystalline diamond (PCD) or coated carbide tooling (note: additive manufacturing / 3D printing is unsupported for the exact BASF A3WG6 HRX granule grade).
 
 ---
 
@@ -237,7 +239,7 @@ Evaluated under 70 °C external boundary and 7200 s (2h) exposure:
 
 ## 11. Structural Screening Across Pressure Scenarios (Architecture A: Inconel 718 + Discrete PEEK Carrier (3.5 mm Wall))
 
-*Authoritative casing design pressure remains unresolved. Sizing is based on preliminary engineering screening.*
+*Authoritative casing design pressure remains unresolved. Sizing is based on preliminary engineering screening. PA66 is NOT ELIGIBLE AS THE CURRENT PRESSURE-SHELL BASELINE. Polymer-only casing remains EXPLORATORY / CONDITIONAL because authoritative field pressure, creep and collapse requirements remain unresolved.*
 
 1. **Scenario A (~10 MPa / 1,450 psi - ~1000 m Hydrostatic Context):**
    - Max von Mises Stress: **59.7 MPa** | Strength Ratio: **16.75** | Buckling FoS: **11.33**
