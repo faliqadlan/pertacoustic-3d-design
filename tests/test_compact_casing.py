@@ -100,6 +100,10 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         # Diff growth: 0.1019 - 0.0243 = +0.0776 mm diametral (+0.0388 mm radial)
         self.assertAlmostEqual(budget["diff_thermal_growth_diametral_mm"], 0.0776, places=3)
         self.assertAlmostEqual(budget["diff_thermal_growth_radial_mm"], 0.0388, places=3)
+        self.assertAlmostEqual(budget["dim_uncertainty_allowance_diametral_mm"], 0.020, places=3)
+        self.assertAlmostEqual(budget["hot_clearance_diametral_mm"], 0.3024, places=3)
+        self.assertAlmostEqual(budget["hot_clearance_radial_mm"], 0.1512, places=3)
+        self.assertTrue(budget["adequate_clearance"])
 
     def test_carrier_tolerance_budget_returns_complete_dict(self):
         budget = compute_carrier_tolerance_budget()
@@ -110,15 +114,17 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
 
     def test_radial_budget_returns_dict_with_nested_tolerance_budget(self):
         budget = compute_radial_budget(44.45, 3.5, is_discrete_carrier=True)
+        tol = budget["tolerance_budget"]
         self.assertIsInstance(budget, dict)
-        self.assertIsInstance(budget["tolerance_budget"], dict)
+        self.assertIsInstance(tol, dict)
         self.assertAlmostEqual(budget["shell_bore_id_mm"], 37.45, places=2)
-        self.assertEqual(budget["dim_uncertainty_allowance_diametral_mm"], 0.020)
-        
-        # Hot operating clearance: 0.400 - 0.0776 - 0.020 (allowance) = 0.3024 mm
-        self.assertAlmostEqual(budget["hot_clearance_diametral_mm"], 0.3024, places=3)
-        self.assertAlmostEqual(budget["hot_clearance_radial_mm"], 0.1512, places=3)
-        self.assertTrue(budget["adequate_clearance"])
+        self.assertIn("dim_uncertainty_allowance_diametral_mm", tol)
+        self.assertIn("hot_clearance_diametral_mm", tol)
+        self.assertIn("hot_clearance_radial_mm", tol)
+        self.assertIn("adequate_clearance", tol)
+        self.assertAlmostEqual(tol["hot_clearance_diametral_mm"], 0.3024, places=3)
+        self.assertAlmostEqual(tol["hot_clearance_radial_mm"], 0.1512, places=3)
+        self.assertTrue(tol["adequate_clearance"])
 
     def test_final_carrier_remains_inside_shell_at_nominal_geometry(self):
         """Verify that nominal carrier outer radius (18.525 mm) remains strictly inside the shell bore (18.725 mm)."""
@@ -697,8 +703,8 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         self.assertIn("UNVERIFIED", content)
         self.assertIn("PROPOSED SCREENING TEST CONDITIONS — NOT AUTHORITATIVE QUALIFICATION REQUIREMENTS", content)
         self.assertNotIn("QUALIFIED PRELIMINARY SCREENING CANDIDATE", content)
-        self.assertNotIn("PA66 is qualified", content.lower())
-        self.assertNotIn("PA66 downhole-qualified", content.lower())
+        self.assertNotIn("pa66 is qualified", content.lower())
+        self.assertNotIn("pa66 downhole-qualified", content.lower())
 
     def test_pa66_dimensional_report_values_are_generated_from_live_rows(self):
         """PA66 sizing prose must reflect the same live sensitivity rows as the table."""

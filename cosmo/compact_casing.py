@@ -1823,7 +1823,7 @@ The following downhole environmental exposures remain **UNVERIFIED** for PA66-GF
 | **Moisture Absorption (Eq 50% RH)** | 0.10% (24h) / 0.50% (sat) | 0.20% (24h) / 1.80% (sat) | **1.5 – 1.9 %** |
 | **Water Absorption (Saturation in water)** | **0.50%** | **1.80%** | **5.6 – 6.3 %** |
 | **CLTE (Cross-flow / Flow)** | 55 / 45 ppm/K | 55 / 22 ppm/K | 70 / 30 ppm/K |
-| **70 °C Property Confidence** | `VERIFIED / INTERPOLATED` | `VERIFIED / INTERPOLATED` | `CONDITIONAL — UNVERIFIED WET` |
+| **70 °C Property Confidence** | `VERIFIED / INTERPOLATED` | `DERIVED / INTERPOLATED SCREENING — DAM` | `CONDITIONAL — EXACT 70 C CONDITIONED PROPERTY NOT VERIFIED` |
 | **1000h Creep Modulus (23 °C Cond)** | High (Tg = 143 °C) | High (10.8 GPa @ 100 °C) | 4800 MPa (70 °C wet unverified) |
 | **Dimensional Risk in Tight Bore** | `LOW` | `LOW-TO-MODERATE` | `HIGH DIMENSIONAL RISK` |
 | **Downhole Fluid Compatibility** | `STRONGEST EVIDENCE` | `PROVISIONAL / CONDITIONAL` | `UNVERIFIED / HIGH RISK` |
