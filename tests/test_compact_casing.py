@@ -597,8 +597,9 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         pa66 = next(m for m in matrix if "Ultramid" in m["exact_grade"])
         
         self.assertEqual(peek["overall_screening_classification"], "RECOMMENDED BASELINE / STRONGEST CURRENT EVIDENCE")
-        self.assertEqual(ppa["overall_screening_classification"], "PREFERRED HIGH-PERFORMANCE COST-REDUCTION CANDIDATE — procurement and exact carrier qualification pending")
-        self.assertEqual(pa66["overall_screening_classification"], "PROTOTYPE / VALIDATION CANDIDATE — exact 70 C wet properties and downhole-fluid compatibility unresolved")
+        self.assertEqual(ppa["overall_screening_classification"], "HIGHER-PERFORMANCE POLYAMIDE ALTERNATIVE / SECONDARY VALIDATION CANDIDATE — procurement and exact carrier validation pending")
+        self.assertEqual(pa66["overall_screening_classification"], "PRIMARY NYLON PROTOTYPE / VALIDATION CANDIDATE — exact 70 C wet properties and downhole-fluid compatibility unresolved")
+        self.assertIn("DERIVED / INTERPOLATED SCREENING — DAM", ppa["property_70c_confidence"])
         
         self.assertEqual(peek["relative_cost_class"], "HIGH COST CLASS")
         self.assertEqual(ppa["relative_cost_class"], "EXPECTED LOWER-COST CANDIDATE — PROCUREMENT UNVERIFIED")
@@ -671,6 +672,38 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         csv_content = csv_path.read_text(encoding="utf-8")
         self.assertIn("Architecture B2", csv_content)
         self.assertIn("PA66_Ultramid_A3WG6_HRX", csv_content)
+
+    def test_nylon_prototype_report_preserves_evidence_boundaries(self):
+        """The generated report must distinguish prototype screening from qualification evidence."""
+        report_path = Path(__file__).resolve().parents[1] / "results" / "compact-casing" / "compact_casing_redesign_report.md"
+        content = report_path.read_text(encoding="utf-8")
+
+        self.assertIn("PRIMARY NYLON PROTOTYPE / VALIDATION CANDIDATE", content)
+        self.assertIn("HIGHER-PERFORMANCE POLYAMIDE ALTERNATIVE / SECONDARY VALIDATION CANDIDATE", content)
+        self.assertIn("Elnusa", content)
+        self.assertIn("UNVERIFIED", content)
+        self.assertIn("PROPOSED SCREENING TEST CONDITIONS — NOT AUTHORITATIVE QUALIFICATION REQUIREMENTS", content)
+        self.assertNotIn("QUALIFIED PRELIMINARY SCREENING CANDIDATE", content)
+        self.assertNotIn("PA66 is qualified", content.lower())
+        self.assertNotIn("PA66 downhole-qualified", content.lower())
+
+    def test_pa66_dimensional_report_values_are_generated_from_live_rows(self):
+        """PA66 sizing prose must reflect the same live sensitivity rows as the table."""
+        rows = compute_carrier_dimensional_sensitivity(37.45)
+        nominal = next(r for r in rows if r["material"] == "PA66_Ultramid_A3WG6_HRX" and r["carrier_od_nom_mm"] == 37.05 and r["assumed_conditioning_allowance_mm"] == 0.08)
+        saturation = next(r for r in rows if r["material"] == "PA66_Ultramid_A3WG6_HRX" and r["carrier_od_nom_mm"] == 37.05 and r["assumed_conditioning_allowance_mm"] == 0.30)
+        report = (Path(__file__).resolve().parents[1] / "results" / "compact-casing" / "compact_casing_redesign_report.md").read_text(encoding="utf-8")
+        self.assertIn(f"{nominal['worst_case_hot_diametral_mm']:+.4f} mm", report)
+        self.assertIn(f"{saturation['worst_case_hot_diametral_mm']:+.4f} mm", report)
+
+    def test_pa66_cad_variant_names_carrier_material(self):
+        """The explicit PA66 prototype CAD variant must be identifiable in metadata."""
+        candidate = size_architecture_candidate(
+            "PA66 prototype", od_mm=44.45, wall_mm=3.5, is_discrete_carrier=True,
+            casing_material="Inconel718", liner_material="PA66_Ultramid_A3WG6_HRX"
+        )
+        names = [name for _, name, _ in generate_compact_casing_cad(candidate)]
+        self.assertIn("PA66-GF30_Prototype_Carrier_Rails", names)
 
     def test_historical_biweekly5_artifacts_remain_unmodified(self):
         """Verify historical Biweekly 5 script and results remain intact."""
