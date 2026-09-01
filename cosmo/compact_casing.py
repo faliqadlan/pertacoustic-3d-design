@@ -186,6 +186,7 @@ def compute_carrier_tolerance_budget(
         "worst_case_hot_radial_mm": round(worst_case_hot_radial_mm, 4),
         "adequate_clearance": adequate_clearance,
     }
+    return result
 
 
 def compute_carrier_dimensional_sensitivity(
@@ -256,7 +257,7 @@ def build_carrier_material_trade_matrix() -> list[dict[str, Any]]:
             "downhole_fluid_compatibility": "STRONGEST EVIDENCE — Excellent resistance to crude, sour gas (H2S), CO2, completion brine, acids",
             "manufacturability": "High-temperature injection molding (380-400 °C) or easy CNC machining of stock plate/rod",
             "relative_cost_class": "HIGH COST CLASS",
-            "overall_screening_classification": "RECOMMENDED BASELINE / STRONGEST CURRENT EVIDENCE",
+            "overall_screening_classification": "ENGINEERING BENCHMARK / REFERENCE — STRONGEST CURRENT EVIDENCE",
         },
         {
             "exact_grade": "Amodel A-1133 HS",
@@ -377,6 +378,7 @@ def compute_radial_budget(
         "tolerance_budget": tol_budget,
         "packaging_status": pkg_status,
     }
+    return result
 
 
 # ==============================================================================

@@ -100,6 +100,19 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         # Diff growth: 0.1019 - 0.0243 = +0.0776 mm diametral (+0.0388 mm radial)
         self.assertAlmostEqual(budget["diff_thermal_growth_diametral_mm"], 0.0776, places=3)
         self.assertAlmostEqual(budget["diff_thermal_growth_radial_mm"], 0.0388, places=3)
+
+    def test_carrier_tolerance_budget_returns_complete_dict(self):
+        budget = compute_carrier_tolerance_budget()
+        self.assertIsInstance(budget, dict)
+        self.assertIn("cold_clearance_diametral_mm", budget)
+        self.assertIn("worst_case_hot_diametral_mm", budget)
+        self.assertAlmostEqual(budget["cold_clearance_diametral_mm"], 0.4, places=3)
+
+    def test_radial_budget_returns_dict_with_nested_tolerance_budget(self):
+        budget = compute_radial_budget(44.45, 3.5, is_discrete_carrier=True)
+        self.assertIsInstance(budget, dict)
+        self.assertIsInstance(budget["tolerance_budget"], dict)
+        self.assertAlmostEqual(budget["shell_bore_id_mm"], 37.45, places=2)
         self.assertEqual(budget["dim_uncertainty_allowance_diametral_mm"], 0.020)
         
         # Hot operating clearance: 0.400 - 0.0776 - 0.020 (allowance) = 0.3024 mm
@@ -596,7 +609,7 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         ppa = next(m for m in matrix if "Amodel" in m["exact_grade"])
         pa66 = next(m for m in matrix if "Ultramid" in m["exact_grade"])
         
-        self.assertEqual(peek["overall_screening_classification"], "RECOMMENDED BASELINE / STRONGEST CURRENT EVIDENCE")
+        self.assertEqual(peek["overall_screening_classification"], "ENGINEERING BENCHMARK / REFERENCE — STRONGEST CURRENT EVIDENCE")
         self.assertEqual(ppa["overall_screening_classification"], "HIGHER-PERFORMANCE POLYAMIDE ALTERNATIVE / SECONDARY VALIDATION CANDIDATE — procurement and exact carrier validation pending")
         self.assertEqual(pa66["overall_screening_classification"], "PRIMARY NYLON PROTOTYPE / VALIDATION CANDIDATE — exact 70 C wet properties and downhole-fluid compatibility unresolved")
         self.assertIn("DERIVED / INTERPOLATED SCREENING — DAM", ppa["property_70c_confidence"])
@@ -721,9 +734,11 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         self.assertIn("PPA 100 °C DAM", content)
         self.assertIn("PPA 70 °C", content)
         self.assertIn("DERIVED / INTERPOLATED SCREENING — DAM", content)
-        self.assertIn("PA66-GF30 is the first physical carrier prototype", content)
+        self.assertIn("First physical carrier prototype", content)
+        self.assertIn("PA66-GF30", content)
+        self.assertIn("first prototype path", content)
         self.assertNotIn("PA66-GF30 (or Solvay Amodel", content)
-        self.assertNotIn("directly into the wellbore fluid", content)
+        self.assertNotIn("directly into the wellbore fluid", content.lower())
 
     def test_historical_biweekly5_artifacts_remain_unmodified(self):
         """Verify historical Biweekly 5 script and results remain intact."""
