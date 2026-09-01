@@ -1641,9 +1641,14 @@ def export_trade_study_csv_and_report(
         f"| **{r['material'].split('_')[0]}** | {r['carrier_od_nom_mm']:.3f} mm | {r['nominal_clearance_diametral_mm']:.4f} mm | +{r['assumed_conditioning_allowance_mm']:.3f} mm | +{r['diff_thermal_growth_mm']:.4f} mm | {r['hot_clearance_diametral_mm']:.4f} mm | **{r['worst_case_hot_diametral_mm']:+.4f} mm** | {r['interference_diametral_mm']:.4f} mm | `{r['sliding_status']}` |"
         for r in dim_sens_rows
     )
-    pa66_nominal = next(r for r in dim_sens_rows if r["material"] == "PA66_Ultramid_A3WG6_HRX" and r["carrier_od_nom_mm"] == carrier_od and r["assumed_conditioning_allowance_mm"] == 0.080)
-    pa66_screening = next(r for r in dim_sens_rows if r["material"] == "PA66_Ultramid_A3WG6_HRX" and r["carrier_od_nom_mm"] == carrier_od and r["assumed_conditioning_allowance_mm"] == 0.200)
-    pa66_extreme = next(r for r in dim_sens_rows if r["material"] == "PA66_Ultramid_A3WG6_HRX" and r["carrier_od_nom_mm"] == carrier_od and r["assumed_conditioning_allowance_mm"] == 0.300)
+    pa66_rows = [
+        r for r in dim_sens_rows
+        if r["material"] == "PA66_Ultramid_A3WG6_HRX"
+        and math.isclose(r["carrier_od_nom_mm"], carrier_od, abs_tol=1e-9)
+    ]
+    pa66_nominal = next(r for r in pa66_rows if math.isclose(r["assumed_conditioning_allowance_mm"], 0.080, abs_tol=1e-9))
+    pa66_screening = next(r for r in pa66_rows if math.isclose(r["assumed_conditioning_allowance_mm"], 0.200, abs_tol=1e-9))
+    pa66_extreme = next(r for r in pa66_rows if math.isclose(r["assumed_conditioning_allowance_mm"], 0.300, abs_tol=1e-9))
     
     # Carrier Material Trade Matrix
     trade_matrix = build_carrier_material_trade_matrix()
@@ -1816,8 +1821,8 @@ The following downhole environmental exposures remain **UNVERIFIED** for PA66-GF
 | **Polymer Family** | PEEK (Unfilled) | PPA (Polyphthalamide) | PA66 (Polyamide 66) |
 | **Reinforcement** | None (Unfilled) | 33% Glass Fiber | 30% Glass Fiber |
 | **Density** | 1300 kg/m³ | 1480 kg/m³ | 1370 kg/m³ |
-| **Tensile Modulus** | 23 °C DAM: 4000 MPa | 23 °C DAM: {ppa_trade['modulus_dry_mpa']} MPa<br>100 °C DAM: {MATERIALS['PPA_Amodel_A1133HS']['elastic_modulus_mpa_100c']} MPa<br>70 °C: {ppa_trade['modulus_cond_mpa']} MPa<br>`DERIVED / INTERPOLATED SCREENING — DAM` | 23 °C dry: {MATERIALS['PA66_Ultramid_A3WG6_HRX']['elastic_modulus_mpa_23c_dry']} MPa<br>23 °C conditioned: {pa66_trade['modulus_cond_mpa']} MPa<br>70 °C wet: UNRESOLVED |
-| **Strength Basis & Value** | `TENSILE_STRENGTH`<br>23 °C: 100 MPa | `TENSILE_STRESS_AT_BREAK`<br>23 °C DAM: {ppa_trade['strength_dry_mpa']} MPa<br>100 °C DAM: {MATERIALS['PPA_Amodel_A1133HS']['tensile_strength_mpa_100c']} MPa<br>70 °C: {ppa_trade['strength_cond_mpa']} MPa<br>`DERIVED / INTERPOLATED SCREENING — DAM` | `TENSILE_STRESS_AT_BREAK`<br>23 °C dry: {pa66_trade['strength_dry_mpa']} MPa<br>23 °C conditioned: {pa66_trade['strength_cond_mpa']} MPa<br>70 °C wet: UNRESOLVED |
+| **Tensile Modulus** | 23 °C DAM: 4000 MPa | PPA 23 °C DAM: {ppa_trade['modulus_dry_mpa']} MPa<br>PPA 100 °C DAM: {MATERIALS['PPA_Amodel_A1133HS']['elastic_modulus_mpa_100c']} MPa<br>PPA 70 °C: {ppa_trade['modulus_cond_mpa']} MPa<br>`DERIVED / INTERPOLATED SCREENING — DAM` | 23 °C dry: {MATERIALS['PA66_Ultramid_A3WG6_HRX']['elastic_modulus_mpa_23c_dry']} MPa<br>23 °C conditioned: {pa66_trade['modulus_cond_mpa']} MPa<br>70 °C wet: UNRESOLVED |
+| **Strength Basis & Value** | `TENSILE_STRENGTH`<br>23 °C: 100 MPa | `TENSILE_STRESS_AT_BREAK`<br>PPA 23 °C DAM: {ppa_trade['strength_dry_mpa']} MPa<br>PPA 100 °C DAM: {MATERIALS['PPA_Amodel_A1133HS']['tensile_strength_mpa_100c']} MPa<br>PPA 70 °C: {ppa_trade['strength_cond_mpa']} MPa<br>`DERIVED / INTERPOLATED SCREENING — DAM` | `TENSILE_STRESS_AT_BREAK`<br>23 °C dry: {pa66_trade['strength_dry_mpa']} MPa<br>23 °C conditioned: {pa66_trade['strength_cond_mpa']} MPa<br>70 °C wet: UNRESOLVED |
 | **Thermal Conductivity** | 0.29 W/(m·K) | 0.26 W/(m·K) | 0.36 W/(m·K) |
 | **Specific Heat Capacity** | 1500 J/(kg·K) | 1200 J/(kg·K) | 1260 J/(kg·K) |
 | **Moisture Absorption (Eq 50% RH)** | 0.10% (24h) / 0.50% (sat) | 0.20% (24h) / 1.80% (sat) | **1.5 – 1.9 %** |
@@ -2040,4 +2045,3 @@ def run_compact_study_pipeline() -> dict[str, Any]:
 
 if __name__ == "__main__":
     run_compact_study_pipeline()
-

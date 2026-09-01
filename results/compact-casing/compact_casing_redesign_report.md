@@ -10,7 +10,9 @@
 
 ## 1. Executive Summary & Direct Engineering Answers
 
-This engineering screening trade study evaluates whether alternative polymer materials can reduce carrier cost while retaining the accepted mechanical architecture:
+This engineering screening trade study evaluates whether a PA66-GF30 electronics carrier can be practically used inside the Inconel 718 pressure shell for the 70 °C / 2-hour target, subject to physical validation of wet dimensional behaviour, packaging, and the unresolved internal thermal path. It does not establish downhole material qualification.
+
+The accepted mechanical architecture remains:
 - **44.45 mm / 1.75 in OD**
 - **Inconel 718 metallic pressure shell**
 - **3.50 mm preliminary packaging-favorable screening wall**
@@ -23,17 +25,17 @@ This engineering screening trade study evaluates whether alternative polymer mat
 
 1. **"Can we replace the PEEK electronics carrier with a lower-cost nylon-based material for the current 70 °C / 2-hour PertAcoustic downhole tool?"**
    - **For PPA-GF (Solvay Amodel A-1133 HS, 33% GF):**  
-     **PREFERRED HIGH-PERFORMANCE COST-REDUCTION CANDIDATE (procurement and exact carrier qualification pending).**  
+     **HIGHER-PERFORMANCE POLYAMIDE ALTERNATIVE / SECONDARY VALIDATION CANDIDATE (procurement and exact carrier validation pending).**
      PPA provides superior stiffness ($E = 11.81\text{ GPa}$ at 70 °C DAM vs 3.70 GPa for PEEK), moderate moisture absorption (0.20% 24h, 1.80% sat), high glass transition temperature ($T_g \approx 125\text{--}135\text{ °C}$), and is an expected lower-cost candidate compared to PEEK. Note that published downhole qualification evidence often cites structural lubricated AS-1133 HS rather than standard A-1133 HS.
    - **For PA66-GF30 (BASF Ultramid A3WG6 HRX BK23591):**  
-     **PROTOTYPE / VALIDATION CANDIDATE (exact 70 °C wet properties and downhole-fluid compatibility unresolved).**  
-     While Ultramid A3WG6 HRX offers expected lower material cost and excellent injection moldability with automotive-grade hydrolysis resistance, its **high water absorption (1.5–1.9% equilibrium at 50% RH, 5.6–6.3% saturation in water)** creates substantial dimensional swelling risk in tight sliding bores ($0.200\text{ mm}$ nominal radial clearance). Moisture conditioning substantially reduces 23 °C modulus and stress at break; exact 70 °C conditioned mechanical behavior remains unresolved. Compatibility with hot wellbore completion brines, crude hydrocarbons, and sour gas remains unestablished. Therefore, PA66-GF30 is classified as a prototype/validation candidate only.
+     **PRIMARY NYLON PROTOTYPE / VALIDATION CANDIDATE (exact 70 °C wet properties and downhole-fluid compatibility unresolved).**
+     While Ultramid A3WG6 HRX offers expected lower material cost and excellent injection moldability with automotive-grade hydrolysis resistance, its **high water absorption (1.5–1.9% equilibrium at 50% RH, 5.6–6.3% saturation in water)** creates substantial dimensional swelling risk in the tight sliding bore (initial diametral clearance **0.4000 mm**, radial **0.2000 mm**). Moisture conditioning substantially reduces 23 °C modulus and stress at break; exact 70 °C conditioned mechanical behavior remains unresolved. Compatibility with hot wellbore completion brines, crude hydrocarbons, and sour gas remains unestablished. Therefore, PA66-GF30 remains a prototype/validation candidate only.
 
 2. **"Which material should we manufacture for the first physical carrier prototype?"**
-   - **For Downhole Qualification / Primary Functional Tool Baseline:**  
-     **Victrex 450G PEEK** provides the **STRONGEST CURRENT MATERIAL EVIDENCE** and remains the **RECOMMENDED CARRIER BASELINE** (actual PertAcoustic carrier still requires physical validation).
-   - **For Low-Cost Benchtop / Assembly / Fit Verification Prototype:**  
-     **BASF Ultramid A3WG6 HRX PA66-GF30** (or Solvay Amodel A-1133 HS PPA) can be injection molded or CNC-machined from exact-grade molded stock/coupons to verify circuit card retention, connector harness routing, and sliding fit in an Inconel coupon under dry laboratory conditions (note: additive manufacturing / 3D printing is unsupported for the exact A3WG6 HRX granule grade).
+   - **For engineering benchmark / reference:**
+     **Victrex 450G PEEK** remains the **ENGINEERING BENCHMARK / REFERENCE** with the **STRONGEST CURRENT MATERIAL EVIDENCE** (actual PertAcoustic carrier still requires physical validation).
+   - **First physical carrier prototype:**
+     **BASF Ultramid A3WG6 HRX PA66-GF30** is the first prototype path. Manufacture an exact-grade molded or machined specimen/coupon to verify circuit card retention, connector harness routing, and sliding fit in an Inconel coupon under dry and proposed wet screening conditions.
 
 ---
 
@@ -99,20 +101,20 @@ The following downhole environmental exposures remain **UNVERIFIED** for PA66-GF
 | **Polymer Family** | PEEK (Unfilled) | PPA (Polyphthalamide) | PA66 (Polyamide 66) |
 | **Reinforcement** | None (Unfilled) | 33% Glass Fiber | 30% Glass Fiber |
 | **Density** | 1300 kg/m³ | 1480 kg/m³ | 1370 kg/m³ |
-| **Tensile Modulus (23 °C)** | Dry: 4000 MPa<br>Cond: 4000 MPa | Dry: 13,400 MPa<br>Cond: 11,813 MPa (70C) | Dry: 9500 MPa<br>Cond: 6000 MPa |
-| **Strength Basis & Value** | `TENSILE_STRENGTH`<br>Dry: 100 MPa<br>70 °C: 70 MPa | `TENSILE_STRESS_AT_BREAK`<br>Dry: 233 MPa<br>70 °C DAM: 181 MPa | `TENSILE_STRESS_AT_BREAK`<br>Dry: 185 MPa<br>Cond (23C): 110 MPa |
+| **Tensile Modulus** | 23 °C DAM: 4000 MPa | PPA 23 °C DAM: 13400 MPa<br>PPA 100 °C DAM: 10800 MPa<br>PPA 70 °C: 11813 MPa<br>`DERIVED / INTERPOLATED SCREENING — DAM` | 23 °C dry: 9500 MPa<br>23 °C conditioned: 6000 MPa<br>70 °C wet: UNRESOLVED |
+| **Strength Basis & Value** | `TENSILE_STRENGTH`<br>23 °C: 100 MPa | `TENSILE_STRESS_AT_BREAK`<br>PPA 23 °C DAM: 233 MPa<br>PPA 100 °C DAM: 148 MPa<br>PPA 70 °C: 181 MPa<br>`DERIVED / INTERPOLATED SCREENING — DAM` | `TENSILE_STRESS_AT_BREAK`<br>23 °C dry: 185 MPa<br>23 °C conditioned: 110 MPa<br>70 °C wet: UNRESOLVED |
 | **Thermal Conductivity** | 0.29 W/(m·K) | 0.26 W/(m·K) | 0.36 W/(m·K) |
 | **Specific Heat Capacity** | 1500 J/(kg·K) | 1200 J/(kg·K) | 1260 J/(kg·K) |
 | **Moisture Absorption (Eq 50% RH)** | 0.10% (24h) / 0.50% (sat) | 0.20% (24h) / 1.80% (sat) | **1.5 – 1.9 %** |
 | **Water Absorption (Saturation in water)** | **0.50%** | **1.80%** | **5.6 – 6.3 %** |
 | **CLTE (Cross-flow / Flow)** | 55 / 45 ppm/K | 55 / 22 ppm/K | 70 / 30 ppm/K |
-| **70 °C Property Confidence** | `VERIFIED / INTERPOLATED` | `VERIFIED / INTERPOLATED` | `CONDITIONAL — UNVERIFIED WET` |
+| **70 °C Property Confidence** | `VERIFIED / INTERPOLATED` | `DERIVED / INTERPOLATED SCREENING — DAM` | `CONDITIONAL — EXACT 70 C CONDITIONED PROPERTY NOT VERIFIED` |
 | **1000h Creep Modulus (23 °C Cond)** | High (Tg = 143 °C) | High (10.8 GPa @ 100 °C) | 4800 MPa (70 °C wet unverified) |
 | **Dimensional Risk in Tight Bore** | `LOW` | `LOW-TO-MODERATE` | `HIGH DIMENSIONAL RISK` |
 | **Downhole Fluid Compatibility** | `STRONGEST EVIDENCE` | `PROVISIONAL / CONDITIONAL` | `UNVERIFIED / HIGH RISK` |
 | **Manufacturability & Processing** | High melt temp (380 °C); excellent CNC | Standard high temp (320 °C); abrasive GF | Excellent molding (280 °C); drying req (0.025-0.045%); GF abrasive |
 | **Relative Cost Class** | `HIGH COST CLASS` | `EXPECTED LOWER-COST CANDIDATE — PROCUREMENT UNVERIFIED` | `EXPECTED LOWER-COST CANDIDATE — PROCUREMENT UNVERIFIED` |
-| **Overall Carrier Classification** | **`RECOMMENDED BASELINE / STRONGEST CURRENT EVIDENCE`** | **`PREFERRED HIGH-PERFORMANCE COST-REDUCTION CANDIDATE`** | **`PROTOTYPE / VALIDATION CANDIDATE`** |
+| **Overall Carrier Classification** | **`ENGINEERING BENCHMARK / REFERENCE`** | **`HIGHER-PERFORMANCE POLYAMIDE ALTERNATIVE / SECONDARY VALIDATION CANDIDATE`** | **`PRIMARY NYLON PROTOTYPE / VALIDATION CANDIDATE`** |
 
 ---
 
@@ -123,31 +125,29 @@ Inside the 37.45 mm Inconel shell bore, the carrier chassis must maintain free s
 ### Assumed Dimensional-Conditioning Sensitivity Sweep:
 *Note: Dimensional-conditioning allowances represent an explicit sensitivity sweep over assumed radial growth, NOT a direct conversion from water-absorption mass percentage.*
 
-| Material | Carrier Nom OD | Conditioning Diam Allowance | Diff Thermal Growth | Hot Clearance (Nom) | Worst-Case Hot Clearance | Avail Guide Wall | Sliding Status |
-|---|---|---|---|---|---|---|---|
-| **PEEK** | 37.050 mm | +0.010 mm | +0.0775 mm | 0.3125 mm | **0.3125 mm** | 3.525 mm | `FREE SLIDING` |
-| **PEEK** | 37.050 mm | +0.020 mm | +0.0775 mm | 0.3025 mm | **0.3025 mm** | 3.525 mm | `FREE SLIDING` |
-| **PEEK** | 37.050 mm | +0.040 mm | +0.0775 mm | 0.2825 mm | **0.2825 mm** | 3.525 mm | `FREE SLIDING` |
-| **PPA** | 37.050 mm | +0.020 mm | +0.0775 mm | 0.3025 mm | **0.3025 mm** | 3.525 mm | `FREE SLIDING` |
-| **PPA** | 37.050 mm | +0.030 mm | +0.0775 mm | 0.2925 mm | **0.2925 mm** | 3.525 mm | `FREE SLIDING` |
-| **PPA** | 37.050 mm | +0.060 mm | +0.0775 mm | 0.2625 mm | **0.2625 mm** | 3.525 mm | `FREE SLIDING` |
-| **PA66** | 37.050 mm | +0.040 mm | +0.1053 mm | 0.2547 mm | **0.2547 mm** | 3.525 mm | `FREE SLIDING` |
-| **PA66** | 37.050 mm | +0.080 mm | +0.1053 mm | 0.2147 mm | **0.2147 mm** | 3.525 mm | `FREE SLIDING` |
-| **PA66** | 37.050 mm | +0.120 mm | +0.1053 mm | 0.1747 mm | **0.1747 mm** | 3.525 mm | `FREE SLIDING` |
-| **PA66** | 37.050 mm | +0.200 mm | +0.1053 mm | 0.0947 mm | **0.0947 mm** | 3.525 mm | `FREE SLIDING` |
-| **PA66** | 37.050 mm | +0.300 mm | +0.1053 mm | -0.0053 mm | **-0.0053 mm** | 3.525 mm | `RISK OF BINDING / INTERFERENCE` |
-| **PA66** | 36.850 mm | +0.040 mm | +0.1046 mm | 0.4554 mm | **0.4554 mm** | 3.425 mm | `FREE SLIDING` |
-| **PA66** | 36.850 mm | +0.080 mm | +0.1046 mm | 0.4154 mm | **0.4154 mm** | 3.425 mm | `FREE SLIDING` |
-| **PA66** | 36.850 mm | +0.120 mm | +0.1046 mm | 0.3754 mm | **0.3754 mm** | 3.425 mm | `FREE SLIDING` |
-| **PA66** | 36.850 mm | +0.200 mm | +0.1046 mm | 0.2954 mm | **0.2954 mm** | 3.425 mm | `FREE SLIDING` |
-| **PA66** | 36.850 mm | +0.300 mm | +0.1046 mm | 0.1954 mm | **0.1954 mm** | 3.425 mm | `FREE SLIDING` |
+| Material | Carrier Nom OD | Initial Diam Clearance | Assumed Hot/Wet Allowance | Diff Thermal Growth | Hot Clearance (Nom) | Remaining Diam Clearance | Interference | Avail Guide Wall | Sliding Status |
+|---|---|---|---|---|---|---|---|---|---|
+| **PEEK** | 37.050 mm | 0.4000 mm | +0.010 mm | +0.0775 mm | 0.3125 mm | **+0.3125 mm** | 0.0000 mm | `FREE SLIDING` |
+| **PEEK** | 37.050 mm | 0.4000 mm | +0.020 mm | +0.0775 mm | 0.3025 mm | **+0.3025 mm** | 0.0000 mm | `FREE SLIDING` |
+| **PEEK** | 37.050 mm | 0.4000 mm | +0.040 mm | +0.0775 mm | 0.2825 mm | **+0.2825 mm** | 0.0000 mm | `FREE SLIDING` |
+| **PPA** | 37.050 mm | 0.4000 mm | +0.020 mm | +0.0775 mm | 0.3025 mm | **+0.3025 mm** | 0.0000 mm | `FREE SLIDING` |
+| **PPA** | 37.050 mm | 0.4000 mm | +0.030 mm | +0.0775 mm | 0.2925 mm | **+0.2925 mm** | 0.0000 mm | `FREE SLIDING` |
+| **PPA** | 37.050 mm | 0.4000 mm | +0.060 mm | +0.0775 mm | 0.2625 mm | **+0.2625 mm** | 0.0000 mm | `FREE SLIDING` |
+| **PA66** | 37.050 mm | 0.4000 mm | +0.040 mm | +0.1053 mm | 0.2547 mm | **+0.2547 mm** | 0.0000 mm | `FREE SLIDING` |
+| **PA66** | 37.050 mm | 0.4000 mm | +0.080 mm | +0.1053 mm | 0.2147 mm | **+0.2147 mm** | 0.0000 mm | `FREE SLIDING` |
+| **PA66** | 37.050 mm | 0.4000 mm | +0.120 mm | +0.1053 mm | 0.1747 mm | **+0.1747 mm** | 0.0000 mm | `FREE SLIDING` |
+| **PA66** | 37.050 mm | 0.4000 mm | +0.200 mm | +0.1053 mm | 0.0947 mm | **+0.0947 mm** | 0.0000 mm | `FREE SLIDING` |
+| **PA66** | 37.050 mm | 0.4000 mm | +0.300 mm | +0.1053 mm | -0.0053 mm | **-0.0053 mm** | 0.0053 mm | `RISK OF BINDING / INTERFERENCE` |
+| **PA66** | 36.850 mm | 0.6000 mm | +0.040 mm | +0.1046 mm | 0.4554 mm | **+0.4554 mm** | 0.0000 mm | `FREE SLIDING` |
+| **PA66** | 36.850 mm | 0.6000 mm | +0.080 mm | +0.1046 mm | 0.4154 mm | **+0.4154 mm** | 0.0000 mm | `FREE SLIDING` |
+| **PA66** | 36.850 mm | 0.6000 mm | +0.120 mm | +0.1046 mm | 0.3754 mm | **+0.3754 mm** | 0.0000 mm | `FREE SLIDING` |
+| **PA66** | 36.850 mm | 0.6000 mm | +0.200 mm | +0.1046 mm | 0.2954 mm | **+0.2954 mm** | 0.0000 mm | `FREE SLIDING` |
+| **PA66** | 36.850 mm | 0.6000 mm | +0.300 mm | +0.1046 mm | 0.1954 mm | **+0.1954 mm** | 0.0000 mm | `FREE SLIDING` |
 
 ### Sizing Observations:
-- For **PEEK** ($OD = 37.05\text{ mm}$, allowance $= 0.020\text{ mm}$), worst-case hot diametral clearance is **+0.2634 mm** (+0.1317 mm radial), maintaining ample free-sliding margin.
-- For **PPA-GF** ($OD = 37.05\text{ mm}$, allowance $= 0.030\text{ mm}$), worst-case hot diametral clearance is **+0.2534 mm**, fully adequate.
-- For **PA66-GF30** ($OD = 37.05\text{ mm}$):
-  - At nominal assumed conditioning allowance ($0.080\text{ mm}$), worst-case clearance is **+0.1756 mm** (adequate).
-  - However, if assumed saturation swelling reaches $0.200\text{--}0.300\text{ mm}$ diametral in a wet well environment, worst-case clearance drops to **+0.0556 mm / -0.0444 mm**, risking carrier binding and tool jamming unless carrier OD is reduced to **36.85 mm**.
+- The live table uses shell bore **37.450 mm**, nominal carrier OD **37.050 mm**, and initial diametral clearance **0.4000 mm**.
+- For PA66-GF30 at the nominal assumed allowance (0.080 mm), remaining worst-case diametral clearance is **+0.2147 mm**.
+- At the 0.200 mm and 0.300 mm assumed sensitivity cases, remaining clearance is **+0.0947 mm** and **-0.0053 mm**, respectively; any negative result represents **0.0053 mm diametral interference**. These are assumed screening sensitivities, not verified swelling values.
 
 ---
 
@@ -159,8 +159,8 @@ Inside the 37.45 mm Inconel shell bore, the carrier chassis must maintain free s
 
 ### Thermal Comparison:
 - Thermal conductivities: PEEK ($0.29\text{ W/(m·K)}$), PPA ($0.26\text{ W/(m·K)}$), PA66-GF30 ($0.36\text{ W/(m·K)}$).
-- PA66-GF30 provides slightly higher bulk conductivity (+24% vs PEEK), aiding heat transfer from board guide edges to the shell.
-- Inner shell surface 2-hour screening temperature remains virtually identical across all three discrete carrier candidates (**70.00 °C** at 1.0 W) because heat conducts through the high-conductivity Inconel shell ($14.7\text{ W/(m·K)}$) directly into the wellbore fluid.
+- PA66-GF30 bulk thermal conductivity is approximately $0.36\text{ W/(m·K)}$ where supported, but this value does not prove electronics cooling. Actual electronics temperature depends on PCB → supports/carrier → contacts/gaps → shell → environment.
+- With a fixed outer 70 °C Dirichlet boundary, the 2-hour inner-shell result is a shell-coupled lower-bound screening result (**70.00 °C** at 1.0 W); it does not establish PCB, junction, cavity, or wellbore heat-transfer temperatures. The internal PCB/carrier/contact/gap thermal resistance remains unresolved.
 - The allowable internal thermal resistance budget remains **15.00 K/W** for verified +85 °C electronics.
 
 ---
@@ -179,18 +179,31 @@ Inside the 37.45 mm Inconel shell bore, the carrier chassis must maintain free s
 
 ## 8. Proposed Future Physical Validation Plan (Wet / 70 °C Testing)
 
-Because PA66 moisture absorption is substantial, the following empirical screening test plan is recommended prior to downhole adoption:
+### PA66-GF30 NYLON CARRIER PHYSICAL VALIDATION PLAN
+
+**PROPOSED SCREENING TEST CONDITIONS — NOT AUTHORITATIVE QUALIFICATION REQUIREMENTS**
+
+Field input from Pak Afif indicates that nylon is used in an Elnusa downhole/wireline context. The exact Elnusa component architecture, nylon grade, pressure exposure, temperature rating, and qualification basis have not been independently verified. This information motivates the PA66 prototype path only; it is not material qualification evidence.
+
+Because PA66 moisture absorption is substantial, the following empirical screening test plan is proposed. It is not completed evidence:
 
 1. **As-Machined / Molded Baseline Inspection:**
    - Measure carrier OD, length, card-guide slot width, and total dry mass ($M_0$).
 2. **Water / Brine Conditioning Immersion:**
-   - Immerse carrier test coupons in simulated completion brine (3% KCl / NaCl solution) at 23 °C and 70 °C.
-   - Measure mass uptake $\Delta M(t)$ and diametral linear expansion $\Delta D(t)$ at 24h, 48h, 168h (1 week), and saturation.
+   - Immerse carrier test coupons in the currently proposed simulated completion brine (3% KCl / NaCl solution) at 23 °C and 70 °C.
+   - Measure mass change, critical dimensions, and diametral change after 24h, 48h, 168h (1 week), and saturation; do not estimate dimensional change from mass absorption percentage.
 3. **Inconel Bore Sliding Coupon Test:**
    - Slide conditioned wet carrier coupons through an Inconel 718 tube bore coupon (ID $37.45\pm 0.02\text{ mm}$) at 20 °C and inside a 70 °C heated chamber.
-   - Verify insertion/extraction force remains $< 20\text{ N}$ without binding.
+   - Record insertion/extraction force and assess binding against a pre-agreed prototype criterion; do not treat this screening criterion as a qualification requirement.
 4. **PCB Card Guide Fit & Retention Test:**
    - Measure PCB card-edge insertion force into the guide slots before and after 70 °C hydrothermal conditioning to verify slot width does not swell shut or pinch circuit boards.
+5. **Post-exposure inspection:**
+   - Record dimensional change, permanent versus recoverable change where observable, interference/binding, cracking, warping, visual degradation, and mass change.
+6. **Decision gate:**
+   - If PA66 remains dimensionally compatible, intact, and practical to assemble at 70 °C under representative wet exposure, retain it as the preferred low-cost nylon prototype path.
+   - If PA66 shows unacceptable swelling, binding, creep, degradation, or instability, evaluate PPA A-1133 HS as the next polyamide candidate; if both fail carrier requirements, retain/revert to the PEEK benchmark architecture.
+
+Actual service-fluid compatibility remains **UNRESOLVED** unless an authoritative fluid specification becomes available.
 
 ---
 
@@ -201,9 +214,9 @@ Evaluated under 70 °C external boundary and 7200 s (2h) exposure:
 | Architecture | Casing Material | Carrier / Liner | Wall mm | Shell Bore ID | Packaging Feasibility | Inner Shell Temp @ 1W | FoS Buckle (10k psi) | Classification |
 |---|---|---|---|---|---|---|---|---|
 | **Architecture A: Inconel 718 + Discrete PEEK Carrier (3.5 mm Wall)** | Inconel718 | Conformal Rails (PEEK) | 3.50 | 37.45 mm | FEASIBLE | 70.00 °C | 1.64 | RECOMMENDED BASELINE |
-| **Architecture A (4.0 mm Wall): Inconel 718 + Discrete PEEK Carrier** | Inconel718 | Conformal Rails (PEEK) | 4.00 | 36.45 mm | FEASIBLE | 70.00 °C | 2.45 | QUALIFIED SCREENING |
-| **Architecture B: Inconel 718 + Discrete PPA Carrier (3.5 mm Wall)** | Inconel718 | Conformal Rails (PPA) | 3.50 | 37.45 mm | FEASIBLE | 70.00 °C | 1.64 | QUALIFIED SCREENING |
-| **Architecture B2: Inconel 718 + Discrete PA66-GF30 Carrier (3.5 mm Wall)** | Inconel718 | Conformal Rails (PA66) | 3.50 | 37.45 mm | FEASIBLE | 70.00 °C | 1.64 | QUALIFIED SCREENING |
+| **Architecture A (4.0 mm Wall): Inconel 718 + Discrete PEEK Carrier** | Inconel718 | Conformal Rails (PEEK) | 4.00 | 36.45 mm | FEASIBLE | 70.00 °C | 2.45 | SCREENING CANDIDATE |
+| **Architecture B: Inconel 718 + Discrete PPA Carrier (3.5 mm Wall)** | Inconel718 | Conformal Rails (PPA) | 3.50 | 37.45 mm | FEASIBLE | 70.00 °C | 1.64 | SCREENING CANDIDATE |
+| **Architecture B2: Inconel 718 + Discrete PA66-GF30 Carrier (3.5 mm Wall)** | Inconel718 | Conformal Rails (PA66) | 3.50 | 37.45 mm | FEASIBLE | 70.00 °C | 1.64 | SCREENING CANDIDATE |
 | **Architecture C: Inconel 718 + Full PEEK Liner (3.5 mm Wall)** | Inconel718 | Full Liner (PEEK) | 3.50 | 37.45 mm | INFEASIBLE | 70.09 °C | 1.64 | INFEASIBLE |
 | **Architecture D: Inconel 718 + Full PPA Liner (3.5 mm Wall)** | Inconel718 | Full Liner (PPA) | 3.50 | 37.45 mm | INFEASIBLE | 70.10 °C | 1.64 | INFEASIBLE |
 | **Architecture D2: Inconel 718 + Full PA66-GF30 Liner (3.5 mm Wall)** | Inconel718 | Full Liner (PA66) | 3.50 | 37.45 mm | INFEASIBLE | 70.07 °C | 1.64 | INFEASIBLE |
@@ -211,10 +224,10 @@ Evaluated under 70 °C external boundary and 7200 s (2h) exposure:
 | **Architecture F: PEEK-Only Pressure Casing (Exploratory)** | PEEK | None (PEEK) | 7.22 | 30.00 mm | INFEASIBLE | 70.41 °C | 0.29 | EXPLORATORY |
 | **Architecture G: PPA-Only Pressure Casing (Exploratory)** | PPA_Amodel_A1133HS | None (PPA) | 7.22 | 30.00 mm | INFEASIBLE | 70.46 °C | 0.93 | EXPLORATORY |
 | **Architecture G2: PA66-GF30-Only Pressure Casing (Exploratory)** | PA66_Ultramid_A3WG6_HRX | None (PA66) | 7.22 | 30.00 mm | INFEASIBLE | 70.33 °C | 0.47 | EXPLORATORY |
-| **Architecture A: Inconel 718 + Discrete PEEK (OD 47.62 mm)** | Inconel718 | Conformal Rails (PEEK) | 3.50 | 40.62 mm | FEASIBLE | 70.00 °C | 1.34 | QUALIFIED SCREENING |
-| **Architecture A: Inconel 718 + Discrete PEEK (OD 50.80 mm)** | Inconel718 | Conformal Rails (PEEK) | 3.50 | 43.80 mm | FEASIBLE | 70.00 °C | 1.10 | QUALIFIED SCREENING |
-| **Architecture A: Inconel 718 + Discrete PEEK (OD 53.98 mm)** | Inconel718 | Conformal Rails (PEEK) | 3.50 | 46.98 mm | FEASIBLE | 70.00 °C | 0.92 | QUALIFIED SCREENING |
-| **Architecture A: Inconel 718 + Discrete PEEK (OD 57.15 mm)** | Inconel718 | Conformal Rails (PEEK) | 3.50 | 50.15 mm | FEASIBLE | 70.00 °C | 0.77 | QUALIFIED SCREENING |
+| **Architecture A: Inconel 718 + Discrete PEEK (OD 47.62 mm)** | Inconel718 | Conformal Rails (PEEK) | 3.50 | 40.62 mm | FEASIBLE | 70.00 °C | 1.34 | SCREENING CANDIDATE |
+| **Architecture A: Inconel 718 + Discrete PEEK (OD 50.80 mm)** | Inconel718 | Conformal Rails (PEEK) | 3.50 | 43.80 mm | FEASIBLE | 70.00 °C | 1.10 | SCREENING CANDIDATE |
+| **Architecture A: Inconel 718 + Discrete PEEK (OD 53.98 mm)** | Inconel718 | Conformal Rails (PEEK) | 3.50 | 46.98 mm | FEASIBLE | 70.00 °C | 0.92 | SCREENING CANDIDATE |
+| **Architecture A: Inconel 718 + Discrete PEEK (OD 57.15 mm)** | Inconel718 | Conformal Rails (PEEK) | 3.50 | 50.15 mm | FEASIBLE | 70.00 °C | 0.77 | SCREENING CANDIDATE |
 
 ---
 
