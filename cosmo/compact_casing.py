@@ -171,7 +171,7 @@ def compute_carrier_tolerance_budget(
     
     adequate_clearance = worst_case_hot_diametral_mm > 0.050  # Must maintain >= 0.05 mm positive sliding margin
     
-    return {
+    result = {
         "shell_bore_nom_mm": shell_bore_nom_mm,
         "carrier_od_nom_mm": carrier_od_nom_mm,
         "carrier_material": carrier_material_key,
@@ -360,7 +360,7 @@ def compute_radial_budget(
     else:
         pkg_status = f"INFEASIBLE (Clear ID {clear_id_mm:.2f} mm < {diagonal_pcm:.2f} mm PCM1808 envelope)"
         
-    return {
+    result = {
         "od_mm": od_mm,
         "wall_mm": wall_mm,
         "aerogel_mm": aerogel_mm,
@@ -428,7 +428,7 @@ def lame_stress(od_mm: float, wall_mm: float, pressure_mpa: float, material_key:
         
     strength_ratio = screening_strength / max_mises if max_mises > 0 else float("inf")
     
-    return {
+    result = {
         "pressure_mpa": pressure_mpa,
         "max_von_mises_mpa": round(max_mises, 2),
         "von_mises_inner_mpa": round(sigma_inner, 2),
@@ -436,8 +436,10 @@ def lame_stress(od_mm: float, wall_mm: float, pressure_mpa: float, material_key:
         "strength_basis": strength_basis,
         "screening_strength_mpa": screening_strength,
         "screening_strength_ratio": round(strength_ratio, 2),
-        "yield_safety_factor": round(strength_ratio, 2),  # aliased for Inconel compatibility
     }
+    if strength_basis == "YIELD":
+        result["yield_safety_factor"] = round(strength_ratio, 2)
+    return result
 
 
 def elastic_buckling(od_mm: float, wall_mm: float, pressure_mpa: float, material_key: str = "Inconel718") -> dict[str, float]:
@@ -1643,6 +1645,8 @@ def export_trade_study_csv_and_report(
     
     # Carrier Material Trade Matrix
     trade_matrix = build_carrier_material_trade_matrix()
+    ppa_trade = next(item for item in trade_matrix if item["polymer_family"].startswith("PPA"))
+    pa66_trade = next(item for item in trade_matrix if item["polymer_family"] == "PA66-GF30")
     trade_matrix_md = "\n".join(
         f"| **{item['exact_grade']}** | {item['polymer_family']} | {item['density_kg_m3']} kg/m³ | Dry: {item['modulus_dry_mpa']} MPa<br>Cond: {item['modulus_cond_mpa']} MPa | `{item['strength_basis']}`<br>Dry: {item['strength_dry_mpa']} MPa<br>Cond: {item['strength_cond_mpa']} MPa | {item['thermal_conductivity_w_mk']} W/(m·K) | Eq: {item['moisture_absorption_eq_percent']}<br>Sat: {item['water_absorption_sat_percent']} | `{item['carrier_dimensional_risk']}` | `{item['property_70c_confidence']}` | `{item['downhole_fluid_compatibility']}` | {item['relative_cost_class']} | **`{item['overall_screening_classification']}`** |"
         for item in trade_matrix
@@ -1741,10 +1745,10 @@ The accepted mechanical architecture remains:
      While Ultramid A3WG6 HRX offers expected lower material cost and excellent injection moldability with automotive-grade hydrolysis resistance, its **high water absorption (1.5–1.9% equilibrium at 50% RH, 5.6–6.3% saturation in water)** creates substantial dimensional swelling risk in the tight sliding bore (initial diametral clearance **{cold_clear_diam:.4f} mm**, radial **{cold_clear_rad:.4f} mm**). Moisture conditioning substantially reduces 23 °C modulus and stress at break; exact 70 °C conditioned mechanical behavior remains unresolved. Compatibility with hot wellbore completion brines, crude hydrocarbons, and sour gas remains unestablished. Therefore, PA66-GF30 remains a prototype/validation candidate only.
 
 2. **"Which material should we manufacture for the first physical carrier prototype?"**
-   - **For Downhole Qualification / Primary Functional Tool Baseline:**  
+   - **For engineering benchmark / reference:**
      **Victrex 450G PEEK** remains the **ENGINEERING BENCHMARK / REFERENCE** with the **STRONGEST CURRENT MATERIAL EVIDENCE** (actual PertAcoustic carrier still requires physical validation).
-   - **For Low-Cost Benchtop / Assembly / Fit Verification Prototype:**  
-     **BASF Ultramid A3WG6 HRX PA66-GF30** (or Solvay Amodel A-1133 HS PPA) can be injection molded or CNC-machined from exact-grade molded stock/coupons to verify circuit card retention, connector harness routing, and sliding fit in an Inconel coupon under dry laboratory conditions (note: additive manufacturing / 3D printing is unsupported for the exact A3WG6 HRX granule grade).
+   - **First physical carrier prototype:**
+     **BASF Ultramid A3WG6 HRX PA66-GF30** is the first prototype path. Manufacture an exact-grade molded or machined specimen/coupon to verify circuit card retention, connector harness routing, and sliding fit in an Inconel coupon under dry and proposed wet screening conditions.
 
 ---
 
@@ -1810,8 +1814,8 @@ The following downhole environmental exposures remain **UNVERIFIED** for PA66-GF
 | **Polymer Family** | PEEK (Unfilled) | PPA (Polyphthalamide) | PA66 (Polyamide 66) |
 | **Reinforcement** | None (Unfilled) | 33% Glass Fiber | 30% Glass Fiber |
 | **Density** | 1300 kg/m³ | 1480 kg/m³ | 1370 kg/m³ |
-| **Tensile Modulus (23 °C)** | Dry: 4000 MPa<br>Cond: 4000 MPa | Dry: 13,400 MPa<br>Cond: 11,813 MPa (70C) | Dry: 9500 MPa<br>Cond: 6000 MPa |
-| **Strength Basis & Value** | `TENSILE_STRENGTH`<br>Dry: 100 MPa<br>70 °C: 70 MPa | `TENSILE_STRESS_AT_BREAK`<br>Dry: 233 MPa<br>70 °C DAM: 181 MPa | `TENSILE_STRESS_AT_BREAK`<br>Dry: 185 MPa<br>Cond (23C): 110 MPa |
+| **Tensile Modulus** | 23 °C DAM: 4000 MPa | 23 °C DAM: {ppa_trade['modulus_dry_mpa']} MPa<br>100 °C DAM: {MATERIALS['PPA_Amodel_A1133HS']['elastic_modulus_mpa_100c']} MPa<br>70 °C: {ppa_trade['modulus_cond_mpa']} MPa<br>`DERIVED / INTERPOLATED SCREENING — DAM` | 23 °C dry: {MATERIALS['PA66_Ultramid_A3WG6_HRX']['elastic_modulus_mpa_23c_dry']} MPa<br>23 °C conditioned: {pa66_trade['modulus_cond_mpa']} MPa<br>70 °C wet: UNRESOLVED |
+| **Strength Basis & Value** | `TENSILE_STRENGTH`<br>23 °C: 100 MPa | `TENSILE_STRESS_AT_BREAK`<br>23 °C DAM: {ppa_trade['strength_dry_mpa']} MPa<br>100 °C DAM: {MATERIALS['PPA_Amodel_A1133HS']['tensile_strength_mpa_100c']} MPa<br>70 °C: {ppa_trade['strength_cond_mpa']} MPa<br>`DERIVED / INTERPOLATED SCREENING — DAM` | `TENSILE_STRESS_AT_BREAK`<br>23 °C dry: {pa66_trade['strength_dry_mpa']} MPa<br>23 °C conditioned: {pa66_trade['strength_cond_mpa']} MPa<br>70 °C wet: UNRESOLVED |
 | **Thermal Conductivity** | 0.29 W/(m·K) | 0.26 W/(m·K) | 0.36 W/(m·K) |
 | **Specific Heat Capacity** | 1500 J/(kg·K) | 1200 J/(kg·K) | 1260 J/(kg·K) |
 | **Moisture Absorption (Eq 50% RH)** | 0.10% (24h) / 0.50% (sat) | 0.20% (24h) / 1.80% (sat) | **1.5 – 1.9 %** |
@@ -1854,7 +1858,7 @@ Inside the 37.45 mm Inconel shell bore, the carrier chassis must maintain free s
 ### Thermal Comparison:
 - Thermal conductivities: PEEK ($0.29\\text{{ W/(m·K)}}$), PPA ($0.26\\text{{ W/(m·K)}}$), PA66-GF30 ($0.36\\text{{ W/(m·K)}}$).
 - PA66-GF30 bulk thermal conductivity is approximately $0.36\\text{{ W/(m·K)}}$ where supported, but this value does not prove electronics cooling. Actual electronics temperature depends on PCB → supports/carrier → contacts/gaps → shell → environment.
-- Inner shell surface 2-hour screening temperature remains virtually identical across all three discrete carrier candidates (**{rec_t1:.2f} °C** at 1.0 W) because heat conducts through the high-conductivity Inconel shell ($14.7\\text{{ W/(m·K)}}$) directly into the wellbore fluid.
+- With a fixed outer 70 °C Dirichlet boundary, the 2-hour inner-shell result is a shell-coupled lower-bound screening result (**{rec_t1:.2f} °C** at 1.0 W); it does not establish PCB, junction, cavity, or wellbore heat-transfer temperatures. The internal PCB/carrier/contact/gap thermal resistance remains unresolved.
 - The allowable internal thermal resistance budget remains **{85.0 - rec_t1:.2f} K/W** for verified +85 °C electronics.
 
 ---

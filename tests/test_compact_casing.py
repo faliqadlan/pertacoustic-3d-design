@@ -705,6 +705,26 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         names = [name for _, name, _ in generate_compact_casing_cad(candidate)]
         self.assertIn("PA66-GF30_Prototype_Carrier_Rails", names)
 
+    def test_yield_safety_factor_only_exists_for_yield_strength_basis(self):
+        """Generic polymer tensile screening must not be reported as yield safety factor."""
+        inconel = lame_stress(44.45, 3.5, 10.0, "Inconel718")
+        pa66 = lame_stress(44.45, 3.5, 10.0, "PA66_Ultramid_A3WG6_HRX")
+        self.assertEqual(inconel["strength_basis"], "YIELD")
+        self.assertIn("yield_safety_factor", inconel)
+        self.assertNotEqual(pa66["strength_basis"], "YIELD")
+        self.assertNotIn("yield_safety_factor", pa66)
+
+    def test_report_separates_ppa_dam_temperatures_and_first_prototype(self):
+        """PPA interpolations and the PA66-first decision must be explicit in generated prose."""
+        content = (Path(__file__).resolve().parents[1] / "results" / "compact-casing" / "compact_casing_redesign_report.md").read_text(encoding="utf-8")
+        self.assertIn("PPA 23 °C DAM", content)
+        self.assertIn("PPA 100 °C DAM", content)
+        self.assertIn("PPA 70 °C", content)
+        self.assertIn("DERIVED / INTERPOLATED SCREENING — DAM", content)
+        self.assertIn("PA66-GF30 is the first physical carrier prototype", content)
+        self.assertNotIn("PA66-GF30 (or Solvay Amodel", content)
+        self.assertNotIn("directly into the wellbore fluid", content)
+
     def test_historical_biweekly5_artifacts_remain_unmodified(self):
         """Verify historical Biweekly 5 script and results remain intact."""
         biweekly5_path = Path(__file__).resolve().parents[1] / "cosmo" / "biweekly5.py"
