@@ -18,6 +18,7 @@ from cosmo.compact_casing import (
     MATERIALS,
     MAX_OD_MM,
     MAX_TOOL_LENGTH_MM,
+    MIN_USABLE_ID_MM,
     PCM1808_ENVELOPE_MM,
     PREFERRED_OD_MM,
     PRESSURE_SCENARIO_1000M_MPA,
@@ -28,10 +29,12 @@ from cosmo.compact_casing import (
     THERMAL_ZONES_LOCAL_MM,
     ZERO_POWER_W,
     build_carrier_material_trade_matrix,
+    build_id_od_envelope_study,
     check_cad_assembly_interferences,
     compute_carrier_dimensional_sensitivity,
     compute_carrier_tolerance_budget,
     compute_radial_budget,
+    compute_required_circular_diameter,
     elastic_buckling,
     generate_compact_casing_cad,
     lame_stress,
@@ -42,6 +45,9 @@ from cosmo.compact_casing import (
     structural_screening,
     transient_thermal_simulation,
     zone_thermal_assessment,
+    future_custom_pcb_envelope,
+    is_id_od_candidate_viable,
+    select_id_od_preliminary_configuration,
 )
 
 
@@ -58,6 +64,129 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         self.assertEqual(THERMAL_DURATION_S, 7200)
         self.assertEqual(INHERITED_SCREENING_POWER_W, 1.0)
         self.assertEqual(ZERO_POWER_W, 0.0)
+        self.assertEqual(MIN_USABLE_ID_MM, 30.0)
+
+    def test_id_floor_is_not_target_and_envelope_study_is_parametric(self):
+        self.assertGreater(PREFERRED_OD_MM - 2 * 3.5, MIN_USABLE_ID_MM)
+        self.assertNotIn("target_id_mm", build_id_od_envelope_study()[0])
+        rows = build_id_od_envelope_study()
+        self.assertEqual(len(rows), 10)
+        self.assertEqual({r["od_mm"] for r in rows}, {44.45, 47.625, 50.8, 53.975, 57.15})
+        self.assertEqual({r["wall_mm"] for r in rows}, {3.5, 4.0})
+        selected = next(r for r in rows if r["od_mm"] == 44.45 and r["wall_mm"] == 3.5)
+        self.assertAlmostEqual(selected["id_mm"], 37.45, places=2)
+        self.assertEqual(selected["id_floor_status"], "PASS")
+        self.assertEqual(selected["electronics_packaging_status"], "PASS")
+
+    def test_exact_30mm_id_fails_strict_floor_rule(self):
+        """1. Exactly 30.0 mm ID fails the strict ID > 30 mm floor rule."""
+        rows = build_id_od_envelope_study(od_values=(36.0,), wall_values=(3.0,))
+        self.assertEqual(len(rows), 1)
+        r = rows[0]
+        self.assertAlmostEqual(r["id_mm"], 30.0, places=2)
+        self.assertEqual(r["id_floor_status"], "FAIL")
+        self.assertAlmostEqual(r["margin_above_min_id_mm"], 0.0, places=2)
+        self.assertFalse(is_id_od_candidate_viable(r))
+
+    def test_required_diameter_is_derived_and_floor_can_pass_while_packaging_fails(self):
+        """2 & 9. Derived required diameter and floor pass while packaging fails."""
+        self.assertAlmostEqual(compute_required_circular_diameter(30.0, 12.0), math.hypot(32.0, 14.0), places=6)
+        floor_only = next(r for r in build_id_od_envelope_study(od_values=(34.1,), wall_values=(2.0,)))
+        self.assertEqual(floor_only["id_floor_status"], "PASS")
+        self.assertEqual(floor_only["electronics_packaging_status"], "FAIL")
+        self.assertFalse(is_id_od_candidate_viable(floor_only))
+        self.assertEqual(compute_radial_budget(od_mm=32.0, wall_mm=1.0, is_discrete_carrier=True)["direct_fit"], False)
+
+    def test_structural_status_explicitly_states_10mpa_screening_basis(self):
+        """3. Structural status explicitly states the 10 MPa screening basis."""
+        rows = build_id_od_envelope_study()
+        for r in rows:
+            self.assertIn("10 MPa SCREENING", r["structural_10mpa_screening_status"])
+            self.assertIn(r["structural_10mpa_screening_status"], {"PASS @ 10 MPa SCREENING", "FAIL @ 10 MPa SCREENING"})
+            self.assertEqual(r["structural_screening_status"], r["structural_10mpa_screening_status"])
+
+    def test_structural_authority_remains_conditional_design_pressure_unresolved(self):
+        """4. Structural authority remains CONDITIONAL — DESIGN PRESSURE UNRESOLVED."""
+        rows = build_id_od_envelope_study()
+        for r in rows:
+            self.assertEqual(r["structural_authority_status"], "CONDITIONAL — DESIGN PRESSURE UNRESOLVED")
+
+    def test_20mpa_and_historical_10kpsi_metrics_included_in_envelope(self):
+        """5. 20 MPa and historical 10k psi values are included in the envelope result."""
+        rows = build_id_od_envelope_study()
+        for r in rows:
+            self.assertIn("strength_ratio_10mpa", r)
+            self.assertIn("buckling_fos_10mpa", r)
+            self.assertIn("strength_ratio_20mpa", r)
+            self.assertIn("buckling_fos_20mpa", r)
+            self.assertIn("strength_ratio_historical_10kpsi", r)
+            self.assertIn("buckling_fos_historical_10kpsi", r)
+            self.assertIsInstance(r["strength_ratio_20mpa"], float)
+            self.assertIsInstance(r["buckling_fos_20mpa"], float)
+            self.assertIsInstance(r["strength_ratio_historical_10kpsi"], float)
+            self.assertIsInstance(r["buckling_fos_historical_10kpsi"], float)
+            # Clearance naming check per Section D
+            self.assertEqual(r["board_assembly_clearance_per_side_mm"], BOARD_ASSEMBLY_CLEARANCE_MM)
+            self.assertEqual(r["carrier_manufacturing_allowance"], "UNRESOLVED")
+            self.assertNotIn("carrier_allowance_mm", r)
+
+        # FoS trend visibility: increasing OD at fixed wall thickness reduces buckling margin
+        wall_35_rows = [r for r in rows if r["wall_mm"] == 3.5]
+        buckling_10mpa = [r["buckling_fos_10mpa"] for r in wall_35_rows]
+        self.assertEqual(buckling_10mpa, sorted(buckling_10mpa, reverse=True))
+
+    def test_recommendation_selector_derives_44_45_with_current_inputs(self):
+        """6. The recommendation selector derives 44.45/3.5 with current inputs."""
+        rows = build_id_od_envelope_study()
+        rec = select_id_od_preliminary_configuration(rows)
+        self.assertIsNotNone(rec)
+        self.assertAlmostEqual(rec["od_mm"], 44.45, places=2)
+        self.assertAlmostEqual(rec["wall_mm"], 3.50, places=2)
+        self.assertAlmostEqual(rec["id_mm"], 37.45, places=2)
+        self.assertEqual(rec["overall_preliminary_recommendation"], "RECOMMENDED PRELIMINARY CONFIGURATION")
+
+    def test_selector_picks_next_smallest_viable_od_when_44_45_infeasible(self):
+        """7. If 44.45 becomes infeasible in a synthetic test, the next smallest viable OD is selected."""
+        import copy
+        rows = build_id_od_envelope_study()
+        synthetic_rows = copy.deepcopy(rows)
+        # Mark all 44.45 mm OD candidates as failing packaging
+        for r in synthetic_rows:
+            if math.isclose(r["od_mm"], 44.45):
+                r["electronics_packaging_status"] = "FAIL"
+                r["packaging_diametral_margin_mm"] = -1.0
+        rec = select_id_od_preliminary_configuration(synthetic_rows)
+        self.assertIsNotNone(rec)
+        self.assertAlmostEqual(rec["od_mm"], 47.625, places=3)
+        self.assertAlmostEqual(rec["wall_mm"], 3.50, places=2)
+
+    def test_selector_returns_none_if_no_od_viable(self):
+        """8. If no OD is viable, no false recommendation is produced."""
+        import copy
+        rows = build_id_od_envelope_study()
+        synthetic_rows = copy.deepcopy(rows)
+        for r in synthetic_rows:
+            r["electronics_packaging_status"] = "FAIL"
+        rec = select_id_od_preliminary_configuration(synthetic_rows)
+        self.assertIsNone(rec)
+
+    def test_current_electronics_requirement_derived_from_source_dimensions(self):
+        """9. Current electronics requirement remains derived from source dimensions."""
+        w_pcm, h_pcm = PCM1808_ENVELOPE_MM[1], PCM1808_ENVELOPE_MM[2]
+        self.assertEqual(w_pcm, 30.0)
+        self.assertEqual(h_pcm, 12.0)
+        expected_d = math.hypot(w_pcm + 2.0 * BOARD_ASSEMBLY_CLEARANCE_MM, h_pcm + 2.0 * BOARD_ASSEMBLY_CLEARANCE_MM)
+        derived_d = compute_required_circular_diameter(w_pcm, h_pcm, BOARD_ASSEMBLY_CLEARANCE_MM)
+        self.assertAlmostEqual(derived_d, expected_d, places=6)
+        self.assertAlmostEqual(derived_d, 34.928, places=3)
+
+    def test_future_custom_pcb_dimensions_are_input_driven(self):
+        """10. Future custom-PCB dimensions remain input-driven."""
+        unresolved = future_custom_pcb_envelope()
+        self.assertEqual(unresolved["status"], "INPUT REQUIRED / UNRESOLVED")
+        self.assertIsNone(unresolved["required_diameter_mm"])
+        measured = future_custom_pcb_envelope(width_mm=20.0, height_mm=10.0)
+        self.assertAlmostEqual(measured["required_diameter_mm"], math.hypot(22.0, 12.0), places=6)
 
     def test_pcm1808_exact_geometry_and_packaging_clearance(self):
         """Verify exact PCM1808 nominal dimensions, clearance calculation, and direct circular fit rules."""
@@ -758,5 +887,3 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-

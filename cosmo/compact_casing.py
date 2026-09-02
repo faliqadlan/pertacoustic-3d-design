@@ -40,6 +40,7 @@ DATA_DIR = RESULTS_DIR / "data"
 # Governing Design Envelope (Formal MoM & 20 August 2026 Direction)
 PREFERRED_OD_MM = 44.45  # 1.75 in
 MAX_OD_MM = 57.15  # 2.25 in
+MIN_USABLE_ID_MM = 30.0  # Project floor; not a target ID
 MAX_TOOL_LENGTH_MM = 2000.0  # 2.0 m hard limit
 HOUSING_LENGTH_MM = 520.0  # Modeled housing length (well within <=2000 mm)
 ENDCAP_THICKNESS_MM = 35.0
@@ -103,6 +104,125 @@ MATERIALS = json.loads((ROOT / "cosmo" / "material_library.json").read_text(enco
 # ==============================================================================
 # 1. PACKAGING STUDY & RADIAL BUDGET
 # ==============================================================================
+
+def compute_required_circular_diameter(
+    width_mm: float, height_mm: float, clearance_mm: float = BOARD_ASSEMBLY_CLEARANCE_MM
+) -> float:
+    """Return the circular bore required by a rectangular envelope plus per-side clearance."""
+    return math.hypot(width_mm + 2.0 * clearance_mm, height_mm + 2.0 * clearance_mm)
+
+
+def future_custom_pcb_envelope(
+    width_mm: float | None = None, height_mm: float | None = None,
+    clearance_mm: float = BOARD_ASSEMBLY_CLEARANCE_MM,
+) -> dict[str, Any]:
+    """Keep future custom-PCB sizing input-driven until measured dimensions exist."""
+    if width_mm is None or height_mm is None:
+        return {"status": "INPUT REQUIRED / UNRESOLVED", "required_diameter_mm": None}
+    return {
+        "status": "INPUT PROVIDED / SCREENING ONLY",
+        "required_diameter_mm": compute_required_circular_diameter(width_mm, height_mm, clearance_mm),
+    }
+
+
+def is_id_od_candidate_viable(row: dict[str, Any]) -> bool:
+    """Check if an ID/OD candidate row passes preliminary engineering screening gates."""
+    od_ok = row["od_mm"] <= MAX_OD_MM
+    id_floor_ok = (row["id_mm"] > MIN_USABLE_ID_MM) and (row.get("id_floor_status") != "FAIL")
+    pkg_ok = (row.get("electronics_packaging_status") == "PASS") and (row.get("packaging_diametral_margin_mm", 0.0) >= 0.0)
+    struct_status = row.get("structural_10mpa_screening_status") or row.get("structural_screening_status", "")
+    struct_ok = (
+        "PASS" in struct_status
+        or (row.get("strength_ratio_10mpa", 0.0) >= 2.0 and row.get("buckling_fos_10mpa", 0.0) >= 2.0)
+    )
+    return bool(od_ok and id_floor_ok and pkg_ok and struct_ok)
+
+
+def select_id_od_preliminary_configuration(rows: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """
+    Select the preliminary recommended ID/OD configuration from candidate rows using explicit engineering rules.
+
+    Rules:
+    1. Filter to OD <= MAX_OD_MM (57.15 mm / 2.25 in).
+    2. Require ID > MIN_USABLE_ID_MM (30.0 mm project floor; strict inequality).
+    3. Require electronics packaging fit (direct circular bore fit / non-negative diametral margin).
+    4. Require preliminary structural screening gate (10 MPa screening FoS >= 2.0).
+    5. Rank viable configurations by smallest OD.
+    6. Within the same OD, prefer the least restrictive wall that passes the screening criteria
+       and preserves the best packaging margin (e.g., 3.5 mm packaging-favorable baseline).
+    7. Return None if no candidate row is viable.
+    """
+    viable = [r for r in rows if is_id_od_candidate_viable(r)]
+    if not viable:
+        return None
+    # Sort by smallest OD, then smallest wall thickness (which maximizes packaging margin)
+    viable.sort(key=lambda r: (r["od_mm"], r["wall_mm"]))
+    return viable[0]
+
+
+def build_id_od_envelope_study(
+    od_values: tuple[float, ...] = (44.45, 47.625, 50.80, 53.975, 57.15),
+    wall_values: tuple[float, ...] = (3.50, 4.00),
+) -> list[dict[str, Any]]:
+    """Evaluate the bounded ID/OD screening envelope without selecting a target ID."""
+    rows = []
+    required_diameter = compute_required_circular_diameter(PCM1808_ENVELOPE_MM[1], PCM1808_ENVELOPE_MM[2])
+    for od_mm in od_values:
+        for wall_mm in wall_values:
+            id_mm = od_mm - 2.0 * wall_mm
+            packaging = compute_radial_budget(od_mm, wall_mm, is_discrete_carrier=True)
+            structural = structural_screening(od_mm, wall_mm)
+
+            sr_10 = structural["scenarios"]["scenario_1000m_10mpa"]["screening_strength_ratio"]
+            bf_10 = structural["buckling_1000m"]["buckling_safety_factor"]
+            sr_20 = structural["scenarios"]["scenario_intermediate_20mpa"]["screening_strength_ratio"]
+            bf_20 = structural["buckling_20mpa"]["buckling_safety_factor"]
+            sr_hist = structural["scenarios"]["scenario_historical_68_9mpa"]["screening_strength_ratio"]
+            bf_hist = structural["buckling_historical"]["buckling_safety_factor"]
+
+            structural_pass_10mpa = (sr_10 >= 2.0 and bf_10 >= 2.0)
+            structural_10mpa_status = (
+                "PASS @ 10 MPa SCREENING" if structural_pass_10mpa else "FAIL @ 10 MPa SCREENING"
+            )
+            structural_authority_status = "CONDITIONAL — DESIGN PRESSURE UNRESOLVED"
+
+            floor_status = "PASS" if id_mm > MIN_USABLE_ID_MM else "FAIL"
+            electronics_status = "PASS" if packaging["direct_fit"] else "FAIL"
+
+            rows.append({
+                "od_mm": od_mm,
+                "od_in": round(od_mm / 25.4, 3),
+                "wall_mm": wall_mm,
+                "id_mm": round(id_mm, 2),
+                "margin_above_min_id_mm": round(id_mm - MIN_USABLE_ID_MM, 2),
+                "electronics_required_diameter_mm": round(required_diameter, 2),
+                "packaging_diametral_margin_mm": round(id_mm - required_diameter, 2),
+                "board_assembly_clearance_per_side_mm": BOARD_ASSEMBLY_CLEARANCE_MM,
+                "carrier_manufacturing_allowance": "UNRESOLVED",
+                "id_floor_status": floor_status,
+                "electronics_packaging_status": electronics_status,
+                "strength_ratio_10mpa": round(sr_10, 2),
+                "buckling_fos_10mpa": round(bf_10, 2),
+                "strength_ratio_20mpa": round(sr_20, 2),
+                "buckling_fos_20mpa": round(bf_20, 2),
+                "strength_ratio_historical_10kpsi": round(sr_hist, 2),
+                "buckling_fos_historical_10kpsi": round(bf_hist, 2),
+                "structural_10mpa_screening_status": structural_10mpa_status,
+                "structural_screening_status": structural_10mpa_status,
+                "structural_authority_status": structural_authority_status,
+            })
+
+    # Derive recommendation using explicit selector
+    selected = select_id_od_preliminary_configuration(rows)
+    for r in rows:
+        if selected is not None and math.isclose(r["od_mm"], selected["od_mm"]) and math.isclose(r["wall_mm"], selected["wall_mm"]):
+            r["overall_preliminary_recommendation"] = "RECOMMENDED PRELIMINARY CONFIGURATION"
+        elif is_id_od_candidate_viable(r):
+            r["overall_preliminary_recommendation"] = "VIABLE SCREENING ALTERNATIVE"
+        else:
+            r["overall_preliminary_recommendation"] = "NOT RECOMMENDED"
+
+    return rows
 
 def compute_carrier_tolerance_budget(
     shell_bore_nom_mm: float = 37.450,
@@ -335,9 +455,9 @@ def compute_radial_budget(
         
     # PCM1808 nominal cross-section: 30.0 mm width x 12.0 mm height
     w_pcm, h_pcm = PCM1808_ENVELOPE_MM[1], PCM1808_ENVELOPE_MM[2]
-    eff_w = w_pcm + 2.0 * BOARD_ASSEMBLY_CLEARANCE_MM  # 32.0 mm
-    eff_h = h_pcm + 2.0 * BOARD_ASSEMBLY_CLEARANCE_MM  # 14.0 mm
-    diagonal_pcm = math.hypot(eff_w, eff_h)  # sqrt(32^2 + 14^2) = sqrt(1220) ≈ 34.928 mm ≈ 34.93 mm
+    eff_w = w_pcm + 2.0 * BOARD_ASSEMBLY_CLEARANCE_MM
+    eff_h = h_pcm + 2.0 * BOARD_ASSEMBLY_CLEARANCE_MM
+    diagonal_pcm = compute_required_circular_diameter(w_pcm, h_pcm)
     
     # Direct circular fit condition: clear diameter >= enclosing bounding diameter
     direct_fit = clear_id_mm >= diagonal_pcm
@@ -1551,6 +1671,12 @@ def export_trade_study_csv_and_report(
     All reported numbers and tables are strictly derived from live candidate and result objects.
     """
     output_dir.mkdir(parents=True, exist_ok=True)
+    envelope_rows = build_id_od_envelope_study()
+    envelope_csv_path = output_dir / "compact_casing_id_od_envelope.csv"
+    with open(envelope_csv_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=list(envelope_rows[0]))
+        writer.writeheader()
+        writer.writerows(envelope_rows)
     
     # 1. Export CSV
     csv_path = output_dir / "compact_casing_trade_study.csv"
@@ -1677,6 +1803,10 @@ def export_trade_study_csv_and_report(
             f"| **{c['architecture']}** | {c['casing_material']} | {carrier_label} ({c['liner_material'].split('_')[0]}) | {c['wall_mm']:.2f} | {c['packaging']['shell_bore_id_mm']:.2f} mm | {c['packaging']['packaging_status'].split('(')[0].strip()} | {t1_val:.2f} °C | {buckle_10k:.2f} | {status_short} |"
         )
     comparison_table_md = "\n".join(table_rows)
+    envelope_table_md = "\n".join(
+        f"| {r['od_mm']:.3f} | {r['od_in']:.3f} | {r['wall_mm']:.2f} | {r['id_mm']:.2f} | {r['packaging_diametral_margin_mm']:.2f} | {r['strength_ratio_10mpa']:.2f} | {r['buckling_fos_10mpa']:.2f} | {r['buckling_fos_20mpa']:.2f} | {r['buckling_fos_historical_10kpsi']:.2f} | {r['structural_10mpa_screening_status']} | {r['structural_authority_status']} | {r['overall_preliminary_recommendation']} |"
+        for r in envelope_rows
+    )
     
     # Build Material Properties Table dynamically
     mat_rows = []
@@ -1742,6 +1872,35 @@ The accepted mechanical architecture remains:
 - **Total modeled tool length: {rec_len:.1f} mm** (CAD Bounding Span: **{cad_len:.1f} mm**)
 
 ### Direct Answers to Required Engineering Questions:
+
+## ID/OD Envelope and Prototype Geometry Recommendation
+
+- **Recommendation basis:** **PRELIMINARY ENGINEERING SCREENING**
+- **Structural authority status:** **STRUCTURAL ACCEPTANCE CONDITIONAL ON AUTHORITATIVE DESIGN PRESSURE** (evaluated under ~10 MPa screening context; authoritative casing design pressure remains unresolved).
+- **Minimum ID requirement / project floor:** ID > **{MIN_USABLE_ID_MM:.1f} mm**. This is a lower bound, not a design target.
+- **Preferred OD / maximum OD:** **{PREFERRED_OD_MM:.2f} mm / 1.750 in** / **{MAX_OD_MM:.2f} mm / 2.250 in**.
+- **Current electronics-required diameter:** **{envelope_rows[0]['electronics_required_diameter_mm']:.2f} mm**, derived from the PCM1808 transverse envelope plus {BOARD_ASSEMBLY_CLEARANCE_MM:.1f} mm per side.
+- **Selected preliminary geometry:** **{rec_od:.2f} mm OD / {rec_clear_id:.2f} mm ID / {rec_wall:.2f} mm wall**; packaging margin **{next(r['packaging_diametral_margin_mm'] for r in envelope_rows if math.isclose(r['od_mm'], rec_od) and math.isclose(r['wall_mm'], rec_wall)):.2f} mm** (derived via explicit multi-gate selection).
+- **Wall decision:** 3.5 mm remains the packaging-favorable screening configuration; 4.0 mm remains the higher-collapse-margin sensitivity.
+- **30 mm is not the design target:** it can satisfy the project floor statement while failing the current PCM1808 breakout packaging requirement.
+- **Further OD reduction requires:** actual board, header, connector, wiring, bend-radius, carrier, and manufacturing-clearance measurements.
+- **Structural screening trends:** As shown in the matrix below, increasing OD at fixed wall thickness reduces the elastic buckling margin (e.g. 10 MPa buckling FoS drops from 11.33 at 44.45 mm OD to 5.33 at 57.15 mm OD for 3.5 mm wall). Under 10,000 psi (68.95 MPa) historical comparison, 3.5 mm wall has FoS < 2.0 across all ODs, whereas 4.0 mm wall maintains FoS >= 2.0 only at 44.45 mm OD. Passing 10 MPa screening does NOT imply pressure qualification.
+
+| OD (mm) | OD (in) | Wall (mm) | ID (mm) | Pkg Margin (mm) | 10 MPa Yield FoS | 10 MPa Buckle FoS | 20 MPa Buckle FoS | 10k psi Buckle FoS | 10 MPa Screening | Structural Authority | Recommendation |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|
+{envelope_table_md}
+
+Full matrix: `results/compact-casing/compact_casing_id_od_envelope.csv`.
+
+### Actual Hardware Measurement Checklist
+
+**ACTUAL HARDWARE MEASUREMENT REQUIRED** — current nominal envelopes remain the screening basis.
+
+- PCM1808 board: actual width; actual thickness/component height; header protrusion; connector protrusion.
+- STM32: actual width; height; headers.
+- Other electronics: maximum transverse envelope; wiring exits; connector size; bend radius; solder/header protrusion.
+
+Future custom-PCB dimensions remain **INPUT REQUIRED / UNRESOLVED** until entered; no future dimensions are assumed.
 
 1. **"Can we replace the PEEK electronics carrier with a lower-cost nylon-based material for the current 70 °C / 2-hour PertAcoustic downhole tool?"**
    - **For PPA-GF (Solvay Amodel A-1133 HS, 33% GF):**  
