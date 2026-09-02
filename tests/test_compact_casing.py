@@ -18,6 +18,7 @@ from cosmo.compact_casing import (
     MATERIALS,
     MAX_OD_MM,
     MAX_TOOL_LENGTH_MM,
+    MIN_USABLE_ID_MM,
     PCM1808_ENVELOPE_MM,
     PREFERRED_OD_MM,
     PRESSURE_SCENARIO_1000M_MPA,
@@ -28,10 +29,12 @@ from cosmo.compact_casing import (
     THERMAL_ZONES_LOCAL_MM,
     ZERO_POWER_W,
     build_carrier_material_trade_matrix,
+    build_id_od_envelope_study,
     check_cad_assembly_interferences,
     compute_carrier_dimensional_sensitivity,
     compute_carrier_tolerance_budget,
     compute_radial_budget,
+    compute_required_circular_diameter,
     elastic_buckling,
     generate_compact_casing_cad,
     lame_stress,
@@ -42,6 +45,7 @@ from cosmo.compact_casing import (
     structural_screening,
     transient_thermal_simulation,
     zone_thermal_assessment,
+    future_custom_pcb_envelope,
 )
 
 
@@ -58,6 +62,33 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
         self.assertEqual(THERMAL_DURATION_S, 7200)
         self.assertEqual(INHERITED_SCREENING_POWER_W, 1.0)
         self.assertEqual(ZERO_POWER_W, 0.0)
+        self.assertEqual(MIN_USABLE_ID_MM, 30.0)
+
+    def test_id_floor_is_not_target_and_envelope_study_is_parametric(self):
+        self.assertGreater(PREFERRED_OD_MM - 2 * 3.5, MIN_USABLE_ID_MM)
+        self.assertNotIn("target_id_mm", build_id_od_envelope_study()[0])
+        rows = build_id_od_envelope_study()
+        self.assertEqual(len(rows), 10)
+        self.assertEqual({r["od_mm"] for r in rows}, {44.45, 47.625, 50.8, 53.975, 57.15})
+        self.assertEqual({r["wall_mm"] for r in rows}, {3.5, 4.0})
+        selected = next(r for r in rows if r["od_mm"] == 44.45 and r["wall_mm"] == 3.5)
+        self.assertAlmostEqual(selected["id_mm"], 37.45, places=2)
+        self.assertEqual(selected["id_floor_status"], "PASS")
+        self.assertEqual(selected["electronics_packaging_status"], "PASS")
+
+    def test_required_diameter_is_derived_and_floor_can_pass_while_packaging_fails(self):
+        self.assertAlmostEqual(compute_required_circular_diameter(30.0, 12.0), math.hypot(32.0, 14.0), places=6)
+        floor_only = next(r for r in build_id_od_envelope_study(od_values=(34.1,), wall_values=(2.0,)))
+        self.assertEqual(floor_only["id_floor_status"], "PASS")
+        self.assertEqual(floor_only["electronics_packaging_status"], "FAIL")
+        self.assertEqual(compute_radial_budget(od_mm=32.0, wall_mm=1.0, is_discrete_carrier=True)["direct_fit"], False)
+
+    def test_future_custom_pcb_dimensions_are_input_driven(self):
+        unresolved = future_custom_pcb_envelope()
+        self.assertEqual(unresolved["status"], "INPUT REQUIRED / UNRESOLVED")
+        self.assertIsNone(unresolved["required_diameter_mm"])
+        measured = future_custom_pcb_envelope(width_mm=20.0, height_mm=10.0)
+        self.assertAlmostEqual(measured["required_diameter_mm"], math.hypot(22.0, 12.0), places=6)
 
     def test_pcm1808_exact_geometry_and_packaging_clearance(self):
         """Verify exact PCM1808 nominal dimensions, clearance calculation, and direct circular fit rules."""
@@ -758,5 +789,3 @@ class SimplifiedCompactCasingTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-
