@@ -85,8 +85,8 @@ The candidate nylon material is based strictly on the official manufacturer data
 - **Polymer Family & Reinforcement:** PA66-GF30 (Polyamide 66 reinforced with 30% standard glass fibers)
 - **Manufacturer:** BASF Performance Polymers
 - **Density:** $1370\text{ kg/m³}$ (ISO 1183)
-- **Thermal Conductivity:** $0.36\text{ W/(m·K)}$ (Datasheet)
-- **Specific Heat Capacity:** $1260\text{ J/(kg·K)}$ (Datasheet)
+- **Thermal Conductivity:** 0.36 W/(m·K) (Datasheet)
+- **Specific Heat Capacity:** 1260 J/(kg·K) (Datasheet)
 - **Melting Temperature:** $260\text{ °C}$ (ISO 11357)
 - **Heat Deflection Temperature:** HDT/A (1.80 MPa) = $245\text{ °C}$; HDT/B (0.45 MPa) = $260\text{ °C}$ (ISO 75-2)
 - **Moisture Absorption (Equilibrium, 23 °C / 50% RH):** **1.5 – 1.9 %** (ISO 62)
@@ -196,8 +196,8 @@ Inside the 37.45 mm Inconel shell bore, the carrier chassis must maintain free s
 - For the nominal **2.0 hours (7200 s)** PertAcoustic logging run, the short duration reduces concern under internal self-weight and card-retention loads, but does not establish formal creep qualification.
 
 ### Thermal Comparison:
-- Thermal conductivities: PEEK ($0.29\text{ W/(m·K)}$), PPA ($0.26\text{ W/(m·K)}$), PA66-GF30 ($0.36\text{ W/(m·K)}$).
-- PA66-GF30 bulk thermal conductivity is approximately $0.36\text{ W/(m·K)}$ where supported, but this value does not prove electronics cooling. Actual electronics temperature depends on PCB → supports/carrier → contacts/gaps → shell → environment.
+- Thermal conductivities: PEEK (0.29 W/(m·K)), PPA (0.26 W/(m·K)), PA66-GF30 (0.36 W/(m·K)).
+- PA66-GF30 bulk thermal conductivity is approximately 0.36 W/(m·K) where supported, but this value does not prove electronics cooling. Actual electronics temperature depends on PCB → supports/carrier → contacts/gaps → shell → environment.
 - With a fixed outer 70 °C Dirichlet boundary, the 2-hour inner-shell result is a shell-coupled lower-bound screening result (**70.00 °C** at 1.0 W); it does not establish PCB, junction, cavity, or wellbore heat-transfer temperatures. The internal PCB/carrier/contact/gap thermal resistance remains unresolved.
 - The allowable internal thermal resistance budget remains **15.00 K/W** for verified +85 °C electronics.
 
