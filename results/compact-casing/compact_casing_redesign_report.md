@@ -25,26 +25,29 @@ The accepted mechanical architecture remains:
 
 ## ID/OD Envelope and Prototype Geometry Recommendation
 
+- **Recommendation basis:** **PRELIMINARY ENGINEERING SCREENING**
+- **Structural authority status:** **STRUCTURAL ACCEPTANCE CONDITIONAL ON AUTHORITATIVE DESIGN PRESSURE** (evaluated under ~10 MPa screening context; authoritative casing design pressure remains unresolved).
 - **Minimum ID requirement / project floor:** ID > **30.0 mm**. This is a lower bound, not a design target.
 - **Preferred OD / maximum OD:** **44.45 mm / 1.750 in** / **57.15 mm / 2.250 in**.
 - **Current electronics-required diameter:** **34.93 mm**, derived from the PCM1808 transverse envelope plus 1.0 mm per side.
-- **Selected preliminary geometry:** **44.45 mm OD / 37.45 mm ID / 3.50 mm wall**; packaging margin **2.52 mm**.
+- **Selected preliminary geometry:** **44.45 mm OD / 37.45 mm ID / 3.50 mm wall**; packaging margin **2.52 mm** (derived via explicit multi-gate selection).
 - **Wall decision:** 3.5 mm remains the packaging-favorable screening configuration; 4.0 mm remains the higher-collapse-margin sensitivity.
 - **30 mm is not the design target:** it can satisfy the project floor statement while failing the current PCM1808 breakout packaging requirement.
 - **Further OD reduction requires:** actual board, header, connector, wiring, bend-radius, carrier, and manufacturing-clearance measurements.
+- **Structural screening trends:** As shown in the matrix below, increasing OD at fixed wall thickness reduces the elastic buckling margin (e.g. 10 MPa buckling FoS drops from 11.33 at 44.45 mm OD to 5.33 at 57.15 mm OD for 3.5 mm wall). Under 10,000 psi (68.95 MPa) historical comparison, 3.5 mm wall has FoS < 2.0 across all ODs, whereas 4.0 mm wall maintains FoS >= 2.0 only at 44.45 mm OD. Passing 10 MPa screening does NOT imply pressure qualification.
 
-| OD (mm) | OD (in) | Wall (mm) | ID (mm) | Margin above 30 mm | Electronics required (mm) | Packaging margin (mm) | ID floor | Electronics | Structural | Recommendation |
-|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|
-| 44.450 | 1.750 | 3.50 | 37.45 | 7.45 | 34.93 | 2.52 | PASS | PASS | PASS | RECOMMENDED PRELIMINARY CONFIGURATION |
-| 44.450 | 1.750 | 4.00 | 36.45 | 6.45 | 34.93 | 1.52 | PASS | PASS | PASS | VIABLE SCREENING ALTERNATIVE |
-| 47.625 | 1.875 | 3.50 | 40.62 | 10.62 | 34.93 | 5.70 | PASS | PASS | PASS | VIABLE SCREENING ALTERNATIVE |
-| 47.625 | 1.875 | 4.00 | 39.62 | 9.62 | 34.93 | 4.70 | PASS | PASS | PASS | VIABLE SCREENING ALTERNATIVE |
-| 50.800 | 2.000 | 3.50 | 43.80 | 13.80 | 34.93 | 8.87 | PASS | PASS | PASS | VIABLE SCREENING ALTERNATIVE |
-| 50.800 | 2.000 | 4.00 | 42.80 | 12.80 | 34.93 | 7.87 | PASS | PASS | PASS | VIABLE SCREENING ALTERNATIVE |
-| 53.975 | 2.125 | 3.50 | 46.98 | 16.98 | 34.93 | 12.05 | PASS | PASS | PASS | VIABLE SCREENING ALTERNATIVE |
-| 53.975 | 2.125 | 4.00 | 45.98 | 15.98 | 34.93 | 11.05 | PASS | PASS | PASS | VIABLE SCREENING ALTERNATIVE |
-| 57.150 | 2.250 | 3.50 | 50.15 | 20.15 | 34.93 | 15.22 | PASS | PASS | PASS | VIABLE SCREENING ALTERNATIVE |
-| 57.150 | 2.250 | 4.00 | 49.15 | 19.15 | 34.93 | 14.22 | PASS | PASS | PASS | VIABLE SCREENING ALTERNATIVE |
+| OD (mm) | OD (in) | Wall (mm) | ID (mm) | Pkg Margin (mm) | 10 MPa Yield FoS | 10 MPa Buckle FoS | 20 MPa Buckle FoS | 10k psi Buckle FoS | 10 MPa Screening | Structural Authority | Recommendation |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|
+| 44.450 | 1.750 | 3.50 | 37.45 | 2.52 | 16.75 | 11.33 | 5.67 | 1.64 | PASS @ 10 MPa SCREENING | CONDITIONAL — DESIGN PRESSURE UNRESOLVED | RECOMMENDED PRELIMINARY CONFIGURATION |
+| 44.450 | 1.750 | 4.00 | 36.45 | 1.52 | 18.91 | 16.92 | 8.46 | 2.45 | PASS @ 10 MPa SCREENING | CONDITIONAL — DESIGN PRESSURE UNRESOLVED | VIABLE SCREENING ALTERNATIVE |
+| 47.625 | 1.875 | 3.50 | 40.62 | 5.70 | 15.72 | 9.21 | 4.61 | 1.34 | PASS @ 10 MPa SCREENING | CONDITIONAL — DESIGN PRESSURE UNRESOLVED | VIABLE SCREENING ALTERNATIVE |
+| 47.625 | 1.875 | 4.00 | 39.62 | 4.70 | 17.77 | 13.75 | 6.88 | 1.99 | PASS @ 10 MPa SCREENING | CONDITIONAL — DESIGN PRESSURE UNRESOLVED | VIABLE SCREENING ALTERNATIVE |
+| 50.800 | 2.000 | 3.50 | 43.80 | 8.87 | 14.81 | 7.59 | 3.80 | 1.10 | PASS @ 10 MPa SCREENING | CONDITIONAL — DESIGN PRESSURE UNRESOLVED | VIABLE SCREENING ALTERNATIVE |
+| 50.800 | 2.000 | 4.00 | 42.80 | 7.87 | 16.75 | 11.33 | 5.67 | 1.64 | PASS @ 10 MPa SCREENING | CONDITIONAL — DESIGN PRESSURE UNRESOLVED | VIABLE SCREENING ALTERNATIVE |
+| 53.975 | 2.125 | 3.50 | 46.98 | 12.05 | 14.00 | 6.33 | 3.16 | 0.92 | PASS @ 10 MPa SCREENING | CONDITIONAL — DESIGN PRESSURE UNRESOLVED | VIABLE SCREENING ALTERNATIVE |
+| 53.975 | 2.125 | 4.00 | 45.98 | 11.05 | 15.85 | 9.45 | 4.72 | 1.37 | PASS @ 10 MPa SCREENING | CONDITIONAL — DESIGN PRESSURE UNRESOLVED | VIABLE SCREENING ALTERNATIVE |
+| 57.150 | 2.250 | 3.50 | 50.15 | 15.22 | 13.28 | 5.33 | 2.67 | 0.77 | PASS @ 10 MPa SCREENING | CONDITIONAL — DESIGN PRESSURE UNRESOLVED | VIABLE SCREENING ALTERNATIVE |
+| 57.150 | 2.250 | 4.00 | 49.15 | 14.22 | 15.03 | 7.96 | 3.98 | 1.15 | PASS @ 10 MPa SCREENING | CONDITIONAL — DESIGN PRESSURE UNRESOLVED | VIABLE SCREENING ALTERNATIVE |
 
 Full matrix: `results/compact-casing/compact_casing_id_od_envelope.csv`.
 
