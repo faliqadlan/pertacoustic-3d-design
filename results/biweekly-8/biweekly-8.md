@@ -4,10 +4,16 @@
 **Status:** Review Required  
 **Reporting-period dates:** UNRESOLVED - no authoritative Biweekly 6/7/8 date chain was established in repository evidence.  
 **Repository evidence cutoff:** `main@667ccd59cf6657a75dfe3cc2b4c67488737ef028`  
-**Governing reporting task:** `.agents/tasks/biweekly-8-report.md @ c1d8d7c00d6fe3b3055bdabebb604f4e49bb86cb`  
-**Governing compact-casing task:** `.agents/tasks/compact-downhole-casing-redesign.md @ ad24d9146815f88368d8f6b1d635831d57aed13d`
+**Governing reporting task:** `.agents/tasks/biweekly-8-report.md @ 833cf553f3b08348670588209655e8e18182ec1c`  
+**Governing compact-casing task:** `.agents/tasks/compact-downhole-casing-redesign.md @ ad24d9146815f88368d8f6b1d635831d57aed13d`  
+**Primary human-facing deliverable:** Native Google Doc `3d-design-biweekly-8`  
+**Google Doc URL:** `https://docs.google.com/document/d/1APiwwgRWdYymxyVo5zMt8-UmJUBvw6uppI3421Gw1dA/edit?usp=drivesdk`  
+**Google Doc document ID:** `1APiwwgRWdYymxyVo5zMt8-UmJUBvw6uppI3421Gw1dA`  
+**Google Drive target folder:** `pertacoustic` (`14V4rGX0lwHmwCNOGn8BQYE-0R6DH-Fy9`)
 
 This report summarizes accepted repository evidence only. It is not a manufacturing drawing, pressure qualification, field qualification, or new engineering source of truth.
+
+The Markdown file remains the repository traceability/source artifact. The native Google Doc is the primary human-facing deliverable and is not an engineering source of truth.
 
 ## Executive Progress Summary
 
@@ -179,7 +185,7 @@ Evidence inspected for this report:
 | `.agents/context/project.md` | Repository-wide context, evidence hazards, and reporting conventions |
 | `.agents/context/biweekly-5/project.md` | Historical Biweekly 5 context and preservation constraints |
 | `.agents/tasks/compact-downhole-casing-redesign.md @ ad24d9146815f88368d8f6b1d635831d57aed13d` | Engineering task authority and constraints |
-| `.agents/tasks/biweekly-8-report.md @ c1d8d7c00d6fe3b3055bdabebb604f4e49bb86cb` | Reporting task authority and acceptance criteria |
+| `.agents/tasks/biweekly-8-report.md @ 833cf553f3b08348670588209655e8e18182ec1c` | Reporting task authority and acceptance criteria |
 
 Accepted compact-casing figures available for review, without duplication in this reporting package:
 
@@ -235,4 +241,3 @@ This section records the accepted evidence direction; it does not create a new e
 | REQ-RPT8-004 Strict structural semantics | Structural status remains conditional; pressure cases classified separately | `compact_casing_id_od_envelope.csv`; `compact_casing_redesign_report.md` |
 | REQ-RPT8-005 Historical preservation | Historical Biweekly 5 is used only as historical comparison | `results/biweekly-5/`; `.agents/context/biweekly-5/project.md` |
 | REQ-RPT8-006 Traceable reporting package | Canonical report generated under `results/biweekly-8/` only | `results/biweekly-8/biweekly-8.md` |
-
