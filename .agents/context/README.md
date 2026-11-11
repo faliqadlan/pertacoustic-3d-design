@@ -3,7 +3,7 @@
 
 **Status:** Initialized as a pointer, 2026-11-11
 
-The primary human-facing project document is the [root README](../../README.md).
+The primary human-facing document is the [root README](../../README.md). It distinguishes the broader PHE–UGM PertAcoustic research project from this repository's 3D engineering workstream and its proposed instrument concept.
 
 Supporting repository orientation remains in [project.md](project.md). The detailed [CCL assessment](../../docs/ccl-integration-assessment.md) has its own bounded engineering scope.
 

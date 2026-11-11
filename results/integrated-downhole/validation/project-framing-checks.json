@@ -1,0 +1,406 @@
+{
+  "status": "PASS — bounded documentation verification; independent Planner/Reviewer assessment pending",
+  "starting_revision": "3d92624ddc4a75d35e8347a381de9f2afb7c78f3",
+  "starting_tree": "d1eae083b64732a7ef10b0e5b3271979a6f6483a",
+  "branch": "feat/trl5-integrated-downhole-concept",
+  "execution_start": {
+    "worktree": "clean",
+    "remote_feature_sha_observed": "3d92624ddc4a75d35e8347a381de9f2afb7c78f3",
+    "remote_main_sha_observed": "667ccd59cf6657a75dfe3cc2b4c67488737ef028"
+  },
+  "human_request": {
+    "title": "PertAcoustic — Project Framing Correction and Documentation Alignment",
+    "sha256": "9d2e1233095661461cdc38bdcaac303efc3009e432caa3046364864636f2075e",
+    "source_access": "Complete user-supplied attachment remains available in the conversation; no restricted source document is published."
+  },
+  "authority": {
+    "representation": "Explicit bounded human follow-up under software-workflow §15.8; no formal task file",
+    "scope": "Project identity, repository/workstream scope and terminology correction only; commit/push to the existing feature branch authorized",
+    "minimum_contract_preflight": "Baseline, role, intent, affected documents, preservation, source hierarchy, verification, stop conditions and side-effect boundaries are specified in the complete attachment",
+    "governance_modified": false,
+    "implementation_acceptance_claimed": false
+  },
+  "identity_source": {
+    "description": "Human-supplied account of the August 2026 official progress presentation",
+    "underlying_presentation_independently_inspected": false,
+    "restricted_source_files_published": false,
+    "objectives": [
+      "Characterization and design parameters",
+      "Downhole components and housing design",
+      "Analytical software development"
+    ]
+  },
+  "documentation_checks": {
+    "required_readme_sections": [
+      "PertAcoustic project context",
+      "Scope of this repository",
+      "Current engineering work",
+      "Engineering requirements",
+      "Conceptual instrument architecture",
+      "Visual gallery",
+      "Setup and reproduction",
+      "Available deliverables",
+      "CCL and depth correlation",
+      "Engineering limitations",
+      "References"
+    ],
+    "identity_and_three_objectives_present_in_readme_and_context": true,
+    "project_repository_and_concept_scope_review": "PASS — broader project, 3D workstream, implemented capabilities and related workstreams distinguished",
+    "TRL_framing_review": "PASS — current TRL 4-related experiments distinguished from prospective TRL 5 conceptual engineering; no achieved TRL 5 or approved field-instrument claim",
+    "terminology_review": "PASS — edited documentation uses project name for project/repository context; product-name shorthand removed",
+    "local_file_and_anchor_links_checked": 37,
+    "links": [
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/design_report.md",
+        "resolved_path": "results/integrated-downhole/design_report.md"
+      },
+      {
+        "document": "README.md",
+        "target": "#available-deliverables",
+        "resolved_path": "README.md"
+      },
+      {
+        "document": "README.md",
+        "target": "docs/ccl-integration-assessment.md",
+        "resolved_path": "docs/ccl-integration-assessment.md"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/validation/review-remediation/remediation-results.json",
+        "resolved_path": "results/integrated-downhole/validation/review-remediation/remediation-results.json"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/validation/review-remediation/unittest-final-source.log",
+        "resolved_path": "results/integrated-downhole/validation/review-remediation/unittest-final-source.log"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/figures/integrated_complete.png",
+        "resolved_path": "results/integrated-downhole/figures/integrated_complete.png"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/figures/integrated_sectional.png",
+        "resolved_path": "results/integrated-downhole/figures/integrated_sectional.png"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/figures/integrated_exploded.png",
+        "resolved_path": "results/integrated-downhole/figures/integrated_exploded.png"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/figures/annotated_longitudinal_section.png",
+        "resolved_path": "results/integrated-downhole/figures/annotated_longitudinal_section.png"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/figures/integrated_orthographic.png",
+        "resolved_path": "results/integrated-downhole/figures/integrated_orthographic.png"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/figures/integration_details.png",
+        "resolved_path": "results/integrated-downhole/figures/integration_details.png"
+      },
+      {
+        "document": "README.md",
+        "target": "pyproject.toml",
+        "resolved_path": "pyproject.toml"
+      },
+      {
+        "document": "README.md",
+        "target": "cosmo/integrated_downhole.py",
+        "resolved_path": "cosmo/integrated_downhole.py"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/parameters.json",
+        "resolved_path": "results/integrated-downhole/parameters.json"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/cad/integrated_complete.step",
+        "resolved_path": "results/integrated-downhole/cad/integrated_complete.step"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/cad/integrated_sectional.step",
+        "resolved_path": "results/integrated-downhole/cad/integrated_sectional.step"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/cad/integrated_exploded.step",
+        "resolved_path": "results/integrated-downhole/cad/integrated_exploded.step"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/cad/module_wet_head.step",
+        "resolved_path": "results/integrated-downhole/cad/module_wet_head.step"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/cad/module_sensor_bulkhead.step",
+        "resolved_path": "results/integrated-downhole/cad/module_sensor_bulkhead.step"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/cad/module_electronics_cartridge.step",
+        "resolved_path": "results/integrated-downhole/cad/module_electronics_cartridge.step"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/cad/module_battery_pack.step",
+        "resolved_path": "results/integrated-downhole/cad/module_battery_pack.step"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/cad/module_pressure_housing.step",
+        "resolved_path": "results/integrated-downhole/cad/module_pressure_housing.step"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/design_report.md",
+        "resolved_path": "results/integrated-downhole/design_report.md"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/verification.json",
+        "resolved_path": "results/integrated-downhole/verification.json"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/artifact_manifest.json",
+        "resolved_path": "results/integrated-downhole/artifact_manifest.json"
+      },
+      {
+        "document": "README.md",
+        "target": "docs/ccl-integration-assessment.md",
+        "resolved_path": "docs/ccl-integration-assessment.md"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/validation/ccl-readme-checks.json",
+        "resolved_path": "results/integrated-downhole/validation/ccl-readme-checks.json"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/validation/project-framing-checks.json",
+        "resolved_path": "results/integrated-downhole/validation/project-framing-checks.json"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/design_report.md",
+        "resolved_path": "results/integrated-downhole/design_report.md"
+      },
+      {
+        "document": "README.md",
+        "target": "docs/ccl-integration-assessment.md",
+        "resolved_path": "docs/ccl-integration-assessment.md"
+      },
+      {
+        "document": "docs/ccl-integration-assessment.md",
+        "target": "../README.md",
+        "resolved_path": "README.md"
+      },
+      {
+        "document": "docs/ccl-integration-assessment.md",
+        "target": "../results/integrated-downhole/parameters.json",
+        "resolved_path": "results/integrated-downhole/parameters.json"
+      },
+      {
+        "document": "docs/ccl-integration-assessment.md",
+        "target": "../results/integrated-downhole/verification.json",
+        "resolved_path": "results/integrated-downhole/verification.json"
+      },
+      {
+        "document": "docs/ccl-integration-assessment.md",
+        "target": "../results/integrated-downhole/design_report.md",
+        "resolved_path": "results/integrated-downhole/design_report.md"
+      },
+      {
+        "document": ".agents/context/README.md",
+        "target": "../../README.md",
+        "resolved_path": "README.md"
+      },
+      {
+        "document": ".agents/context/README.md",
+        "target": "project.md",
+        "resolved_path": ".agents/context/project.md"
+      },
+      {
+        "document": ".agents/context/README.md",
+        "target": "../../docs/ccl-integration-assessment.md",
+        "resolved_path": "docs/ccl-integration-assessment.md"
+      }
+    ],
+    "embedded_image_destinations_unchanged": 3,
+    "readme_commands_and_technical_tables_unchanged": true,
+    "public_reference_destinations_unchanged": true,
+    "new_external_research_performed": false,
+    "whitespace_and_balanced_code_fences": "PASS"
+  },
+  "CCL_preservation": {
+    "technical_conclusions_review": "PASS — neither A nor B selected; conditional 700 mm CCL scenario, offsets, clocks and unresolved PHE inputs retained",
+    "numeric_tokens_below_section_1_unchanged": true,
+    "formula_code_blocks_unchanged": true,
+    "measurement_offset_deployment_data_exchange_and_timing_sections_byte_identical": true
+  },
+  "preservation": {
+    "baseline_tracked_files": 100,
+    "existing_files_changed": [
+      ".agents/context/README.md",
+      ".agents/context/project.md",
+      "README.md",
+      "docs/ccl-integration-assessment.md"
+    ],
+    "other_tracked_files_byte_identical": 96,
+    "preserved_file_sha256": {
+      ".agents/.gitignore": "3641704430427ac0f37bdd7768b592b3397fa521171dafb92301c229f6b009c5",
+      ".agents/AGENTS.md": "7e4d23b24f0ad067c362e2c0ed70259c6f4152a41fcc9708065ea9eebd9d0593",
+      ".agents/context/biweekly-2/260619_PERTACOUSTIC_BIWEEKLY_2.pdf": "a2c9320bd105ab3c7b194cba529d41e9852cef725d80e9a199ade594cdee2bf3",
+      ".agents/context/biweekly-4/260720_PERTACOUSTIC_BIWEEKLY_4.pdf": "68842b37408cb6773b49419a6eff1538b5d799598c8867612f94af260c4f88fc",
+      ".agents/context/biweekly-5/HTI-02-DHPC_D MECH OUTLINE_.pdf": "6e647a82018a8eb70af11b10581d2eb9ad22f8b26c43164ba2f71f0242f7cb35",
+      ".agents/context/biweekly-5/project.md": "43aaeaeed847382f8121f9d72ce36b92f7cb9968628859c61bf385b3edfa08d1",
+      ".agents/context/references/1043532984.pdf": "add6667056e73bdcfc51dc8528cc2f8798c2bab9a5dd6d184fd698dcd74559e9",
+      ".agents/context/references/2604.05547v1.pdf": "3115ee5f0f12889c8da45da8446f6a173d79346d4a4f66eb97ab7874e67ea5e3",
+      ".agents/context/references/FIND-specification-flyer.pdf": "5763c96f01b8d06ed957d0b7821f624c20f06b64998884628f663b1897ea1f45",
+      ".agents/context/references/Oil-_-Gas-5.3-Noise-Logging-Tool-1.pdf": "939ac4cfb2b16fa65db1da57dd5cfd2c219c33c783c3de055fc969880abfe3a5",
+      ".agents/manifest.json": "b883ebf5262f119e90b8566e57114c15de0293dcd1c77b13d5dc0986a6286128",
+      ".agents/prompts/plan-create-task.md": "b805690a83e8df7e8ec6b3f02ff5913f7bd1cd186365c4ea4c94a43b028518e7",
+      ".agents/rules/antigravity-code-agent-workflow.md": "7cbfb56d0fb02a44c2b2ad2b27c2de4625e24b3773829daac6d2db5587c5186f",
+      ".agents/software-workflow.md": "09db8f2f6e332a9ac7e1c3616820ef0a702639bff207b2785d622096f3ded650",
+      ".agents/tasks/_template.md": "eece67459fc2241d68f1bb5bf580b2bfb7a3260209e0f6447680b88b55e158b0",
+      ".agents/tasks/compact-downhole-casing-redesign.md": "d6bd79180c87a0da7f66d3c92375b8da8d463778946fe3995a026cba18ce1515",
+      ".gitignore": "59f1a4d27a3f2abd1645517557f79e594cb5702402dba4e461109989b72c19ba",
+      ".vscode/settings.json": "ef4cd1fc62cd9a5bb80e2b289f1a9e933fe5012ce4d1f897c725397a7b387c6a",
+      "AGENTS.md": "eff3c44d340c0a69b5fc0ae3dedc1750f83729b22dfdf4123bd45e953ad73327",
+      "cosmo/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "cosmo/biweekly5.py": "6880f4c40d77eaf1fcc6fcf0be9c5b205437e8a22e71b5da5ac1397fd3ecfa93",
+      "cosmo/ccx/calculix_2.22_4win/README_Install": "c124273005ecdf41d25c501d691ff21be8e8d0c5114e9c21d51c20d64432d70e",
+      "cosmo/ccx/calculix_2.22_4win/ccx_static.exe": "a326dfb2efe888e35e2195da263761c0b646b10e452b8998f36ea38da612a277",
+      "cosmo/compact_casing.py": "748489ffaa9ff738ab259c9e7e6d29b2f2509a17e4a46d4d48cf05e360bf7c6e",
+      "cosmo/core/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "cosmo/core/cad_generator.py": "1e7ba75e66335b94c551578559f1f1a215c2f5afdb18626cc1698feadd218a09",
+      "cosmo/core/mesh_generator.py": "bfb9cb9f395a352c9b4b3528dae4ef106e5111004b12df9936f968ba62f0cc7d",
+      "cosmo/core/plot_results.py": "efbf729e7215fbcf615b1b0e979307710ab456c7ab3ae38651545940febd0935",
+      "cosmo/core/result_extractor.py": "e05a544d68991e65f517bb3795eb871735a264850e2d0909c41e962695eb364c",
+      "cosmo/core/results_compiler.py": "794cdf9a283cb6c222fbdf4b350c829d0b0a52d2e91f2c73433c3ba0433d024e",
+      "cosmo/core/solver_interface.py": "145d9fbe37776b288740f717fd74944dbc8309cf2641634a65f5d9f5588d417b",
+      "cosmo/cosmo_runner.py": "c348df9890cfb350490fb0739f6bb2ce51163b41a4ea842e6c4c30b958885845",
+      "cosmo/integrated_downhole.py": "a259eb9a57ef208f8cb4236ad39b0379ab93a1b4471600ebdd6a99299e2821d1",
+      "cosmo/integrated_report.py": "98c7b6d09f6535032176358433e443e2dc468bffc731051c8fcb54e0d16764ec",
+      "cosmo/material_library.json": "c41a74b60d57894388880441609482112583fd6d760cfedfa03fea76db4da565",
+      "cosmo/optimization/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "cosmo/optimization/optimizer.py": "3d7ab759cd3dbbb86984da7c8a56a2cdbd377b20a65ac936e5df56a1364e8614",
+      "pyproject.toml": "99aa342fee14c51c1ae6cb0a57c1588afb72b42ef2830f1710933474324dfcfe",
+      "results/biweekly-5/biweekly-5.md": "d4bdff314625ebee8f44aa471be18590a5d3e3bb88ee83b1a7abf50fe4087977",
+      "results/biweekly-5/cad/hti_casing_analysis.step": "3b01897056cdffc68c939dea919cb4d08f0a33a82b19945ff135aae82678050e",
+      "results/biweekly-5/cad/hti_casing_detailed.step": "f2512ce5dd36324beef24f9596704ddf8cece92373e6cafbe469f927369ef02e",
+      "results/biweekly-5/figures/cad_assembly.png": "7eb4d33ce60b156be85341aa206e19ce9597ee4877c94371421c2fa7f7863deb",
+      "results/biweekly-5/figures/longitudinal_section.png": "7751affcc9d0eb07cf0f63c4dc2bdc85395d33257470af64e1d8674644762c72",
+      "results/biweekly-5/figures/structural_comparison.png": "679b2c217e24e81e6a67540b08add080d3ea23286e97d59561a1d2e056409af1",
+      "results/biweekly-5/figures/thermal_history.png": "a1b41fd6bf8e58ec14c8f2f8ad18f6914b130be42754c3ce24f5da38ba0c3d97",
+      "results/biweekly-5/figures/thermal_tradeoff.png": "82ea7dcbbd647a15c5b1caaed618c367e6e5ac2e6f6ff1383f5edc4ccafa4a4d",
+      "results/biweekly-5/input_spec.json": "ce570b312c9c1783ed3207ac05fe0bf429d8e7b9b2e12b42b8c6e7198931a6e1",
+      "results/biweekly-5/mesh_convergence.csv": "0b62bce3a3620c860a0d87450e77369d854d06244fb2f8a5634be776d79c5112",
+      "results/biweekly-5/structural_fea_results.csv": "dbfa827558dc7c31be487bb0e26866e022b78e37af73ba125fe10b2eb6d07a23",
+      "results/biweekly-5/summary.json": "49331e0944851148ac24cd504e604d21fe9ac936125d500c9dde772880bac9e8",
+      "results/biweekly-5/thermal_results.csv": "2f8a9ae3c26f150a0202a9a85324f39dd1a2aaff118dabcef18f67e58d7c4eae",
+      "results/compact-casing/compact_casing_id_od_envelope.csv": "440455c7b1f1da4ff77586b68009ac416fe02cbdc0c7efaeccc0461f040134f4",
+      "results/compact-casing/compact_casing_redesign_report.md": "afd00a265f6dc8a0e5c07cad21052b568ecb653a28a39357056743c04ff535e4",
+      "results/compact-casing/compact_casing_trade_study.csv": "9c02e62caa7a01a992b34e1c447baaf5208e0a20920d711767794f49ba333332",
+      "results/compact-casing/figures/compact_cad_assembly.png": "b17b4c5eef8317ecbdaa12913c51f79af8b501edce6517432473351d4922902c",
+      "results/compact-casing/figures/compact_longitudinal_section.png": "28e1cf971c919dd7d737fadffef871d9cc0ad910a8fa9bec54d91e3bfd604181",
+      "results/compact-casing/figures/compact_thermal_trade_study.png": "4fd98f69058b2a8ff64a61168ad7420ba52fdb72597cebc498b84c43cccffd49",
+      "results/compact-casing/figures/compact_transverse_pcm1808_section.png": "6ca930ffb955c5543e4d8b73253346976770326209c5c82051316a51d9347f2a",
+      "results/hti-02-dhpc-d-20260716/comparison_table.md": "60465ddcd8c2d37637d4b4fc85bc5949d1be55dc31506d0ca4c487af5d52028a",
+      "results/hti-02-dhpc-d-20260716/iteration_01/summary.json": "903e76b53c156321d89fec9cc66af52edf7adc31868e1bd38be5b3814268bca9",
+      "results/hti-02-dhpc-d-20260716/optimization_log.json": "faa731ee0b2445321d71e29fe95c7685c9c90945998382e20d9e5aefcf2ad7b7",
+      "results/integrated-downhole/artifact_manifest.json": "54c2a84d1f2e20c6d037b68871747918f48b87b7ad76fa6da5e2f754f1f4f2a3",
+      "results/integrated-downhole/cad/integrated_complete.step": "6ddef283835b4bf64397a5f5432f0939a3238f742c9dd842b4d35bd12b77e837",
+      "results/integrated-downhole/cad/integrated_exploded.step": "7b63a8f44154b447beaac106110bb1b905470742c75cf37d31be471106ee5832",
+      "results/integrated-downhole/cad/integrated_sectional.step": "2219c367d6da25960d78b8861b4a357df98cfa5a076e479798102ccfae997421",
+      "results/integrated-downhole/cad/module_battery_pack.step": "ffe4cffafd9930d670777091eb13c5a97b54738654c443c6b418560bebcb62a5",
+      "results/integrated-downhole/cad/module_electronics_cartridge.step": "e412d9d433d2caa3b7e3f01631389aa71ae002a3f3158b174193a85883860c2b",
+      "results/integrated-downhole/cad/module_pressure_housing.step": "0fbfbf94952cffd70b47328b5552dcec97468ca72da7bd255ee8ff26217d8767",
+      "results/integrated-downhole/cad/module_sensor_bulkhead.step": "6c2fb9e23e030a3c1e5d8157af0318047f4f1461eed617becb221bddc850b35f",
+      "results/integrated-downhole/cad/module_wet_head.step": "8771939cc154cdd2d692eed182f82c66173ac8bb00c739c8148d80ce1feb186f",
+      "results/integrated-downhole/design_report.md": "72e581d21b0cc42bd1b3604645c4b62d2337a30d72bc0747f851cfe788a010fa",
+      "results/integrated-downhole/figures/annotated_longitudinal_section.png": "cbc88f309995d0ebfd29190db813463833b8d2296f392f6d03676bf511699c5d",
+      "results/integrated-downhole/figures/integrated_complete.png": "255fc8657d8791f8656f78fa3bd7f23a7f1b662e91278c9d9ba70858f9338402",
+      "results/integrated-downhole/figures/integrated_exploded.png": "5f5d9ca496c7090d8957bad13330c8c94f079a1b4c8197557138009e449f8344",
+      "results/integrated-downhole/figures/integrated_orthographic.png": "9d2bfa3e7c4e234b2623022df1a53665ff5819fc3ec63afe0199529239609b84",
+      "results/integrated-downhole/figures/integrated_sectional.png": "b787b573c3843ba2329e3c39c90dbe84f2b63d35074a8f39f29e67bc8996df0c",
+      "results/integrated-downhole/figures/integration_details.png": "0a28e8fb924e6bc9922df41d5e81b03deebf520983a72008a3ba92ff39a97f4a",
+      "results/integrated-downhole/parameters.json": "9f89fdbf46b2798c67e26dc9619dd9813b94b33e6e6d8194a2e7ef71278c3be9",
+      "results/integrated-downhole/validation/ccl-readme-checks.json": "7abc522137228f6a6e184d850a3769dec757874f4cdf8829e79fd797efd59049",
+      "results/integrated-downhole/validation/checks.log": "a4f492f8792c1b0fc5ddddf7fbe4cb109a221bfe6904817fff4877f52062735c",
+      "results/integrated-downhole/validation/focused-final.log": "ef7df5ba95f70f1a6d4264b0f7fc2264104cc1a4d68714223d8e1630b9c6f523",
+      "results/integrated-downhole/validation/generation.log": "3e2f6813ec9a089e440495cc510cc95cb3838153b901bc5b7b6d23180927fea2",
+      "results/integrated-downhole/validation/reproduction.log": "0302192dd501fd366b53fee311d9c9938f85712d3f218865de60e2e1489e6ea0",
+      "results/integrated-downhole/validation/review-remediation/approval-provenance.json": "ea517d1c60b4219bb68cba4a0cf7fcf7b0cf1291bfe85f87a77460550189a6ef",
+      "results/integrated-downhole/validation/review-remediation/remediation-results.json": "eea0683a7eb386652479feff79de245054cc89f2ff1a1f9aaf9f43e5e8865c84",
+      "results/integrated-downhole/validation/review-remediation/source-snapshot.json": "a821b1431d06bb60ee7ab0f02b8f276d4678a41888e24912171239c5c73986bb",
+      "results/integrated-downhole/validation/review-remediation/step-recheck.json": "257122d1edea3137c36a54ee96aa3f4f3d61883fcbe9cb4cace91d8c96756d74",
+      "results/integrated-downhole/validation/review-remediation/step-recheck.log": "2b91b7ab15baa90e4fbfc54ca8ec595f28a4c8daed252487fe55b80f72688fee",
+      "results/integrated-downhole/validation/review-remediation/unittest-final-source.log": "030235cfec8769a65cfb0c456dd09976a01e8a2529738ae0083f6be3114c5e1b",
+      "results/integrated-downhole/validation/test_results.json": "83508e85a27dee918abc51a614861b272e5590088269d39043af21d2cdb22773",
+      "results/integrated-downhole/validation/unittest.log": "0b35b8c6fa887e84938c33b9e9b3ee2d213c66a7309415b109db48bbc77d050e",
+      "results/integrated-downhole/verification.json": "85d5725fa1cde1082182f76102ed9332288b03895df1fafc6ed386ae20e1f60c",
+      "tests/test_biweekly5.py": "41bab1a4af6813add6532e8c22293c198776fdfcff2bca6ef27c056b4c7a28c7",
+      "tests/test_compact_casing.py": "bf39ef890b4c08980fb23cbf417b98b71a63cd655e21b365a255b6af1e30e65a",
+      "tests/test_integrated_downhole.py": "4abf51dd1e6cfb3487e1fe4efaff507038cc001ac2b5f9fc56dba415f626bcb6",
+      "tests/test_results_compiler.py": "e647002c888e216898435e0f4f1ae478502d417406e7e99ce9ee7501d033dcd4"
+    },
+    "artifact_manifest_entries_verified": 17,
+    "integrated_STEP_files_byte_identical": 8,
+    "STEP_sha256": {
+      "results/integrated-downhole/cad/integrated_complete.step": "6ddef283835b4bf64397a5f5432f0939a3238f742c9dd842b4d35bd12b77e837",
+      "results/integrated-downhole/cad/integrated_exploded.step": "7b63a8f44154b447beaac106110bb1b905470742c75cf37d31be471106ee5832",
+      "results/integrated-downhole/cad/integrated_sectional.step": "2219c367d6da25960d78b8861b4a357df98cfa5a076e479798102ccfae997421",
+      "results/integrated-downhole/cad/module_battery_pack.step": "ffe4cffafd9930d670777091eb13c5a97b54738654c443c6b418560bebcb62a5",
+      "results/integrated-downhole/cad/module_electronics_cartridge.step": "e412d9d433d2caa3b7e3f01631389aa71ae002a3f3158b174193a85883860c2b",
+      "results/integrated-downhole/cad/module_pressure_housing.step": "0fbfbf94952cffd70b47328b5552dcec97468ca72da7bd255ee8ff26217d8767",
+      "results/integrated-downhole/cad/module_sensor_bulkhead.step": "6c2fb9e23e030a3c1e5d8157af0318047f4f1461eed617becb221bddc850b35f",
+      "results/integrated-downhole/cad/module_wet_head.step": "8771939cc154cdd2d692eed182f82c66173ac8bb00c739c8148d80ce1feb186f"
+    },
+    "recorded_geometry": {
+      "overall_length_mm": 863.0,
+      "maximum_od_mm": 44.45,
+      "part_count": 36,
+      "solid_count": 81
+    },
+    "CAD_parameters_figures_tests_sources_history_and_governance_unchanged": true,
+    "geometry_recomputed_or_binary_artifacts_regenerated": false
+  },
+  "document_sha256": {
+    "README.md": "17a7eb6750022cff589746dddfb7f2039a15b23542aab65898b7e95c89e576f9",
+    ".agents/context/project.md": "8e3feaf843f2bcb207060c29d0a5a4bd73e0b62260be2985690ed4c7f53a9474",
+    "docs/ccl-integration-assessment.md": "56a26c58229faa916dd8bd9e914408e7609a71e44999a04566e659b5fda9b43b",
+    ".agents/context/README.md": "c73d5847dcf559e76ad23ead90647a363dbd731b8cf14db470af4d55dde90d16"
+  },
+  "engineering_tests": {
+    "new_tests_executed": false,
+    "reason": "Documentation only; executable sources, configurations, tests and engineering artifacts are byte-identical. Full numerical regression is unnecessary under the human instruction.",
+    "prior_result_only": {
+      "test_count": 81,
+      "source_revision": "d9f69e81ff0882f17f9fa2425ef3df79d5d00f9d",
+      "evidence": "results/integrated-downhole/validation/review-remediation/remediation-results.json"
+    }
+  },
+  "remaining_documentation_limits": [
+    "Original presentation identity is supplied by the human instruction; its slide deck was not independently inspected.",
+    "Generated report and figure/historical labels are preserved and may retain project-name shorthand for an instrument; README and context explicitly qualify those labels."
+  ],
+  "technical_inconsistencies_discovered": [],
+  "intended_changed_files": [
+    "README.md",
+    ".agents/context/project.md",
+    "docs/ccl-integration-assessment.md",
+    ".agents/context/README.md",
+    "results/integrated-downhole/validation/project-framing-checks.json"
+  ]
+}

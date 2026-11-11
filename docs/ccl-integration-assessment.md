@@ -4,9 +4,11 @@
 
 **Scope:** Documentation and interface assessment; no CAD, CCL sensor, connector or firmware implementation
 
-**Preserved baseline:** `c91c20c83a26d8d61e5e23b99a1fce28cad27c19`, with an 863 mm × 44.45 mm PertAcoustic module
+**Preserved engineering baseline:** `c91c20c83a26d8d61e5e23b99a1fce28cad27c19`, with an 863 mm × 44.45 mm conceptual integrated downhole instrument
 
-This assessment supports a PHE configuration decision. It does not select a final toolstring, claim compatibility with a particular PHE CCL, or change the current conceptual instrument. The [root README](../README.md) is the main project entrypoint.
+PertAcoustic is the broader PHE–UGM research project; this assessment concerns possible external logging/depth-correlation infrastructure for one proposed acoustic logging module within its 3D engineering workstream. The instrument concept is not a separately approved product named PertAcoustic.
+
+This assessment supports a PHE configuration decision. It does not select a final toolstring, claim compatibility with a particular PHE CCL, or change the current conceptual instrument. The [root README](../README.md) provides the project context and repository scope. The terminology correction starts at `3d92624ddc4a75d35e8347a381de9f2afb7c78f3` and preserves the assessment's technical conclusions.
 
 ## 1. Meeting observations and verified references
 
@@ -15,7 +17,7 @@ This assessment supports a PHE configuration decision. It does not select a fina
 | CCL used for casing/tubing joint detection and depth correlation | Human meeting notes, consistent with manufacturer descriptions | Establish the required reference-data role with PHE |
 | CCL approximately 0.7 m long | Preliminary meeting observation | Not a selected model or approved dimension |
 | ALFA segments approximately 1.0 m and 1.5 m in diagrams | Preliminary meeting observation | Several configurations were shown; no universal length or mandatory ALFA component is inferred |
-| PertAcoustic length 863 mm, OD 44.45 mm | Existing CAD/verification evidence | Preserve the acoustic instrument geometry |
+| Current CAD baseline length 863 mm, OD 44.45 mm | Existing CAD/verification evidence | Preserve the acoustic instrument geometry |
 | Maximum 2 m requirement | Human-adopted instrument constraint | PHE must clarify whether it also governs a connected toolstring |
 
 No meeting photographs, supplier-controlled drawings, restricted documents or well data are included. The manufacturer examples below illustrate variation; none is identified as PHE's equipment.
@@ -26,10 +28,10 @@ The [Sondex CCL201 specification](https://dam.bakerhughes.com/m/1a4960ecd80f51df
 
 | Public manufacturer example | Published envelope | Measurement-point information | Assessment implication |
 |---|---|---|---|
-| Baker Hughes Sondex CCL201 | 43 mm OD; 485 mm length | Sensor measure point: 174.45 mm | The one-page table does not define that coordinate's datum/direction. Obtain the exact outline before using it as an offset. Its Ultrawire interface is not established as compatible with PertAcoustic. |
+| Baker Hughes Sondex CCL201 | 43 mm OD; 485 mm length | Sensor measure point: 174.45 mm | The one-page table does not define that coordinate's datum/direction. Obtain the exact outline before using it as an offset. Its Ultrawire interface is not established as compatible with the proposed acoustic logging module. |
 | [Welltec CCL product range](https://www.welltec.com/products-services/intervention/casing-collar-locator-ccl) | 2⅛–3⅛ in. OD; 0.9–1.5 ft length, dependent on configuration | No single measurement-point datum is established by the overview | Converted ranges: 53.975–79.375 mm OD and 274.32–457.2 mm length. These ranges are not paired specifications for one selected model. |
 
-The Welltec overview illustrates why a generic CCL designation cannot establish fit: even the smaller listed OD exceeds PertAcoustic's preferred 44.45 mm, and the larger exceeds 57.15 mm if that maximum governs the combined string. The Sondex example's 43 mm body does not prove that its crossovers, cablehead or complete string remain within either limit. No manufacturer pressure/temperature rating is transferred to PertAcoustic.
+The Welltec overview illustrates why a generic CCL designation cannot establish fit: even the smaller listed OD exceeds the acoustic instrument's preferred 44.45 mm, and the larger exceeds 57.15 mm if that maximum governs the combined string. The Sondex example's 43 mm body does not prove that its crossovers, cablehead or complete string remain within either limit. No manufacturer pressure/temperature rating is transferred to the conceptual instrument.
 
 [Weatherford's Memory Logging Tool](https://www.weatherford.com/drilling-and-evaluation/wireline-products/cased-hole-formation-evaluation/memory-logging-tool/) describes combinability within its HD tool family. This and the Sondex toolbus example support a modular architecture comparison, not universal mechanical, electrical or protocol interoperability.
 
@@ -76,7 +78,7 @@ As engineering considerations requiring later validation, assess magnetic/electr
 
 ## 3. Alternative B — separately operated measurement systems
 
-PHE would provide appropriate CCL/depth reference records while PertAcoustic records timestamped acoustic data. [Weatherford's depth-logger documentation](https://www.weatherford.com/drilling-and-evaluation/wireline-products/telemetry-systems/geothermal-depth-logger-and-encoder/) describes recording depth and line speed against clock time and merging those records with tool data. That establishes an industrial workflow example, not an existing PertAcoustic time–depth processing implementation.
+PHE would provide appropriate CCL/depth reference records while the proposed acoustic logging module records timestamped acoustic data. [Weatherford's depth-logger documentation](https://www.weatherford.com/drilling-and-evaluation/wireline-products/telemetry-systems/geothermal-depth-logger-and-encoder/) describes recording depth and line speed against clock time and merging those records with tool data. That establishes an industrial workflow example; this repository does not implement time–depth processing for the project.
 
 Two cases need different handling:
 
@@ -120,7 +122,7 @@ Keep the existing acoustic/memory module unchanged and develop the external inte
 | Open decision | Required PHE input |
 |---|---|
 | Physically connected CCL or separate logging system? | Intended operational arrangement, ownership and acquisition workflow |
-| Does the 2 m maximum apply to PertAcoustic alone or the entire toolstring? | Governing length/OD envelope and included deployment hardware |
+| Does the 2 m maximum apply to the proposed acoustic logging module alone or the entire toolstring? | Governing length/OD envelope and included deployment hardware |
 | Which exact CCL model, OD, make-up length and sensing point? | Current public/authorized specifications and datum definitions |
 | What connectors and deployment interfaces are actually available? | Mechanical/load, pressure, electrical/power, communications and conveyance requirements |
 | What time–depth/reference records can PHE provide? | Relevant deployment trajectories, CCL events, reference logs, datums, corrections and synchronization evidence |
@@ -136,6 +138,6 @@ Public manufacturer sources consulted on 11 November 2026:
 2. [Welltec — Casing Collar Locator](https://www.welltec.com/products-services/intervention/casing-collar-locator-ccl): configuration-dependent product range, not a selected PHE model.
 3. [Weatherford — Geothermal Depth Logger and Encoder](https://www.weatherford.com/drilling-and-evaluation/wireline-products/telemetry-systems/geothermal-depth-logger-and-encoder/): recording time, depth and line speed for later merging with tool records.
 4. [Weatherford — Memory Logging Tool](https://www.weatherford.com/drilling-and-evaluation/wireline-products/cased-hole-formation-evaluation/memory-logging-tool/): vendor-specific modular memory logging.
-5. Existing [parameters](../results/integrated-downhole/parameters.json), [verification](../results/integrated-downhole/verification.json) and [engineering report](../results/integrated-downhole/design_report.md): PertAcoustic geometry and its limitations.
+5. Existing [parameters](../results/integrated-downhole/parameters.json), [verification](../results/integrated-downhole/verification.json) and [engineering report](../results/integrated-downhole/design_report.md): current conceptual instrument geometry and its limitations.
 
 The 700 mm / ALFA observations come only from the supplied meeting-note summary; no underlying photographs or approved equipment specification were independently inspected. Length arithmetic, coordinate definitions, timing equations and interface risks above are engineering assessment, explicitly conditional on the missing PHE inputs. No field data, acquisition code or physical interoperability validation was produced.

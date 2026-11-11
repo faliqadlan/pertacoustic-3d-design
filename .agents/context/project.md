@@ -3,13 +3,33 @@
 
 **Status:** Verified against the current working tree
 **Last verified:** 2026-11-11
-**Repository base:** `c91c20c83a26d8d61e5e23b99a1fce28cad27c19`
+**Repository base:** `3d92624ddc4a75d35e8347a381de9f2afb7c78f3`
 
 This file records only repository-observed behavior and explicit user direction. Period-specific reporting context belongs under `.agents/context/biweekly-N/`.
 
 ## Purpose
 
-PertAcoustic is a research workspace for an integrated downhole acoustic instrument concept and its earlier casing/thermal studies. The current Python/CadQuery model represents an 863 mm long, 44.45 mm OD self-contained memory-logging concept. It supports discussion of a TRL 5 development pathway; the TRL 4 laboratory apparatus is reference work rather than the target assembly. A supplier-validated HTI connection and field-qualified instrument do not yet exist.
+### Overall research project
+
+PertAcoustic is the broader PHE–UGM research project, not the formal product name of the integrated CAD assembly. Its official title is **“Studi Identifikasi Aliran Fluida di Lubang Sumur Menggunakan Sistem Pertacoustic (Spectral Noise Logging) untuk Mengatasi Permasalahan Air”**. Project Owner: **Pertamina Hulu Energi Upstream Innovation**. Executing institution: **Laboratorium Geofisika, Departemen Fisika, FMIPA, Universitas Gadjah Mada**. Study period: **May 2026 – January 2027**.
+
+The three study objectives are:
+
+1. **Characterization and design parameters:** industry requirements, acoustic sensing, sensor specifications, frequency response, sensitivity, acquisition, memory and power management.
+2. **Downhole components and housing design:** mechanical, pressure and thermal protection for hydrophones, electronics and batteries.
+3. **Analytical software development:** FFT, cross-correlation and noise filtering, alongside monitoring/visualization software for interpreting fluid movement and possible flow locations.
+
+This identity and objective summary follows the human-supplied account of the August 2026 official progress presentation. The underlying presentation was not independently inspected for this correction and is not published here. “Sistem Pertacoustic” in the official title does not formally name or approve each conceptual assembly.
+
+### Repository responsibility and current output
+
+`pertacoustic-3d-design` contains the project's **3D engineering design workstream**: conceptual downhole architecture, pressure/thermal housing studies, packaging, mechanical interfaces, CAD/STEP geometry, engineering calculations and screening, visualization and technical evidence. It also preserves earlier research artifacts and experimental engineering studies. Implemented capabilities are described below.
+
+Laboratory experiments, acoustic characterization, physical hardware acquisition and analytical software remain related project workstreams; this repository does not contain the entire project's hardware, signal-processing pipeline or dashboard. Engineering plots and CAD rendering are not implementation evidence for the analytical software objective.
+
+The current Python/CadQuery output is an **863 mm long, 44.45 mm OD conceptual integrated downhole instrument**, with a single hydrophone, protected wet acoustic head and dry electronics/battery compartments, without an additional valve. It is one proposed engineering output within the project, independent of the current TRL 4 laboratory configuration. The team's TRL 4-related laboratory work involves hydrophones, acquisition systems, controlled acoustic measurements and simulated leakage conditions.
+
+The idealized CAD architecture supports future prototype development and relevant-environment validation toward TRL 5. It does not establish that the project or instrument has achieved TRL 5, define the entire project as a TRL 5 effort, or constitute an approved PHE field instrument. Supplier-validated HTI interfaces and field qualification remain unresolved.
 
 ## Intended Users
 
@@ -56,7 +76,7 @@ The retained legacy thermal workflow uses layer dictionaries ordered from outsid
 
 - Current integrated concept: `cosmo/integrated_downhole.py::{build_design,verify_design,export_all,generate,main}`.
 - Generated engineering report: `cosmo/integrated_report.py::design_report`.
-- Current project entrypoint: root `README.md`; CCL assessment: `docs/ccl-integration-assessment.md`.
+- Project/repository documentation entrypoint: root `README.md`; CCL assessment: `docs/ccl-integration-assessment.md`.
 - Automated optimization: `cosmo/optimization/optimizer.py::run_automated_optimization`.
 - Single iteration: `cosmo/cosmo_runner.py::run_cosmo_iteration`.
 - Core stages: `generate_casing`, `generate_mesh`, `setup_and_run_calculix`, and `extract_max_internal_temperature` under `cosmo/core/`.
@@ -95,8 +115,8 @@ Commands using `python` assume the compatible environment is active. The legacy 
 
 ## Constraints and Hazards
 
-- The current concept uses a 70 °C / 7,200 s envelope, preferred 44.45 mm OD, maximum 57.15 mm OD and 2,000 mm length. Authoritative pressure, supplier interfaces, seals, corrosion conditions and complete-instrument thermal/acoustic qualification remain unresolved. Nominal CAD closure is not leak-tightness evidence.
-- The current human follow-up permits CCL interoperability assessment and README/context completion while preserving the 863 mm geometry. The meeting's approximately 700 mm CCL and 1.0/1.5 m ALFA observations are unconfirmed. No CCL module, connector or final configuration has been selected; whole-toolstring envelope and time–depth requirements remain PHE decisions.
+- The human-adopted engineering constraints are a 70 °C / 7,200 s envelope, preferred 44.45 mm OD, maximum 57.15 mm OD and 2,000 mm length. Original PHE/MoM requirements were not independently inspected for this correction. CAD material/component choices and pressure-screening cases remain preliminary assumptions. Authoritative pressure, supplier interfaces, seals, corrosion conditions and complete-instrument thermal/acoustic qualification remain unresolved. Nominal CAD closure is not leak-tightness evidence.
+- The current human follow-up corrects project/workstream framing and documentation terminology only; it preserves the 863 mm geometry and prior CCL assessment. The meeting's approximately 700 mm CCL and 1.0/1.5 m ALFA observations remain unconfirmed. CCL is possible external logging/depth-correlation infrastructure. No CCL module, connector or final configuration has been selected; whole-toolstring envelope and time–depth requirements remain PHE decisions.
 - The optimizer deletes an existing run log and moves or overwrites generated artifacts. It is not a read-only verification command.
 - The reusable legacy pipeline covers transient heat transfer. The bounded Biweekly 5 runner adds preliminary pressure-shell FEA and analytical checks but does not validate sealing, collapse qualification, acoustic response, corrosion, fatigue, sour service, or manufacturability.
 - Temperature extraction fails closed when the requested boundary or time is absent; callers must handle `ValueError` rather than substituting another metric.
@@ -106,7 +126,9 @@ Commands using `python` assume the compatible environment is active. The legacy 
 
 ## Evidence Provenance
 
-- Current source, parameters, geometry/export evidence, complete final-source test log, CLI options and environment imports were inspected on 2026-11-11 at the repository base above. The GitHub connector reports public visibility. This documentation update does not relabel earlier tests as newly executed.
+- The preceding CCL/README update inspected source, parameters, geometry/export evidence, final-source test logs, CLI options and environment imports on 2026-11-11, starting at `c91c20c83a26d8d61e5e23b99a1fce28cad27c19`; its evidence is in `results/integrated-downhole/validation/ccl-readme-checks.json`. Public visibility was observed through the GitHub connector during that update.
+- This framing correction starts at the repository base above. Its source is the complete human instruction titled “PertAcoustic — Project Framing Correction and Documentation Alignment”; exact request identity, documentation checks and preservation evidence are in `results/integrated-downhole/validation/project-framing-checks.json`. Project identity is attributed to the supplied presentation account, not an independently inspected slide deck. No prior test, import or geometry check is relabeled as newly executed.
+- Generated engineering reports, figures and historical labels are preserved evidence. Any instrument shorthand using the project name in them does not establish a separate formal product name or approval; the root README supplies the corrected project/workstream framing.
 
 ### Historical verification (2026-07-29)
 

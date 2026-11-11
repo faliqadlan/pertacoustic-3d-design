@@ -1,18 +1,38 @@
-# PertAcoustic
+# PertAcoustic — 3D Engineering Workstream
 
-Parametric CAD and preliminary engineering evidence for an integrated downhole Spectral Noise Logging (SNL) instrument.
+PertAcoustic is the broader PHE–UGM research project studying downhole acoustic measurements for identifying fluid movement and possible flow locations. This repository contains its 3D engineering design workstream, including a proposed integrated downhole instrument concept and earlier casing/thermal studies.
 
-**Current concept: 863 mm long × 44.45 mm maximum OD.** The model represents a protected hydrophone, onboard acquisition, battery power and memory storage. It is intended for technical discussion of the next TRL 5 development phase; it is not a field-qualified instrument or evidence that TRL 5 has been achieved.
+**Current CAD concept: 863 mm long × 44.45 mm maximum OD.** This is one conceptual engineering output within the project. It represents a protected hydrophone, onboard acquisition, battery power and memory storage; it has no separately approved product name and is not an approved PHE field instrument.
 
 [Engineering report](results/integrated-downhole/design_report.md) · [STEP deliverables](#available-deliverables) · [CCL integration assessment](docs/ccl-integration-assessment.md)
 
-## Project overview
+## PertAcoustic project context
 
-PertAcoustic investigates downhole acoustic measurements relevant to fluid movement and leakage. The TRL 4 laboratory work concerns sensor response, acquisition and simulated leakage experiments. The integrated CAD concept explores how those functions could become a self-contained downhole instrument. Laboratory pumps, piping and leak chambers are outside this model.
+The official study title is **“Studi Identifikasi Aliran Fluida di Lubang Sumur Menggunakan Sistem Pertacoustic (Spectral Noise Logging) untuk Mengatasi Permasalahan Air”**.
 
-This repository contains the current integrated concept, its verification evidence, and earlier casing/thermal studies retained as historical provenance.
+- **Project Owner:** Pertamina Hulu Energi Upstream Innovation.
+- **Executing institution:** Laboratorium Geofisika, Departemen Fisika, FMIPA, Universitas Gadjah Mada.
+- **Study period:** May 2026 – January 2027.
 
-## Project status
+The study has three main objectives:
+
+1. **Characterization and design parameters:** investigate industry requirements, acoustic sensing, sensor specifications, frequency response, sensitivity, data acquisition, memory and power management.
+2. **Downhole components and housing design:** study and design mechanical, pressure and thermal protection for downhole hydrophones, associated electronics and batteries.
+3. **Analytical software development:** develop FFT, cross-correlation and noise-filtering methods, alongside monitoring/visualization software for interpreting fluid movement and possible flow locations.
+
+This project identity and framing follow the human-supplied account of the August 2026 official progress presentation. That presentation was not independently inspected for this correction and is not republished here. The official title's “Sistem Pertacoustic” wording does not establish a formal name or approval for the conceptual CAD assembly.
+
+## Scope of this repository
+
+`pertacoustic-3d-design` concerns conceptual downhole instrument architecture, pressure/thermal housing studies, component packaging, mechanical interfaces, CAD/STEP geometry, related engineering calculations and screening, design visualization and technical evidence. Earlier research artifacts and experimental engineering studies remain as historical provenance.
+
+Laboratory experiments, acoustic characterization, physical hardware acquisition and analytical software are related project workstreams. This repository does not contain the entire project's hardware, signal-processing pipeline or monitoring dashboard. Its CAD visualization and engineering calculations support the 3D workstream; they do not establish implementation of the project's analytical software objective.
+
+## Current engineering work
+
+The team's current **TRL 4-related experimental workstream** involves laboratory testing with hydrophones, acquisition systems, controlled acoustic measurements and simulated leakage conditions. Laboratory pumps, piping and leak chambers are outside this CAD model.
+
+The **conceptual 3D engineering work** develops an idealized integrated downhole architecture for future prototype development and relevant-environment validation. It supports planning toward TRL 5, independently of the current laboratory configuration. The model does not establish that the instrument or project has achieved TRL 5, and TRL 5 planning does not define the entire project's scope.
 
 - **Design maturity:** Conceptual Engineering Design / Preliminary Integrated System Design.
 - **Geometry baseline:** the integrated implementation at `d9f69e81ff0882f17f9fa2425ef3df79d5d00f9d`, with final-source verification evidence added at `c91c20c83a26d8d61e5e23b99a1fce28cad27c19`.
@@ -22,7 +42,7 @@ This repository contains the current integrated concept, its verification eviden
 
 ## Engineering requirements
 
-These are the human-adopted project constraints. The original PHE/MoM documents were not independently verified during the documentation update.
+The table records the previously human-adopted environmental and geometric constraints for this engineering workstream. The original PHE/MoM documents were not independently inspected for this correction; these entries do not assert fresh verification of official requirements. Current CAD choices, component reservations and screening cases remain preliminary design assumptions.
 
 | Parameter | Governing envelope | Current interpretation |
 |---|---|---|
@@ -34,7 +54,7 @@ These are the human-adopted project constraints. The original PHE/MoM documents 
 | Representative depth | Approximately 1,000 m | Context only; not a pressure rating |
 | Authoritative design pressure | Unresolved | 10, 20 and approximately 68.95 MPa are screening cases only |
 
-## System architecture
+## Conceptual instrument architecture
 
 | Section | Conceptual function |
 |---|---|
@@ -64,7 +84,7 @@ The electronics reservations use nominal or estimated module dimensions, not mea
 
 ### Complete isometric assembly
 
-![Complete integrated PertAcoustic instrument](results/integrated-downhole/figures/integrated_complete.png)
+![Complete conceptual integrated downhole instrument](results/integrated-downhole/figures/integrated_complete.png)
 
 ### Longitudinal cutaway
 
@@ -157,18 +177,18 @@ Use a writable path appropriate to the host in place of `/tmp` when needed. The 
 
 ## CCL and depth correlation
 
-A Casing Collar Locator (CCL) detects changes associated with casing/tubing joints and supports depth correlation against known features. It is considered an **external reference module or a separately operated PHE measurement system**, not a magnetic sensor already inside PertAcoustic. The [assessment](docs/ccl-integration-assessment.md) compares:
+A Casing Collar Locator (CCL) detects changes associated with casing/tubing joints and supports depth correlation against known features. It is possible external logging/depth-correlation infrastructure relevant to the project: an **external reference module or a separately operated PHE measurement system**. No CCL sensor is included in the current CAD concept. The [assessment](docs/ccl-integration-assessment.md) compares:
 
 - **A — Combined toolstring:** a separate CCL mechanically connected to the acoustic module, subject to verified dimensions, connections, deployment conditions, sensor offsets and any power/data interfaces.
-- **B — Separate measurement systems:** PHE supplies appropriate time–depth/reference data while PertAcoustic records timestamped acoustics. Clock alignment, drift, timestamp meaning, depth datum and the measurement-point relationship must be established. Different physical runs cannot be correlated by timestamp plus a fixed offset alone.
+- **B — Separate measurement systems:** PHE supplies appropriate time–depth/reference data while the proposed acoustic logging module records timestamped acoustics. Clock alignment, drift, timestamp meaning, depth datum and the measurement-point relationship must be established. Different physical runs cannot be correlated by timestamp plus a fixed offset alone.
 
-The 11 November 2026 meeting notes mention approximately **0.7 m for a CCL** and **1.0 m / 1.5 m ALFA segments** in different diagrams. These are unconfirmed observations, not supplier specifications or one mandatory combined assembly. ALFA is not a required PertAcoustic component.
+The 11 November 2026 meeting notes mention approximately **0.7 m for a CCL** and **1.0 m / 1.5 m ALFA segments** in different diagrams. These are unconfirmed observations, not supplier specifications or one mandatory combined assembly. ALFA is not a required component of the proposed acoustic logging module.
 
 Using only the unconfirmed 700 mm CCL length, `863 + 700 = 1,563 mm` before net connection and other toolstring allowances. This is a planning calculation, not a verified assembly or a finding that a combined string meets the 2 m limit.
 
 PHE decisions remain open: connected module versus independent system; whether the 2 m limit applies to the instrument or whole string; exact CCL model/OD/length/measurement point; connector and deployment interfaces; available time–depth records and datums; and the hydrophone-to-CCL reference offset. Neither alternative is selected as final.
 
-The [documentation verification record](results/integrated-downhole/validation/ccl-readme-checks.json) records link checks, reproduction checks and preservation of the existing CAD/source evidence for this update.
+The [CCL documentation verification record](results/integrated-downhole/validation/ccl-readme-checks.json) records the earlier link/reproduction checks. The [project-framing correction record](results/integrated-downhole/validation/project-framing-checks.json) records the subsequent documentation checks and byte preservation; it does not claim new engineering tests.
 
 ## Engineering limitations
 
@@ -176,12 +196,15 @@ Design pressure and fluid/corrosion conditions are unresolved. Threads, seals, f
 
 CAD validity, analytical pressure screens and a shell thermal lower bound do not qualify the assembled instrument. Procurement, manufacturing release, pressure certification and field deployment are outside the current result.
 
+Generated reports, figure labels and historical artifacts retain their original wording for traceability. Where those artifacts use PertAcoustic as shorthand for an instrument concept, read that label in the project/workstream context defined above; it is not evidence of a formally named or approved product. Their source, geometry and evidence have not been altered by this documentation correction.
+
 ## References
 
+- **Project identity and objectives:** human-supplied account of the August 2026 official progress presentation, reproduced in the project context above; no restricted presentation file is published. The project study period is not a claim of an approved field-deployment schedule.
 - [HTI — HTI-02-DHPC/D](https://www.hightechincusa.com/products/hydrophones/hti02dhpc.html): public sensor reference; exact purchased interface remains provisional.
 - [Baker Hughes — Sondex CCL201 specification](https://dam.bakerhughes.com/m/1a4960ecd80f51df/original/Sondex-casing-collar-locator-CCL-spec.pdf): CCL principle and model-specific dimensions/measure point.
 - [Welltec — Casing Collar Locator](https://www.welltec.com/products-services/intervention/casing-collar-locator-ccl): configuration-dependent CCL envelopes.
 - [Weatherford — Geothermal Depth Logger and Encoder](https://www.weatherford.com/drilling-and-evaluation/wireline-products/telemetry-systems/geothermal-depth-logger-and-encoder/): time-recorded depth and subsequent merging with tool data.
 - [Weatherford — Memory Logging Tool](https://www.weatherford.com/drilling-and-evaluation/wireline-products/cased-hole-formation-evaluation/memory-logging-tool/): an example of vendor-specific modular memory logging.
 
-Public references were consulted on 11 November 2026. Manufacturer product ratings are not PertAcoustic requirements or qualification evidence. See the [engineering report](results/integrated-downhole/design_report.md) and [CCL assessment](docs/ccl-integration-assessment.md) for claim-specific context and limitations.
+Public references were consulted for the preceding CCL assessment on 11 November 2026. Manufacturer product ratings do not establish project requirements or qualify the conceptual instrument. See the [engineering report](results/integrated-downhole/design_report.md) and [CCL assessment](docs/ccl-integration-assessment.md) for claim-specific context and limitations.
