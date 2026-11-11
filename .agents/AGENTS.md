@@ -1,10 +1,10 @@
 ---
 title: Repository AI Delivery Contract
 document_id: AGENTS-CONTRACT-001
-version: 1.3
+version: 1.4
 status: approved-reference
 language: en-US
-last_updated: 2026-08-30
+last_updated: 2026-11-11
 scope:
   - repository-local AI delivery governance
   - runtime-neutral agent routing
@@ -169,6 +169,10 @@ AI-generated authority-bearing artifacts remain Draft until approved by the desi
 Prompts MUST NOT override the canonical delivery protocol, repository authority, observed implementation evidence, or a governing task revision.
 
 ## Executable tasks
+
+### Scoped prompt-contract exception
+
+For the PertAcoustic Integrated Downhole Conceptual Design for TRL 5 Readiness assignment only, the separately human-approved exception in `.agents/software-workflow.md` §15.8 permits a validated prompt-defined execution contract in place of a published task file. Its applicability, source identity, preflight, approval, and evidence conditions MUST be satisfied before implementation. In that scope, task-file, exact task-revision, publication, and launcher requirements use the replacement semantics defined there. No substitute task file is required or permitted for that assignment. All other delivery, review, preservation, confidentiality, and side-effect boundaries remain controlling.
 
 Implementation-changing work MUST NOT begin without a published validated task.
 

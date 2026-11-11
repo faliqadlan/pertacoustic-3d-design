@@ -28,14 +28,14 @@
     {
       "path": ".agents/software-workflow.md",
       "document_id": "SD-PROTOCOL-001",
-      "version": "2.3",
+      "version": "2.4",
       "status": "approved-reference",
       "role": "normative-delivery-protocol"
     },
     {
       "path": ".agents/AGENTS.md",
       "document_id": "AGENTS-CONTRACT-001",
-      "version": "1.3",
+      "version": "1.4",
       "status": "approved-reference",
       "role": "repository-ai-delivery-contract"
     },

@@ -1,10 +1,10 @@
 ---
 title: Runtime-Neutral Software Delivery Protocol
 document_id: SD-PROTOCOL-001
-version: 2.3
+version: 2.4
 status: approved-reference
 language: en-US
-last_updated: 2026-08-30
+last_updated: 2026-11-11
 applies_to:
   - software repositories
   - services and APIs
@@ -966,6 +966,18 @@ This applies to material changes to:
 - implementation documentation when it changes the delivery contract.
 
 Read-only discovery, planning, analysis, and review MAY occur without an executable task when their purpose is to establish repository state, evaluate evidence, or produce the next task.
+
+## 15.8 Scoped human-approved prompt-contract exception
+
+This exception applies only to the PertAcoustic Integrated Downhole Conceptual Design for TRL 5 Readiness assignment in `faliqadlan/pertacoustic-3d-design`, on `feat/trl5-integrated-downhole-concept`, after separate designated human approval of this governance amendment. It does not change the default workflow for other work.
+
+For this assignment, a human-approved, prompt-defined execution contract MAY replace the formal published task artifact. The contract consists of the complete human engineering request titled “PertAcoustic — Integrated Downhole Conceptual Design for TRL 5 Readiness” and its explicit subsequent human scope, workflow, and side-effect authorizations. Later instructions supersede earlier ones only where they explicitly change them; unchanged engineering and preservation requirements remain binding.
+
+Before implementation, the Executor MUST verify that the instruction set satisfies the minimum contract concerns in §15.2, record the immutable implementation baseline and actual execution-start state, identify the governing source messages/attachments by title and exact content digest where available, and confirm that their complete contents remain accessible for independent review. A digest without accessible source content is insufficient. Material missing authority, ambiguity, incompatible baseline drift, or unavailable governing instructions MUST return to the human authority before dependent execution.
+
+For this exception only, references throughout the protocol, repository contract, orchestration procedures, and runtime adapters to the governing validated/published task, task path/revision, or task publication MUST be read as references to this validated human-approved instruction contract and its frozen source identity. T5 is satisfied through the explicit human approval and recorded preflight validation of that contract, rather than task-file creation or Git-backed task publication. Task-template authoring and task-file Executor Launcher requirements do not apply. Do not create a substitute task document or publish the rejected Draft task or planning artifacts. Use ordinary implementation evidence and the final engineering report to record execution provenance, rather than adding a separate contract artifact.
+
+This changes the contract representation and publication mechanism only. Authority, bounded scope, verification, preservation, confidentiality, stop conditions, independent implementation review, immutable implementation revision, and separate release boundaries remain in force. The Executor MUST NOT self-approve implementation acceptance. Commits and pushes remain limited to explicit human authorization for the named repository and feature branch; this exception does not authorize main-branch writes, force-pushes, history rewriting, merges, pull requests, releases, or disclosure of restricted material. Material changes to the frozen execution contract require renewed human approval before dependent work continues.
 
 ## Gate T5
 
