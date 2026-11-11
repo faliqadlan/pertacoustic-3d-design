@@ -1,0 +1,126 @@
+{
+  "terminal_state": "Review Required; independent Planner/Reviewer acceptance pending",
+  "implementation_baseline": "667ccd59cf6657a75dfe3cc2b4c67488737ef028",
+  "actual_execution_start": "3424b6d1f4d1fb6fad891760914d6d2c319ab3ca",
+  "branch": "feat/trl5-integrated-downhole-concept",
+  "full_regression": {
+    "status": "PASS",
+    "test_count": 81,
+    "duration_s": 69.405,
+    "log": "unittest.log",
+    "provenance": "Local unittest execution; not CI"
+  },
+  "full_regression_source_files_sha256": {
+    "cosmo/integrated_downhole.py": "1eaf4e67d8fb400ca90ee89ac257c1727aa63d1711e024a668da89bea1ecba2e",
+    "cosmo/integrated_report.py": "98c7b6d09f6535032176358433e443e2dc468bffc731051c8fcb54e0d16764ec",
+    "cosmo/compact_casing.py": "748489ffaa9ff738ab259c9e7e6d29b2f2509a17e4a46d4d48cf05e360bf7c6e",
+    "cosmo/material_library.json": "c41a74b60d57894388880441609482112583fd6d760cfedfa03fea76db4da565"
+  },
+  "final_focused_regression": {
+    "status": "PASS",
+    "test_count": 15,
+    "duration_s": 52.266,
+    "log": "focused-final.log",
+    "provenance": "Local unittest execution; not CI"
+  },
+  "final_source_files_sha256": {
+    "cosmo/integrated_downhole.py": "a259eb9a57ef208f8cb4236ad39b0379ab93a1b4471600ebdd6a99299e2821d1",
+    "cosmo/integrated_report.py": "98c7b6d09f6535032176358433e443e2dc468bffc731051c8fcb54e0d16764ec",
+    "cosmo/compact_casing.py": "748489ffaa9ff738ab259c9e7e6d29b2f2509a17e4a46d4d48cf05e360bf7c6e",
+    "cosmo/material_library.json": "c41a74b60d57894388880441609482112583fd6d760cfedfa03fea76db4da565"
+  },
+  "test_sequence_note": "Full regression passed; final orthographic orientation, detail label and retainer section-presentation corrections were followed by the complete focused integrated suite and full CAD generation/STEP validation.",
+  "commands": [
+    "python -m unittest discover -s tests -v",
+    "python -m unittest discover -s tests -p test_integrated_downhole.py -v",
+    "python -m cosmo.integrated_downhole",
+    "python -m cosmo.integrated_downhole --parameters results/integrated-downhole/parameters.json --output /tmp/pertacoustic-integrated-reproduction-verified --no-figures"
+  ],
+  "environment": {
+    "python": "3.11.16",
+    "cadquery": "2.8.0",
+    "numpy": "2.4.6",
+    "matplotlib": "3.11.1",
+    "vtk": "9.6.2"
+  },
+  "command_environment": "/var/www/pertacoustic-3d-design/.venv/bin/python; PYTHONDONTWRITEBYTECODE=1; MPLCONFIGDIR=/tmp/pertacoustic-trl5-mpl",
+  "fresh_directory_reproduction": {
+    "status": "PASS",
+    "parameters_and_source_hashes_match": true,
+    "part_identities_and_geometry_metrics_match": true,
+    "step_exports_compared": 8,
+    "volume_relative_tolerance": 1e-10,
+    "bounds_absolute_tolerance_mm": 1e-07,
+    "byte_identical_step_claimed": false
+  },
+  "artifact_manifest_check": {
+    "status": "PASS",
+    "files_checked": 17,
+    "source_hashes_checked": 4
+  },
+  "visual_inspection": {
+    "method": "Displayed the generated PNGs and inspected readable labels, opaque shell occlusion, wet/dry annotation, module consistency and axis orientation; not acoustic or manufacturing validation",
+    "images": [
+      "integrated_complete.png",
+      "integrated_sectional.png",
+      "integrated_exploded.png",
+      "integrated_orthographic.png",
+      "integration_details.png",
+      "annotated_longitudinal_section.png"
+    ],
+    "status": "Completed"
+  },
+  "preservation": {
+    "status": "PASS",
+    "protected_paths": [
+      "cosmo/biweekly5.py",
+      "cosmo/compact_casing.py",
+      "cosmo/core",
+      "cosmo/material_library.json",
+      "results/biweekly-5",
+      "results/compact-casing",
+      ".agents/context/biweekly-5",
+      "pyproject.toml",
+      "tests/test_biweekly5.py",
+      "tests/test_compact_casing.py",
+      "tests/test_results_compiler.py"
+    ],
+    "git_content_diff_from_baseline": [],
+    "original_workspace": "Clean main at the original baseline; no mutations"
+  },
+  "sensitivity_test": {
+    "od_mm": 47.625,
+    "wall_mm": 4,
+    "electronics_barrel_mm": 420,
+    "battery_barrel_mm": 220,
+    "observed_length_mm": 913,
+    "status": "PASS in integrated tests"
+  },
+  "not_performed": [
+    "Complete-instrument pressure or leak testing",
+    "New structural FEA",
+    "Complete-instrument 7200 s thermal simulation",
+    "Battery runtime or energized pack tests",
+    "Acoustic calibration",
+    "Manufacturing",
+    "Field deployment",
+    "CI"
+  ],
+  "public_distribution_review": "Only new conceptual CAD, source, generated report/figures and local validation evidence. No supplier drawings, PHE documents, field data, secrets or rejected Draft/planning artifacts included.",
+  "delivery_audit": {
+    "status": "PASS",
+    "staged_file_count": 27,
+    "rejected_task_and_planning_artifacts_excluded": true,
+    "staged_bytes_match_working_files": true,
+    "whitespace_note": "Unqualified git diff --check reports native STEP exporter trailing spaces and six intentional Markdown hard-break lines; scoped source/document/JSON validation passed. Native STEP files were not reformatted.",
+    "intentional_markdown_hard_breaks": [
+      "cosmo/integrated_report.py:42",
+      "cosmo/integrated_report.py:43",
+      "cosmo/integrated_report.py:44",
+      "results/integrated-downhole/design_report.md:3",
+      "results/integrated-downhole/design_report.md:4",
+      "results/integrated-downhole/design_report.md:5"
+    ],
+    "supplier_or_field_documents_added": false
+  }
+}

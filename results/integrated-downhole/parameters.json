@@ -1,0 +1,12 @@
+{
+  "od_mm": 44.45,
+  "wall_mm": 3.5,
+  "electronics_barrel_mm": 390.0,
+  "battery_barrel_mm": 200.0,
+  "sensor_diameter_mm": 17.4752,
+  "sensor_length_mm": 88.9,
+  "cell_diameter_mm": 33.4,
+  "cell_length_mm": 61.6,
+  "external_c": 70.0,
+  "duration_s": 7200.0
+}

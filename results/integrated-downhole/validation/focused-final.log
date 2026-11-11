@@ -1,0 +1,20 @@
+test_a_real_component_collision_is_rejected (test_integrated_downhole.IntegratedDownholeTests.test_a_real_component_collision_is_rejected) ... ok
+test_all_step_exports_round_trip_without_losing_modules (test_integrated_downhole.IntegratedDownholeTests.test_all_step_exports_round_trip_without_losing_modules) ... ok
+test_boundary_is_covered_in_ideal_cad_and_guard_has_open_paths (test_integrated_downhole.IntegratedDownholeTests.test_boundary_is_covered_in_ideal_cad_and_guard_has_open_paths) ... ok
+test_closed_acoustic_windows_are_rejected (test_integrated_downhole.IntegratedDownholeTests.test_closed_acoustic_windows_are_rejected) ... ok
+test_complete_geometry_and_all_part_interferences (test_integrated_downhole.IntegratedDownholeTests.test_complete_geometry_and_all_part_interferences) ... ok
+test_corrupt_step_import_cannot_be_reported_as_success (test_integrated_downhole.IntegratedDownholeTests.test_corrupt_step_import_cannot_be_reported_as_success) ... ok
+test_empty_and_invalid_boolean_results_fail_closed (test_integrated_downhole.IntegratedDownholeTests.test_empty_and_invalid_boolean_results_fail_closed) ... ok
+test_historical_directories_cannot_be_output_targets (test_integrated_downhole.IntegratedDownholeTests.test_historical_directories_cannot_be_output_targets) ... ok
+test_nondefault_feasible_parameters_generate_consistent_geometry (test_integrated_downhole.IntegratedDownholeTests.test_nondefault_feasible_parameters_generate_consistent_geometry) ... ok
+test_open_feedthrough_path_is_rejected (test_integrated_downhole.IntegratedDownholeTests.test_open_feedthrough_path_is_rejected) ... ok
+test_parameter_validation_rejects_infeasible_or_changed_governing_envelopes (test_integrated_downhole.IntegratedDownholeTests.test_parameter_validation_rejects_infeasible_or_changed_governing_envelopes) ... ok
+test_power_and_storage_are_explicit_scenarios_not_qualification (test_integrated_downhole.IntegratedDownholeTests.test_power_and_storage_are_explicit_scenarios_not_qualification) ... ok
+test_removable_retention_parts_allow_module_loading (test_integrated_downhole.IntegratedDownholeTests.test_removable_retention_parts_allow_module_loading) ... ok
+test_shell_geometry_has_actual_specified_wall_and_bore (test_integrated_downhole.IntegratedDownholeTests.test_shell_geometry_has_actual_specified_wall_and_bore) ... ok
+test_views_preserve_part_identity_and_explosion_is_only_translation (test_integrated_downhole.IntegratedDownholeTests.test_views_preserve_part_identity_and_explosion_is_only_translation) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 52.266s
+
+OK

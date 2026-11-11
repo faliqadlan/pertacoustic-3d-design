@@ -1,0 +1,9 @@
+{
+  "status": "PASS \u2014 NOMINAL CONCEPT GEOMETRY ONLY",
+  "length_mm": 863.0,
+  "od_mm": 44.45,
+  "parts": 36,
+  "step_exports": 8,
+  "figures": 6,
+  "output": "/tmp/pertacoustic-trl5-Y7KZYy/results/integrated-downhole"
+}

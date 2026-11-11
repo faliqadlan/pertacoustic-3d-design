@@ -1,0 +1,5 @@
+PASS: fresh-directory geometry and all 8 STEP round trips agree.
+PASS: artifact sizes, SHA-256 hashes and final source hashes agree.
+PASS: protected historical/core/dependency files have no content diff.
+PASS: 81 full-suite tests and 15 final focused tests, with separate stage provenance.
+No CI, physical qualification, full thermal simulation or acoustic calibration claimed.

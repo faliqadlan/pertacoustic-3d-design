@@ -1,0 +1,1261 @@
+{
+  "parameters": {
+    "od_mm": 44.45,
+    "wall_mm": 3.5,
+    "electronics_barrel_mm": 390.0,
+    "battery_barrel_mm": 200.0,
+    "sensor_diameter_mm": 17.4752,
+    "sensor_length_mm": 88.9,
+    "cell_diameter_mm": 33.4,
+    "cell_length_mm": 61.6,
+    "external_c": 70.0,
+    "duration_s": 7200.0
+  },
+  "geometry": {
+    "status": "PASS \u2014 NOMINAL CONCEPT GEOMETRY ONLY",
+    "part_count": 36,
+    "solid_count": 81,
+    "maximum_od_mm": 44.45,
+    "overall_length_mm": 863.0,
+    "shell_wall_mm": 3.5,
+    "shell_bore_mm": 37.45,
+    "all_pair_count": 630,
+    "boolean_pairs_after_bbox_pruning": 100,
+    "maximum_prohibited_interference_mm3": 0.0,
+    "collision_exclusions": [],
+    "volume_tolerance_mm3": 0.0001,
+    "outside_envelope_volume_mm3": 0.0,
+    "nominal_boundary_uncovered_volume_mm3": 0.0,
+    "boundary_check_limit": "Ideal CAD coverage at z=160 mm only; does not prove leak-tightness or pressure rating",
+    "wet_to_dry_transition_z_mm": [
+      153,
+      165
+    ],
+    "open_guard_rays": [
+      {
+        "azimuth_deg": 0,
+        "guard_intersection_mm3": 0.0
+      },
+      {
+        "azimuth_deg": 60,
+        "guard_intersection_mm3": 0.0
+      },
+      {
+        "azimuth_deg": 120,
+        "guard_intersection_mm3": 0.0
+      },
+      {
+        "azimuth_deg": 180,
+        "guard_intersection_mm3": 0.0
+      },
+      {
+        "azimuth_deg": 240,
+        "guard_intersection_mm3": 0.0
+      },
+      {
+        "azimuth_deg": 300,
+        "guard_intersection_mm3": 0.0
+      }
+    ],
+    "clearances_mm": {
+      "adc_enclosing_diameter_with_1mm_each_side": 34.92849839314596,
+      "adc_reserved_diametral_margin": 2.521501606854045,
+      "carrier_to_bore_radial": 0.2,
+      "battery_holder_to_bore_radial": 0.425,
+      "cell_to_holder_radial": 0.4,
+      "sensor_to_guard_radial_at_strut": 11.487400000000001,
+      "wiring_trunk_radius": 0.65,
+      "connector_bend_gap_each_end": 4.0
+    },
+    "parts": [
+      {
+        "name": "drained_nose",
+        "module": "wet_head",
+        "kind": "housing",
+        "material": "Inconel718 candidate",
+        "provenance": "Estimated concept; drain is permanently open, no valve",
+        "bounds_mm": {
+          "xmin": -22.225,
+          "xmax": 22.225,
+          "ymin": -22.225,
+          "ymax": 22.225,
+          "zmin": 0.0,
+          "zmax": 22.0
+        },
+        "volume_mm3": 14659.314039147024,
+        "exploded_offset_mm": [
+          0,
+          0,
+          -95
+        ]
+      },
+      {
+        "name": "open_sensor_guard",
+        "module": "wet_head",
+        "kind": "housing",
+        "material": "Inconel718 candidate",
+        "provenance": "Estimated open cage; acoustic transfer uncalibrated",
+        "bounds_mm": {
+          "xmin": -22.225000100000003,
+          "xmax": 22.225000100000003,
+          "ymin": -22.225000100000003,
+          "ymax": 22.225000100000003,
+          "zmin": 21.9999999,
+          "zmax": 140.0000001
+        },
+        "volume_mm3": 20481.533921365597,
+        "exploded_offset_mm": [
+          0,
+          75,
+          -45
+        ]
+      },
+      {
+        "name": "hti_reference",
+        "module": "sensor",
+        "kind": "sensor",
+        "material": "Supplier-controlled sensor",
+        "provenance": "Public HTI nominal envelope; purchased variant/interface unresolved",
+        "bounds_mm": {
+          "xmin": -8.7376,
+          "xmax": 8.7376,
+          "ymin": -8.7376,
+          "ymax": 8.7376,
+          "zmin": 32.0,
+          "zmax": 120.9
+        },
+        "volume_mm3": 21322.393409248816,
+        "exploded_offset_mm": [
+          0,
+          -60,
+          -10
+        ]
+      },
+      {
+        "name": "sensor_mount_reservation",
+        "module": "sensor",
+        "kind": "mechanical",
+        "material": "Metal candidate",
+        "provenance": "Nominal 7/16-20 provenance only; detailed thread/seal not modeled",
+        "bounds_mm": {
+          "xmin": -9.0,
+          "xmax": 9.0,
+          "ymin": -9.0,
+          "ymax": 9.0,
+          "zmin": 120.9,
+          "zmax": 153.0
+        },
+        "volume_mm3": 2520.639942731719,
+        "exploded_offset_mm": [
+          0,
+          -60,
+          -10
+        ]
+      },
+      {
+        "name": "split_sensor_retainer",
+        "module": "wet_head",
+        "kind": "holder",
+        "material": "Metal candidate",
+        "provenance": "Estimated split support below mount flange, captured by removable guard; fastening to verify",
+        "bounds_mm": {
+          "xmin": -20.225,
+          "xmax": 20.225,
+          "ymin": -20.224011100669422,
+          "ymax": 20.224011100669422,
+          "zmin": 134.0,
+          "zmax": 138.0
+        },
+        "volume_mm3": 4705.391054650247,
+        "exploded_offset_mm": [
+          0,
+          -30,
+          -10
+        ]
+      },
+      {
+        "name": "sensor_bulkhead",
+        "module": "pressure_boundary",
+        "kind": "housing",
+        "material": "Inconel718 candidate",
+        "provenance": "Estimated pressure boundary and retention land; no rating",
+        "bounds_mm": {
+          "xmin": -22.225,
+          "xmax": 22.225,
+          "ymin": -22.225,
+          "ymax": 22.225,
+          "zmin": 140.0,
+          "zmax": 187.0
+        },
+        "volume_mm3": 62005.74575809411,
+        "exploded_offset_mm": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "lower_seal_reservations",
+        "module": "pressure_boundary",
+        "kind": "seal",
+        "material": "Elastomer TBD",
+        "provenance": "Rectangular seal-space visualization, not production O-ring glands",
+        "bounds_mm": {
+          "xmin": -18.725,
+          "xmax": 18.725,
+          "ymin": -18.725,
+          "ymax": 18.725,
+          "zmin": 178.5,
+          "zmax": 185.5
+        },
+        "volume_mm3": 318.4220138908188,
+        "exploded_offset_mm": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "sealed_feedthrough_reserve",
+        "module": "pressure_boundary",
+        "kind": "insulator",
+        "material": "Hermetic insulator TBD",
+        "provenance": "Estimated three-pin sealed feedthrough, supplier verification required",
+        "bounds_mm": {
+          "xmin": -6.0,
+          "xmax": 6.0,
+          "ymin": -6.0,
+          "ymax": 6.0,
+          "zmin": 153.0,
+          "zmax": 165.0
+        },
+        "volume_mm3": 993.4972607712363,
+        "exploded_offset_mm": [
+          0,
+          50,
+          20
+        ]
+      },
+      {
+        "name": "feedthrough_conductors",
+        "module": "pressure_boundary",
+        "kind": "conductor",
+        "material": "Conductor TBD",
+        "provenance": "Three-wire visualization only, not a verified HTI pinout",
+        "bounds_mm": {
+          "xmin": -2.4,
+          "xmax": 2.4,
+          "ymin": -0.4,
+          "ymax": 0.4,
+          "zmin": 120.9,
+          "zmax": 187.0
+        },
+        "volume_mm3": 99.67645171309694,
+        "exploded_offset_mm": [
+          0,
+          50,
+          20
+        ]
+      },
+      {
+        "name": "electronics_barrel",
+        "module": "electronics_housing",
+        "kind": "housing",
+        "material": "Inconel718 candidate",
+        "provenance": "Inherited shell OD/wall; length selected for integration",
+        "bounds_mm": {
+          "xmin": -22.225,
+          "xmax": 22.225,
+          "ymin": -22.225,
+          "ymax": 22.225,
+          "zmin": 175.0,
+          "zmax": 565.0
+        },
+        "volume_mm3": 175604.8191595454,
+        "exploded_offset_mm": [
+          0,
+          85,
+          60
+        ]
+      },
+      {
+        "name": "lower_cartridge_spacer",
+        "module": "electronics_cartridge",
+        "kind": "carrier",
+        "material": "PA66-GF30 candidate",
+        "provenance": "Estimated support, not pressure bearing",
+        "bounds_mm": {
+          "xmin": -18.525000000000002,
+          "xmax": 18.525000000000002,
+          "ymin": -18.525000000000002,
+          "ymax": 18.525000000000002,
+          "zmin": 187.0,
+          "zmax": 198.0
+        },
+        "volume_mm3": 9647.617018174733,
+        "exploded_offset_mm": [
+          0,
+          0,
+          75
+        ]
+      },
+      {
+        "name": "afe",
+        "module": "electronics",
+        "kind": "electronics",
+        "material": "Functional module envelope",
+        "provenance": "Inherited nominal module envelope, not measured/custom-PCB dimensions",
+        "bounds_mm": {
+          "xmin": -8.0,
+          "xmax": 8.0,
+          "ymin": -4.0,
+          "ymax": 4.0,
+          "zmin": 207.0,
+          "zmax": 237.0
+        },
+        "volume_mm3": 3839.9999999999995,
+        "exploded_offset_mm": [
+          0,
+          -35,
+          90
+        ]
+      },
+      {
+        "name": "adc",
+        "module": "electronics",
+        "kind": "electronics",
+        "material": "Functional module envelope",
+        "provenance": "Inherited nominal module envelope, not measured/custom-PCB dimensions",
+        "bounds_mm": {
+          "xmin": -15.0,
+          "xmax": 15.0,
+          "ymin": -6.0,
+          "ymax": 6.0,
+          "zmin": 254.0,
+          "zmax": 304.0
+        },
+        "volume_mm3": 18000.0,
+        "exploded_offset_mm": [
+          0,
+          -35,
+          90
+        ]
+      },
+      {
+        "name": "mcu",
+        "module": "electronics",
+        "kind": "electronics",
+        "material": "Functional module envelope",
+        "provenance": "Inherited nominal module envelope, not measured/custom-PCB dimensions",
+        "bounds_mm": {
+          "xmin": -10.5,
+          "xmax": 10.5,
+          "ymin": -5.75,
+          "ymax": 5.75,
+          "zmin": 321.0,
+          "zmax": 374.0
+        },
+        "volume_mm3": 12799.5,
+        "exploded_offset_mm": [
+          0,
+          -35,
+          90
+        ]
+      },
+      {
+        "name": "regulator",
+        "module": "electronics",
+        "kind": "electronics",
+        "material": "Functional module envelope",
+        "provenance": "Inherited nominal module envelope, not measured/custom-PCB dimensions",
+        "bounds_mm": {
+          "xmin": -9.0,
+          "xmax": 9.0,
+          "ymin": -5.0,
+          "ymax": 5.0,
+          "zmin": 391.0,
+          "zmax": 426.0
+        },
+        "volume_mm3": 6300.0,
+        "exploded_offset_mm": [
+          0,
+          -35,
+          90
+        ]
+      },
+      {
+        "name": "rtc",
+        "module": "electronics",
+        "kind": "electronics",
+        "material": "Functional module envelope",
+        "provenance": "Inherited nominal module envelope, not measured/custom-PCB dimensions",
+        "bounds_mm": {
+          "xmin": -7.5,
+          "xmax": 7.5,
+          "ymin": -4.0,
+          "ymax": 4.0,
+          "zmin": 443.0,
+          "zmax": 468.0
+        },
+        "volume_mm3": 3000.0,
+        "exploded_offset_mm": [
+          0,
+          -35,
+          90
+        ]
+      },
+      {
+        "name": "storage",
+        "module": "electronics",
+        "kind": "electronics",
+        "material": "Functional module envelope",
+        "provenance": "Inherited nominal module envelope, not measured/custom-PCB dimensions",
+        "bounds_mm": {
+          "xmin": -7.5,
+          "xmax": 7.5,
+          "ymin": -3.0,
+          "ymax": 3.0,
+          "zmin": 485.0,
+          "zmax": 510.0
+        },
+        "volume_mm3": 2250.0,
+        "exploded_offset_mm": [
+          0,
+          -35,
+          90
+        ]
+      },
+      {
+        "name": "protection",
+        "module": "electronics",
+        "kind": "electronics",
+        "material": "Functional module envelope",
+        "provenance": "Estimated protection/circuit-break reservation",
+        "bounds_mm": {
+          "xmin": -9.0,
+          "xmax": 9.0,
+          "ymin": -4.0,
+          "ymax": 4.0,
+          "zmin": 527.0,
+          "zmax": 545.0
+        },
+        "volume_mm3": 2592.0,
+        "exploded_offset_mm": [
+          0,
+          -35,
+          90
+        ]
+      },
+      {
+        "name": "carrier_and_card_saddles",
+        "module": "electronics_cartridge",
+        "kind": "carrier",
+        "material": "PA66-GF30 prototype / PEEK benchmark",
+        "provenance": "Estimated dry internal carrier; wet properties unqualified",
+        "bounds_mm": {
+          "xmin": -18.52500000000026,
+          "xmax": 18.52500000000001,
+          "ymin": -18.52500000000017,
+          "ymax": 18.525000000000105,
+          "zmin": 198.0,
+          "zmax": 553.0
+        },
+        "volume_mm3": 30251.623654389623,
+        "exploded_offset_mm": [
+          0,
+          0,
+          75
+        ]
+      },
+      {
+        "name": "removable_card_keepers",
+        "module": "electronics_cartridge",
+        "kind": "carrier",
+        "material": "PA66-GF30 prototype / PEEK benchmark",
+        "provenance": "Estimated separate keepers fitted after radial module loading; fasteners TBD",
+        "bounds_mm": {
+          "xmin": -16.0,
+          "xmax": 16.0,
+          "ymin": 3.0,
+          "ymax": 7.0,
+          "zmin": 207.0,
+          "zmax": 545.0
+        },
+        "volume_mm3": 1344.0,
+        "exploded_offset_mm": [
+          0,
+          40,
+          90
+        ]
+      },
+      {
+        "name": "internal_connector_reservations",
+        "module": "electronics",
+        "kind": "connector",
+        "material": "Connector TBD",
+        "provenance": "Estimated plug/service and bend-space allocations, no selected connector",
+        "bounds_mm": {
+          "xmin": -4.0,
+          "xmax": 4.0,
+          "ymin": -4.0,
+          "ymax": 4.0,
+          "zmin": 198.0,
+          "zmax": 523.0
+        },
+        "volume_mm3": 3040.0,
+        "exploded_offset_mm": [
+          0,
+          -35,
+          90
+        ]
+      },
+      {
+        "name": "acquisition_harness",
+        "module": "electronics",
+        "kind": "wire",
+        "material": "Harness TBD",
+        "provenance": "Simplified routes and bend space, no wiring/pinout design",
+        "bounds_mm": {
+          "xmin": -0.6500001,
+          "xmax": 0.6500001,
+          "ymin": -0.55,
+          "ymax": 14.1500001,
+          "zmin": 187.0,
+          "zmax": 589.0
+        },
+        "volume_mm3": 597.8222666544084,
+        "exploded_offset_mm": [
+          0,
+          -35,
+          90
+        ]
+      },
+      {
+        "name": "dry_service_coupler",
+        "module": "service_joint",
+        "kind": "housing",
+        "material": "Inconel718 candidate",
+        "provenance": "Estimated threaded-retention zone; threads not detailed",
+        "bounds_mm": {
+          "xmin": -22.225,
+          "xmax": 22.225,
+          "ymin": -22.225,
+          "ymax": 22.225,
+          "zmin": 553.0,
+          "zmax": 597.0
+        },
+        "volume_mm3": 25260.14066480303,
+        "exploded_offset_mm": [
+          0,
+          0,
+          125
+        ]
+      },
+      {
+        "name": "coupler_seal_reservations",
+        "module": "service_joint",
+        "kind": "seal",
+        "material": "Elastomer TBD",
+        "provenance": "Unqualified seal-space envelopes",
+        "bounds_mm": {
+          "xmin": -18.725,
+          "xmax": 18.725,
+          "ymin": -18.725,
+          "ymax": 18.725,
+          "zmin": 556.0,
+          "zmax": 594.5
+        },
+        "volume_mm3": 636.8440277816376,
+        "exploded_offset_mm": [
+          0,
+          0,
+          125
+        ]
+      },
+      {
+        "name": "battery_barrel",
+        "module": "battery_housing",
+        "kind": "housing",
+        "material": "Inconel718 candidate",
+        "provenance": "Same preliminary shell as electronics compartment",
+        "bounds_mm": {
+          "xmin": -22.225,
+          "xmax": 22.225,
+          "ymin": -22.225,
+          "ymax": 22.225,
+          "zmin": 585.0,
+          "zmax": 785.0
+        },
+        "volume_mm3": 90053.7534151515,
+        "exploded_offset_mm": [
+          0,
+          85,
+          160
+        ]
+      },
+      {
+        "name": "battery_holder",
+        "module": "battery_pack",
+        "kind": "holder",
+        "material": "PEEK benchmark / polymer TBD",
+        "provenance": "Estimated holder; terminal style, swelling and thermal behavior TBD",
+        "bounds_mm": {
+          "xmin": -18.3,
+          "xmax": 18.3,
+          "ymin": -18.3,
+          "ymax": 18.3,
+          "zmin": 601.0,
+          "zmax": 761.2
+        },
+        "volume_mm3": 20801.947247853856,
+        "exploded_offset_mm": [
+          0,
+          0,
+          180
+        ]
+      },
+      {
+        "name": "battery_lower_end_support",
+        "module": "battery_pack",
+        "kind": "holder",
+        "material": "Insulating polymer TBD",
+        "provenance": "Separate insertion stop with lead channel; not an integral closed sleeve end",
+        "bounds_mm": {
+          "xmin": -16.9500001,
+          "xmax": 16.9500001,
+          "ymin": -16.9500001,
+          "ymax": 16.9500001,
+          "zmin": 600.9999999,
+          "zmax": 609.0000001
+        },
+        "volume_mm3": 6801.069667934439,
+        "exploded_offset_mm": [
+          0,
+          0,
+          155
+        ]
+      },
+      {
+        "name": "battery_upper_end_support",
+        "module": "battery_pack",
+        "kind": "holder",
+        "material": "Insulating polymer TBD",
+        "provenance": "Separate insertion stop; retained by axial spacer in the concept",
+        "bounds_mm": {
+          "xmin": -16.95,
+          "xmax": 16.95,
+          "ymin": -16.95,
+          "ymax": 16.95,
+          "zmin": 748.2,
+          "zmax": 761.2
+        },
+        "volume_mm3": 11080.185231707084,
+        "exploded_offset_mm": [
+          0,
+          0,
+          220
+        ]
+      },
+      {
+        "name": "cell_1",
+        "module": "battery_cells",
+        "kind": "battery",
+        "material": "Primary Li-SOCl2 candidate",
+        "provenance": "33.4 x 61.6 mm conservative nominal reservation; pack not qualified",
+        "bounds_mm": {
+          "xmin": -16.7,
+          "xmax": 16.7,
+          "ymin": -16.7,
+          "ymax": 16.7,
+          "zmin": 613.0,
+          "zmax": 674.6
+        },
+        "volume_mm3": 53971.380549834896,
+        "exploded_offset_mm": [
+          0,
+          -60,
+          180
+        ]
+      },
+      {
+        "name": "cell_2",
+        "module": "battery_cells",
+        "kind": "battery",
+        "material": "Primary Li-SOCl2 candidate",
+        "provenance": "33.4 x 61.6 mm conservative nominal reservation; pack not qualified",
+        "bounds_mm": {
+          "xmin": -16.7,
+          "xmax": 16.7,
+          "ymin": -16.7,
+          "ymax": 16.7,
+          "zmin": 682.6,
+          "zmax": 744.2
+        },
+        "volume_mm3": 53971.380549834896,
+        "exploded_offset_mm": [
+          0,
+          -60,
+          180
+        ]
+      },
+      {
+        "name": "battery_contacts_and_leads",
+        "module": "battery_cells",
+        "kind": "conductor",
+        "material": "Contacts/wires TBD",
+        "provenance": "Disconnected conductive solids are separate conductors, not a shorting bridge",
+        "bounds_mm": {
+          "xmin": -7.0000001,
+          "xmax": 7.0000001,
+          "ymin": -7.0000001,
+          "ymax": 17.9,
+          "zmin": 589.0,
+          "zmax": 748.2000001
+        },
+        "volume_mm3": 2516.1183911246285,
+        "exploded_offset_mm": [
+          0,
+          -60,
+          180
+        ]
+      },
+      {
+        "name": "battery_disconnect",
+        "module": "battery_pack",
+        "kind": "connector",
+        "material": "Connector TBD",
+        "provenance": "Estimated two-contact body; exact connector unresolved",
+        "bounds_mm": {
+          "xmin": -5.0,
+          "xmax": 5.0,
+          "ymin": -4.0,
+          "ymax": 4.0,
+          "zmin": 589.0,
+          "zmax": 599.0
+        },
+        "volume_mm3": 794.3451332235381,
+        "exploded_offset_mm": [
+          0,
+          0,
+          180
+        ]
+      },
+      {
+        "name": "battery_axial_spacers",
+        "module": "battery_pack",
+        "kind": "holder",
+        "material": "Polymer TBD",
+        "provenance": "Estimated retention stops; shock/drop loads not qualified",
+        "bounds_mm": {
+          "xmin": -18.3,
+          "xmax": 18.3,
+          "ymin": -18.3,
+          "ymax": 18.3,
+          "zmin": 597.0,
+          "zmax": 773.0
+        },
+        "volume_mm3": 14773.220072985121,
+        "exploded_offset_mm": [
+          0,
+          0,
+          180
+        ]
+      },
+      {
+        "name": "blind_upper_closure",
+        "module": "upper_interface",
+        "kind": "housing",
+        "material": "Inconel718 candidate",
+        "provenance": "Estimated blind closure; no electric-line or field cablehead standard selected",
+        "bounds_mm": {
+          "xmin": -22.225,
+          "xmax": 22.225,
+          "ymin": -22.225,
+          "ymax": 22.225,
+          "zmin": 773.0,
+          "zmax": 829.0
+        },
+        "volume_mm3": 73893.68878441211,
+        "exploded_offset_mm": [
+          0,
+          0,
+          250
+        ]
+      },
+      {
+        "name": "upper_seal_reservations",
+        "module": "upper_interface",
+        "kind": "seal",
+        "material": "Elastomer TBD",
+        "provenance": "Unqualified seal-space envelopes",
+        "bounds_mm": {
+          "xmin": -18.725,
+          "xmax": 18.725,
+          "ymin": -18.725,
+          "ymax": 18.725,
+          "zmin": 776.0,
+          "zmax": 782.5
+        },
+        "volume_mm3": 318.4220138908188,
+        "exploded_offset_mm": [
+          0,
+          0,
+          250
+        ]
+      },
+      {
+        "name": "lifting_eye_reservation",
+        "module": "upper_interface",
+        "kind": "mechanical",
+        "material": "Metal candidate",
+        "provenance": "Estimated lifting interface, no rated load or finalized wireline connection",
+        "bounds_mm": {
+          "xmin": -15.0,
+          "xmax": 15.0,
+          "ymin": -6.0,
+          "ymax": 6.0,
+          "zmin": 829.0,
+          "zmax": 863.0
+        },
+        "volume_mm3": 10625.30976972615,
+        "exploded_offset_mm": [
+          0,
+          0,
+          285
+        ]
+      }
+    ]
+  },
+  "step_exports": [
+    {
+      "file": "integrated_complete.step",
+      "status": "PASS",
+      "part_names": [
+        "drained_nose",
+        "open_sensor_guard",
+        "hti_reference",
+        "sensor_mount_reservation",
+        "split_sensor_retainer",
+        "sensor_bulkhead",
+        "lower_seal_reservations",
+        "sealed_feedthrough_reserve",
+        "feedthrough_conductors",
+        "electronics_barrel",
+        "lower_cartridge_spacer",
+        "afe",
+        "adc",
+        "mcu",
+        "regulator",
+        "rtc",
+        "storage",
+        "protection",
+        "carrier_and_card_saddles",
+        "removable_card_keepers",
+        "internal_connector_reservations",
+        "acquisition_harness",
+        "dry_service_coupler",
+        "coupler_seal_reservations",
+        "battery_barrel",
+        "battery_holder",
+        "battery_lower_end_support",
+        "battery_upper_end_support",
+        "cell_1",
+        "cell_2",
+        "battery_contacts_and_leads",
+        "battery_disconnect",
+        "battery_axial_spacers",
+        "blind_upper_closure",
+        "upper_seal_reservations",
+        "lifting_eye_reservation"
+      ],
+      "solid_count": 81,
+      "units": "mm",
+      "volume_mm3": 761871.8026852555,
+      "bounds_mm": {
+        "xmin": -22.225000100000003,
+        "xmax": 22.225000100000003,
+        "ymin": -22.225000100000003,
+        "ymax": 22.225000100000003,
+        "zmin": 0.0,
+        "zmax": 863.0
+      },
+      "volume_relative_error": 1.5942509411091532e-09
+    },
+    {
+      "file": "integrated_sectional.step",
+      "status": "PASS",
+      "part_names": [
+        "drained_nose",
+        "open_sensor_guard",
+        "hti_reference",
+        "sensor_mount_reservation",
+        "split_sensor_retainer",
+        "sensor_bulkhead",
+        "lower_seal_reservations",
+        "sealed_feedthrough_reserve",
+        "feedthrough_conductors",
+        "electronics_barrel",
+        "lower_cartridge_spacer",
+        "afe",
+        "adc",
+        "mcu",
+        "regulator",
+        "rtc",
+        "storage",
+        "protection",
+        "carrier_and_card_saddles",
+        "removable_card_keepers",
+        "internal_connector_reservations",
+        "acquisition_harness",
+        "dry_service_coupler",
+        "coupler_seal_reservations",
+        "battery_barrel",
+        "battery_holder",
+        "battery_lower_end_support",
+        "battery_upper_end_support",
+        "cell_1",
+        "cell_2",
+        "battery_contacts_and_leads",
+        "battery_disconnect",
+        "battery_axial_spacers",
+        "blind_upper_closure",
+        "upper_seal_reservations",
+        "lifting_eye_reservation"
+      ],
+      "solid_count": 80,
+      "units": "mm",
+      "volume_mm3": 479758.5893816351,
+      "bounds_mm": {
+        "xmin": -16.7,
+        "xmax": 22.225000100000003,
+        "ymin": -22.225000100000003,
+        "ymax": 22.225000100000003,
+        "zmin": -2.469136006766348e-13,
+        "zmax": 863.0
+      },
+      "volume_relative_error": 2.2496038649086465e-09
+    },
+    {
+      "file": "integrated_exploded.step",
+      "status": "PASS",
+      "part_names": [
+        "drained_nose",
+        "open_sensor_guard",
+        "hti_reference",
+        "sensor_mount_reservation",
+        "split_sensor_retainer",
+        "sensor_bulkhead",
+        "lower_seal_reservations",
+        "sealed_feedthrough_reserve",
+        "feedthrough_conductors",
+        "electronics_barrel",
+        "lower_cartridge_spacer",
+        "afe",
+        "adc",
+        "mcu",
+        "regulator",
+        "rtc",
+        "storage",
+        "protection",
+        "carrier_and_card_saddles",
+        "removable_card_keepers",
+        "internal_connector_reservations",
+        "acquisition_harness",
+        "dry_service_coupler",
+        "coupler_seal_reservations",
+        "battery_barrel",
+        "battery_holder",
+        "battery_lower_end_support",
+        "battery_upper_end_support",
+        "cell_1",
+        "cell_2",
+        "battery_contacts_and_leads",
+        "battery_disconnect",
+        "battery_axial_spacers",
+        "blind_upper_closure",
+        "upper_seal_reservations",
+        "lifting_eye_reservation"
+      ],
+      "solid_count": 81,
+      "units": "mm",
+      "volume_mm3": 761871.8026852553,
+      "bounds_mm": {
+        "xmin": -22.225000100000003,
+        "xmax": 22.225000100000003,
+        "ymin": -76.7,
+        "ymax": 107.225,
+        "zmin": -95.0,
+        "zmax": 1148.0
+      },
+      "volume_relative_error": 1.5942509411091539e-09
+    },
+    {
+      "file": "module_wet_head.step",
+      "status": "PASS",
+      "part_names": [
+        "drained_nose",
+        "open_sensor_guard",
+        "hti_reference",
+        "sensor_mount_reservation",
+        "split_sensor_retainer"
+      ],
+      "solid_count": 6,
+      "units": "mm",
+      "volume_mm3": 63689.2724586765,
+      "bounds_mm": {
+        "xmin": -22.225000100000003,
+        "xmax": 22.225000100000003,
+        "ymin": -22.225000100000003,
+        "ymax": 22.225000100000003,
+        "zmin": 0.0,
+        "zmax": 153.0
+      },
+      "volume_relative_error": 1.437182325427543e-09
+    },
+    {
+      "file": "module_sensor_bulkhead.step",
+      "status": "PASS",
+      "part_names": [
+        "sensor_bulkhead",
+        "lower_seal_reservations",
+        "sealed_feedthrough_reserve",
+        "feedthrough_conductors"
+      ],
+      "solid_count": 7,
+      "units": "mm",
+      "volume_mm3": 63417.34148447037,
+      "bounds_mm": {
+        "xmin": -22.225,
+        "xmax": 22.225,
+        "ymin": -22.225,
+        "ymax": 22.225,
+        "zmin": 120.9,
+        "zmax": 187.0
+      },
+      "volume_relative_error": 1.755389754461229e-14
+    },
+    {
+      "file": "module_electronics_cartridge.step",
+      "status": "PASS",
+      "part_names": [
+        "lower_cartridge_spacer",
+        "afe",
+        "adc",
+        "mcu",
+        "regulator",
+        "rtc",
+        "storage",
+        "protection",
+        "carrier_and_card_saddles",
+        "removable_card_keepers",
+        "internal_connector_reservations",
+        "acquisition_harness"
+      ],
+      "solid_count": 45,
+      "units": "mm",
+      "volume_mm3": 93662.56293920877,
+      "bounds_mm": {
+        "xmin": -18.525000000000123,
+        "xmax": 18.525,
+        "ymin": -18.52500000000003,
+        "ymax": 18.525,
+        "zmin": 187.0,
+        "zmax": 589.0
+      },
+      "volume_relative_error": 1.0658061805481196e-13
+    },
+    {
+      "file": "module_battery_pack.step",
+      "status": "PASS",
+      "part_names": [
+        "battery_holder",
+        "battery_lower_end_support",
+        "battery_upper_end_support",
+        "cell_1",
+        "cell_2",
+        "battery_contacts_and_leads",
+        "battery_disconnect",
+        "battery_axial_spacers"
+      ],
+      "solid_count": 12,
+      "units": "mm",
+      "volume_mm3": 164709.64796758178,
+      "bounds_mm": {
+        "xmin": -18.3,
+        "xmax": 18.3,
+        "ymin": -18.3,
+        "ymax": 18.3,
+        "zmin": 589.0,
+        "zmax": 773.0
+      },
+      "volume_relative_error": 6.818564305931608e-09
+    },
+    {
+      "file": "module_pressure_housing.step",
+      "status": "PASS",
+      "part_names": [
+        "electronics_barrel",
+        "dry_service_coupler",
+        "coupler_seal_reservations",
+        "battery_barrel",
+        "blind_upper_closure",
+        "upper_seal_reservations",
+        "lifting_eye_reservation"
+      ],
+      "solid_count": 11,
+      "units": "mm",
+      "volume_mm3": 376392.9778353181,
+      "bounds_mm": {
+        "xmin": -22.225,
+        "xmax": 22.225,
+        "ymin": -22.225,
+        "ymax": 22.225,
+        "zmin": 175.0,
+        "zmax": 863.0
+      },
+      "volume_relative_error": 1.9794685436941926e-14
+    }
+  ],
+  "figure_outputs": [
+    "integrated_complete.png",
+    "integrated_sectional.png",
+    "integrated_exploded.png",
+    "integrated_orthographic.png",
+    "integration_details.png",
+    "annotated_longitudinal_section.png"
+  ],
+  "engineering_scenarios": {
+    "structural_screening": {
+      "od_mm": 44.45,
+      "wall_mm": 3.5,
+      "material": "Inconel718",
+      "scenarios": {
+        "scenario_1000m_10mpa": {
+          "pressure_mpa": 10.0,
+          "max_von_mises_mpa": 59.69,
+          "von_mises_inner_mpa": 59.69,
+          "von_mises_outer_mpa": 42.37,
+          "strength_basis": "YIELD",
+          "screening_strength_mpa": 1000.0,
+          "screening_strength_ratio": 16.75,
+          "yield_safety_factor": 16.75
+        },
+        "scenario_intermediate_20mpa": {
+          "pressure_mpa": 20.0,
+          "max_von_mises_mpa": 119.39,
+          "von_mises_inner_mpa": 119.39,
+          "von_mises_outer_mpa": 84.74,
+          "strength_basis": "YIELD",
+          "screening_strength_mpa": 1000.0,
+          "screening_strength_ratio": 8.38,
+          "yield_safety_factor": 8.38
+        },
+        "scenario_historical_68_9mpa": {
+          "pressure_mpa": 68.9476,
+          "max_von_mises_mpa": 411.57,
+          "von_mises_inner_mpa": 411.57,
+          "von_mises_outer_mpa": 292.15,
+          "strength_basis": "YIELD",
+          "screening_strength_mpa": 1000.0,
+          "screening_strength_ratio": 2.43,
+          "yield_safety_factor": 2.43
+        }
+      },
+      "buckling_1000m": {
+        "critical_buckling_pressure_mpa": 113.33,
+        "buckling_safety_factor": 11.33
+      },
+      "buckling_20mpa": {
+        "critical_buckling_pressure_mpa": 113.33,
+        "buckling_safety_factor": 5.67
+      },
+      "buckling_historical": {
+        "critical_buckling_pressure_mpa": 113.33,
+        "buckling_safety_factor": 1.64
+      },
+      "status": "SCREENING MARGIN (FoS >= 2.0 for ~1000m and 20MPa screening; Conditional at 10,000 psi; design pressure unresolved)"
+    },
+    "pressure_rating": "UNRESOLVED \u2014 barrel-only screens do not qualify joints, feedthrough, guard or eye",
+    "power_scenarios": [
+      {
+        "load_w": 1,
+        "assumed_efficiency": 0.85,
+        "series_cells": 2,
+        "nominal_pack_v": 7.2,
+        "nominal_current_a": 0.16339869281045752,
+        "two_hour_input_wh": 2.3529411764705883,
+        "all_input_as_heat_w": 1.1764705882352942,
+        "ideal_70c_shell_resistance_budget_to_85c_k_per_w": 12.75
+      },
+      {
+        "load_w": 2,
+        "assumed_efficiency": 0.85,
+        "series_cells": 2,
+        "nominal_pack_v": 7.2,
+        "nominal_current_a": 0.32679738562091504,
+        "two_hour_input_wh": 4.705882352941177,
+        "all_input_as_heat_w": 2.3529411764705883,
+        "ideal_70c_shell_resistance_budget_to_85c_k_per_w": 6.375
+      }
+    ],
+    "thermal_status": "CONDITIONAL \u2014 no credible complete-instrument 2-hour temperature simulation without thermal contacts, heat capacity, loss distribution and external convection",
+    "storage_scenarios": [
+      {
+        "sample_rate_hz": 48000,
+        "channels_stored": 2,
+        "bytes_per_sample": 4,
+        "duration_s": 7200.0,
+        "raw_bytes": 2764800000,
+        "with_10pct_allowance_bytes": 3041280000
+      },
+      {
+        "sample_rate_hz": 96000,
+        "channels_stored": 2,
+        "bytes_per_sample": 4,
+        "duration_s": 7200.0,
+        "raw_bytes": 5529600000,
+        "with_10pct_allowance_bytes": 6082560000
+      }
+    ],
+    "battery_limits": {
+      "candidate": "2 x Saft LSH 20 in series, selection provisional",
+      "upper_cell_temperature_c_from_public_datasheet": 85,
+      "exact_pack_qualification": "NOT VERIFIED",
+      "runtime_at_70c": "NOT VERIFIED"
+    }
+  },
+  "source_sha256": "a259eb9a57ef208f8cb4236ad39b0379ab93a1b4471600ebdd6a99299e2821d1",
+  "source_files_sha256": {
+    "cosmo/integrated_downhole.py": "a259eb9a57ef208f8cb4236ad39b0379ab93a1b4471600ebdd6a99299e2821d1",
+    "cosmo/integrated_report.py": "98c7b6d09f6535032176358433e443e2dc468bffc731051c8fcb54e0d16764ec",
+    "cosmo/compact_casing.py": "748489ffaa9ff738ab259c9e7e6d29b2f2509a17e4a46d4d48cf05e360bf7c6e",
+    "cosmo/material_library.json": "c41a74b60d57894388880441609482112583fd6d760cfedfa03fea76db4da565"
+  },
+  "implementation_baseline": "667ccd59cf6657a75dfe3cc2b4c67488737ef028",
+  "actual_execution_start": "3424b6d1f4d1fb6fad891760914d6d2c319ab3ca",
+  "generation_head": "3424b6d1f4d1fb6fad891760914d6d2c319ab3ca",
+  "generation_state": "Local source and artifact generation; immutable result identified in Git handoff",
+  "contract": {
+    "type": "Human-approved prompt-defined execution contract under software-workflow 15.8",
+    "primary_request_sha256": "59ed10afde268b9865bca4e9fba620317b0e9eb4e2c624ffa4236516f8e3dab5",
+    "direct_execution_update_sha256": "7f44bd9aaf4d7dbe95cb949d62bf37dadbb66ea4fb6388725159d7b27f6cb4f2",
+    "latest_authorization": "Updated Execution Authorization \u2014 PertAcoustic TRL 5; human approval 'yes' of scoped governance amendment, 2026-11-11",
+    "preflight": "Scope, baseline, exclusions, acceptance/verification, preservation and Git permissions checked against complete supplied instructions; no unresolved material upstream decision for conceptual geometry"
+  },
+  "environment": {
+    "python": "3.11.16",
+    "cadquery": "2.8.0",
+    "numpy": "2.4.6",
+    "matplotlib": "3.11.1",
+    "vtk": "9.6.2"
+  },
+  "sources": {
+    "HTI": "https://www.hightechincusa.com/products/hydrophones/hti02dhpc.html",
+    "Sondex": "https://dam.bakerhughes.com/m/51dd2829b101fada/original/Sondex-noise-tool-spec.pdf",
+    "Saft": "https://saft4u.saft.com/en/download_file/8bdd6f76-c9c5-422e-95bd-a18e0a12d80f/English",
+    "TI": "https://www.ti.com/lit/ds/symlink/pcm1808.pdf",
+    "IEC1": "https://webstore.iec.ch/en/publication/32074",
+    "IEC2": "https://webstore.iec.ch/en/publication/33276"
+  },
+  "terminal_state": "Review Required; independent acceptance pending"
+}

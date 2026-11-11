@@ -1,0 +1,152 @@
+test_buckling_parser_and_temperature_extractor_fail_closed (test_biweekly5.Biweekly5StudyTests.test_buckling_parser_and_temperature_extractor_fail_closed) ... ok
+test_calculix_conductivity_keeps_w_per_mk_numeric_value (test_biweekly5.Biweekly5StudyTests.test_calculix_conductivity_keeps_w_per_mk_numeric_value) ... ok
+test_calculix_fatal_text_is_not_success (test_biweekly5.Biweekly5StudyTests.test_calculix_fatal_text_is_not_success) ... ok
+test_component_temperature_zones_do_not_mix_endcaps (test_biweekly5.Biweekly5StudyTests.test_component_temperature_zones_do_not_mix_endcaps) ... ok
+test_geometry_and_pressure_screens (test_biweekly5.Biweekly5StudyTests.test_geometry_and_pressure_screens) ... ok
+test_pressure_model_is_closed_and_materials_match_library (test_biweekly5.Biweekly5StudyTests.test_pressure_model_is_closed_and_materials_match_library) ... ok
+test_revised_candidate_replaces_the_old_radial_only_selection (test_biweekly5.Biweekly5StudyTests.test_revised_candidate_replaces_the_old_radial_only_selection) ... ok
+test_revised_geometry_and_status_gate_are_consistent (test_biweekly5.Biweekly5StudyTests.test_revised_geometry_and_status_gate_are_consistent) ... ok
+test_second_order_tetrahedron_keeps_pressure_face_detection (test_biweekly5.Biweekly5StudyTests.test_second_order_tetrahedron_keeps_pressure_face_detection) ... ok
+test_thermal_model_and_thread_datum (test_biweekly5.Biweekly5StudyTests.test_thermal_model_and_thread_datum) ... ok
+test_20mpa_and_historical_10kpsi_metrics_included_in_envelope (test_compact_casing.SimplifiedCompactCasingTests.test_20mpa_and_historical_10kpsi_metrics_included_in_envelope)
+5. 20 MPa and historical 10k psi values are included in the envelope result. ... ok
+test_3d_cad_solid_watertight_and_step_export_conformal_carrier (test_compact_casing.SimplifiedCompactCasingTests.test_3d_cad_solid_watertight_and_step_export_conformal_carrier)
+Verify watertight CadQuery solid generation for conformal carrier casing. ... /var/www/pertacoustic-3d-design/.venv/lib/python3.11/site-packages/cadquery/utils.py:82: FutureWarning: save will be removed in the next release.
+  warn(f"{f.__name__} will be removed in the next release.", FutureWarning)
+ok
+test_cad_assembly_bounding_extent_matches_total_length (test_compact_casing.SimplifiedCompactCasingTests.test_cad_assembly_bounding_extent_matches_total_length)
+Verify that CAD solid assembly axial extent matches modeled length <= 2000 mm. ... ok
+test_carrier_dimensional_sensitivity_sweep (test_compact_casing.SimplifiedCompactCasingTests.test_carrier_dimensional_sensitivity_sweep)
+Verify carrier dimensional sensitivity sweep across assumed swelling allowances. ... ok
+test_carrier_material_trade_matrix_content (test_compact_casing.SimplifiedCompactCasingTests.test_carrier_material_trade_matrix_content)
+Verify carrier material trade matrix contains all three material families with correct classification. ... ok
+test_carrier_tolerance_budget_includes_thermal_expansion (test_compact_casing.SimplifiedCompactCasingTests.test_carrier_tolerance_budget_includes_thermal_expansion)
+Verify explicit carrier tolerance budget accounts for differential expansion, tolerances, and assumed screening allowance. ... ok
+test_carrier_tolerance_budget_returns_complete_dict (test_compact_casing.SimplifiedCompactCasingTests.test_carrier_tolerance_budget_returns_complete_dict) ... ok
+test_component_limits_exact_and_conditional_classification (test_compact_casing.SimplifiedCompactCasingTests.test_component_limits_exact_and_conditional_classification)
+Verify that only authorized ICs are verified and unspecified parts are unverified. ... ok
+test_current_electronics_requirement_derived_from_source_dimensions (test_compact_casing.SimplifiedCompactCasingTests.test_current_electronics_requirement_derived_from_source_dimensions)
+9. Current electronics requirement remains derived from source dimensions. ... ok
+test_current_shell_thermal_result_is_not_labeled_cavity_temperature (test_compact_casing.SimplifiedCompactCasingTests.test_current_shell_thermal_result_is_not_labeled_cavity_temperature)
+Verify that 1D thermal simulation explicitly labels its result as inner shell surface temperature. ... ok
+test_design_envelope_constants_conform_to_formal_authority (test_compact_casing.SimplifiedCompactCasingTests.test_design_envelope_constants_conform_to_formal_authority)
+Verify boundary constants match formal MoM and design direction. ... ok
+test_exact_30mm_id_fails_strict_floor_rule (test_compact_casing.SimplifiedCompactCasingTests.test_exact_30mm_id_fails_strict_floor_rule)
+1. Exactly 30.0 mm ID fails the strict ID > 30 mm floor rule. ... ok
+test_final_carrier_remains_inside_shell_at_nominal_geometry (test_compact_casing.SimplifiedCompactCasingTests.test_final_carrier_remains_inside_shell_at_nominal_geometry)
+Verify that nominal carrier outer radius (18.525 mm) remains strictly inside the shell bore (18.725 mm). ... ok
+test_future_custom_pcb_dimensions_are_input_driven (test_compact_casing.SimplifiedCompactCasingTests.test_future_custom_pcb_dimensions_are_input_driven)
+10. Future custom-PCB dimensions remain input-driven. ... ok
+test_generated_trade_study_report_and_csv_contain_three_materials (test_compact_casing.SimplifiedCompactCasingTests.test_generated_trade_study_report_and_csv_contain_three_materials)
+Verify exported report and CSV contain all required sections and data for PEEK, PPA, and PA66. ... ok
+test_historical_biweekly5_artifacts_remain_unmodified (test_compact_casing.SimplifiedCompactCasingTests.test_historical_biweekly5_artifacts_remain_unmodified)
+Verify historical Biweekly 5 script and results remain intact. ... ok
+test_id_floor_is_not_target_and_envelope_study_is_parametric (test_compact_casing.SimplifiedCompactCasingTests.test_id_floor_is_not_target_and_envelope_study_is_parametric) ... ok
+test_inconel_structural_screening_multi_scenarios (test_compact_casing.SimplifiedCompactCasingTests.test_inconel_structural_screening_multi_scenarios)
+Verify Inconel 718 metallic shell maintains high structural margin under ~1000 m and 20 MPa. ... ok
+test_interference_calculation_errors_fail_closed (test_compact_casing.SimplifiedCompactCasingTests.test_interference_calculation_errors_fail_closed)
+Verify that geometry kernel or solid calculation errors fail closed (passed=False, status='ERROR / NOT VERIFIED'). ... ok
+test_internal_thermal_resistance_budget_derived_from_live_results (test_compact_casing.SimplifiedCompactCasingTests.test_internal_thermal_resistance_budget_derived_from_live_results)
+Verify allowable internal thermal resistance budget calculation: (85 - T_shell) / P. ... ok
+test_internal_thermal_sensitivity_sweep (test_compact_casing.SimplifiedCompactCasingTests.test_internal_thermal_sensitivity_sweep)
+Verify lumped parameter sweep across R_internal. ... ok
+test_invalid_boolean_shape_fails_closed (test_compact_casing.SimplifiedCompactCasingTests.test_invalid_boolean_shape_fails_closed)
+Verify that an invalid OCC Boolean result shape fails closed rather than silently returning 0.0. ... ok
+test_non_empty_boolean_result_with_val_none_fails_closed (test_compact_casing.SimplifiedCompactCasingTests.test_non_empty_boolean_result_with_val_none_fails_closed)
+Verify that a non-empty Boolean objects list with val() == None fails closed. ... ok
+test_nylon_prototype_report_preserves_evidence_boundaries (test_compact_casing.SimplifiedCompactCasingTests.test_nylon_prototype_report_preserves_evidence_boundaries)
+The generated report must distinguish prototype screening from qualification evidence. ... ok
+test_only_one_candidate_marked_recommended (test_compact_casing.SimplifiedCompactCasingTests.test_only_one_candidate_marked_recommended)
+Verify that exactly one candidate in the trade study has is_recommended_baseline == True. ... ok
+test_pa66_cad_variant_names_carrier_material (test_compact_casing.SimplifiedCompactCasingTests.test_pa66_cad_variant_names_carrier_material)
+The explicit PA66 prototype CAD variant must be identifiable in metadata. ... ok
+test_pa66_dimensional_report_values_are_generated_from_live_rows (test_compact_casing.SimplifiedCompactCasingTests.test_pa66_dimensional_report_values_are_generated_from_live_rows)
+PA66 sizing prose must reflect the same live sensitivity rows as the table. ... ok
+test_pa66_material_properties_and_datasheet_exactness (test_compact_casing.SimplifiedCompactCasingTests.test_pa66_material_properties_and_datasheet_exactness)
+Verify BASF Ultramid A3WG6 HRX BK23591 PA66-GF30 properties match verified datasheet values. ... ok
+test_pa66_not_eligible_as_current_pressure_shell_baseline (test_compact_casing.SimplifiedCompactCasingTests.test_pa66_not_eligible_as_current_pressure_shell_baseline)
+Verify PA66 is not eligible as the current pressure-shell baseline. ... ok
+test_pcm1808_exact_geometry_and_packaging_clearance (test_compact_casing.SimplifiedCompactCasingTests.test_pcm1808_exact_geometry_and_packaging_clearance)
+Verify exact PCM1808 nominal dimensions, clearance calculation, and direct circular fit rules. ... ok
+test_pcm1808_reserved_envelope_and_assembly_zero_prohibited_interference (test_compact_casing.SimplifiedCompactCasingTests.test_pcm1808_reserved_envelope_and_assembly_zero_prohibited_interference)
+Verify automated Boolean intersection interference checks pass with zero collision volume. ... ok
+test_peek_provenance_and_clte (test_compact_casing.SimplifiedCompactCasingTests.test_peek_provenance_and_clte)
+Verify Victrex 450G PEEK provenance and CLTE data. ... ok
+test_polymer_csv_strength_values_not_mislabeled_as_yield (test_compact_casing.SimplifiedCompactCasingTests.test_polymer_csv_strength_values_not_mislabeled_as_yield)
+Verify that CSV output columns do not mislabel polymer strength as yield. ... ok
+test_polymer_only_casing_shows_structural_limitations (test_compact_casing.SimplifiedCompactCasingTests.test_polymer_only_casing_shows_structural_limitations)
+Verify that PEEK-only and PPA-only casings exhibit severe buckling vulnerability. ... ok
+test_ppa_derived_70c_properties_match_solvay_source_and_interpolation (test_compact_casing.SimplifiedCompactCasingTests.test_ppa_derived_70c_properties_match_solvay_source_and_interpolation)
+Verify Solvay Amodel technical design guide source data and exact linear interpolation at 70 °C. ... ok
+test_ppa_strength_basis_is_explicit_and_not_mislabeled_as_yield (test_compact_casing.SimplifiedCompactCasingTests.test_ppa_strength_basis_is_explicit_and_not_mislabeled_as_yield)
+Verify that PPA strength basis is explicitly labeled as tensile stress at break and not yield. ... ok
+test_radial_budget_returns_dict_with_nested_tolerance_budget (test_compact_casing.SimplifiedCompactCasingTests.test_radial_budget_returns_dict_with_nested_tolerance_budget) ... ok
+test_recommendation_cannot_select_missing_or_failed_collision_evidence (test_compact_casing.SimplifiedCompactCasingTests.test_recommendation_cannot_select_missing_or_failed_collision_evidence)
+Verify that recommendation engine rejects candidates with missing, False, or ERROR collision status. ... ok
+test_recommendation_engine_rule_logic (test_compact_casing.SimplifiedCompactCasingTests.test_recommendation_engine_rule_logic)
+Verify that candidate recommendation is governed by explicit multi-gate engineering rules. ... ok
+test_recommendation_selector_derives_44_45_with_current_inputs (test_compact_casing.SimplifiedCompactCasingTests.test_recommendation_selector_derives_44_45_with_current_inputs)
+6. The recommendation selector derives 44.45/3.5 with current inputs. ... ok
+test_report_and_csv_consistency_for_recommended_candidate (test_compact_casing.SimplifiedCompactCasingTests.test_report_and_csv_consistency_for_recommended_candidate)
+Verify that generated Markdown report and CSV match 100% numerically for the recommended baseline. ... ok
+test_report_separates_ppa_dam_temperatures_and_first_prototype (test_compact_casing.SimplifiedCompactCasingTests.test_report_separates_ppa_dam_temperatures_and_first_prototype)
+PPA interpolations and the PA66-first decision must be explicit in generated prose. ... ok
+test_required_diameter_is_derived_and_floor_can_pass_while_packaging_fails (test_compact_casing.SimplifiedCompactCasingTests.test_required_diameter_is_derived_and_floor_can_pass_while_packaging_fails)
+2 & 9. Derived required diameter and floor pass while packaging fails. ... ok
+test_selector_picks_next_smallest_viable_od_when_44_45_infeasible (test_compact_casing.SimplifiedCompactCasingTests.test_selector_picks_next_smallest_viable_od_when_44_45_infeasible)
+7. If 44.45 becomes infeasible in a synthetic test, the next smallest viable OD is selected. ... ok
+test_selector_returns_none_if_no_od_viable (test_compact_casing.SimplifiedCompactCasingTests.test_selector_returns_none_if_no_od_viable)
+8. If no OD is viable, no false recommendation is produced. ... ok
+test_structural_authority_remains_conditional_design_pressure_unresolved (test_compact_casing.SimplifiedCompactCasingTests.test_structural_authority_remains_conditional_design_pressure_unresolved)
+4. Structural authority remains CONDITIONAL — DESIGN PRESSURE UNRESOLVED. ... ok
+test_structural_status_explicitly_states_10mpa_screening_basis (test_compact_casing.SimplifiedCompactCasingTests.test_structural_status_explicitly_states_10mpa_screening_basis)
+3. Structural status explicitly states the 10 MPa screening basis. ... ok
+test_thermal_simulation_demonstrates_aerogel_heat_trapping (test_compact_casing.SimplifiedCompactCasingTests.test_thermal_simulation_demonstrates_aerogel_heat_trapping)
+Verify that aerogel is detrimental under 1.0 W internal dissipation at 70 °C. ... ok
+test_tolerance_budget_gate_in_recommendation_engine (test_compact_casing.SimplifiedCompactCasingTests.test_tolerance_budget_gate_in_recommendation_engine)
+Verify that discrete-carrier candidates with missing or inadequate tolerance budget are disqualified. ... ok
+test_total_tool_length_gate_in_recommendation_engine (test_compact_casing.SimplifiedCompactCasingTests.test_total_tool_length_gate_in_recommendation_engine)
+Verify that candidate exceeding total modeled tool length of 2000 mm is disqualified. ... ok
+test_transverse_cross_section_render_succeeds (test_compact_casing.SimplifiedCompactCasingTests.test_transverse_cross_section_render_succeeds)
+Verify transverse PCM1808 clearance cross-section figure is rendered properly. ... ok
+test_unsupported_material_values_not_marked_verified (test_compact_casing.SimplifiedCompactCasingTests.test_unsupported_material_values_not_marked_verified)
+Verify that assumed/screening values like PPA conductivity are NOT marked VERIFIED. ... ok
+test_wall_selection_not_list_order_dependent (test_compact_casing.SimplifiedCompactCasingTests.test_wall_selection_not_list_order_dependent)
+Verify that 3.5 mm baseline wall selection is governed by explicit packaging rule and not list order. ... ok
+test_wall_thickness_sensitivity_included_in_trade_study (test_compact_casing.SimplifiedCompactCasingTests.test_wall_thickness_sensitivity_included_in_trade_study)
+Verify that 4.0 mm wall sensitivity candidate is evaluated and achieves higher buckling margin. ... ok
+test_yield_safety_factor_only_exists_for_yield_strength_basis (test_compact_casing.SimplifiedCompactCasingTests.test_yield_safety_factor_only_exists_for_yield_strength_basis)
+Generic polymer tensile screening must not be reported as yield safety factor. ... ok
+test_a_real_component_collision_is_rejected (test_integrated_downhole.IntegratedDownholeTests.test_a_real_component_collision_is_rejected) ... ok
+test_all_step_exports_round_trip_without_losing_modules (test_integrated_downhole.IntegratedDownholeTests.test_all_step_exports_round_trip_without_losing_modules) ... ok
+test_boundary_is_covered_in_ideal_cad_and_guard_has_open_paths (test_integrated_downhole.IntegratedDownholeTests.test_boundary_is_covered_in_ideal_cad_and_guard_has_open_paths) ... ok
+test_closed_acoustic_windows_are_rejected (test_integrated_downhole.IntegratedDownholeTests.test_closed_acoustic_windows_are_rejected) ... ok
+test_complete_geometry_and_all_part_interferences (test_integrated_downhole.IntegratedDownholeTests.test_complete_geometry_and_all_part_interferences) ... ok
+test_corrupt_step_import_cannot_be_reported_as_success (test_integrated_downhole.IntegratedDownholeTests.test_corrupt_step_import_cannot_be_reported_as_success) ... ok
+test_empty_and_invalid_boolean_results_fail_closed (test_integrated_downhole.IntegratedDownholeTests.test_empty_and_invalid_boolean_results_fail_closed) ... ok
+test_historical_directories_cannot_be_output_targets (test_integrated_downhole.IntegratedDownholeTests.test_historical_directories_cannot_be_output_targets) ... ok
+test_nondefault_feasible_parameters_generate_consistent_geometry (test_integrated_downhole.IntegratedDownholeTests.test_nondefault_feasible_parameters_generate_consistent_geometry) ... ok
+test_open_feedthrough_path_is_rejected (test_integrated_downhole.IntegratedDownholeTests.test_open_feedthrough_path_is_rejected) ... ok
+test_parameter_validation_rejects_infeasible_or_changed_governing_envelopes (test_integrated_downhole.IntegratedDownholeTests.test_parameter_validation_rejects_infeasible_or_changed_governing_envelopes) ... ok
+test_power_and_storage_are_explicit_scenarios_not_qualification (test_integrated_downhole.IntegratedDownholeTests.test_power_and_storage_are_explicit_scenarios_not_qualification) ... ok
+test_removable_retention_parts_allow_module_loading (test_integrated_downhole.IntegratedDownholeTests.test_removable_retention_parts_allow_module_loading) ... ok
+test_shell_geometry_has_actual_specified_wall_and_bore (test_integrated_downhole.IntegratedDownholeTests.test_shell_geometry_has_actual_specified_wall_and_bore) ... ok
+test_views_preserve_part_identity_and_explosion_is_only_translation (test_integrated_downhole.IntegratedDownholeTests.test_views_preserve_part_identity_and_explosion_is_only_translation) ... ok
+test_uses_run_threshold_without_inventing_metrics (test_results_compiler.ResultsCompilerTest.test_uses_run_threshold_without_inventing_metrics) ... ok
+
+----------------------------------------------------------------------
+Ran 81 tests in 69.405s
+
+OK
+Inp file modified with CalculiX properties.
+Running CalculiX job: probe using ccx
+CalculiX finished successfully.
+Inp file modified with CalculiX properties.
+Running CalculiX job: fatal_probe using ccx
+CalculiX reported a fatal input/solver error.
+Compact CAD STEP assembly exported to /tmp/tmpxpk772qp/test_conformal_carrier_casing.step (Axial Bounding Span: 656.9 mm)
+Trade study report exported to /tmp/tmp0zmy3fy1/compact_casing_redesign_report.md
+Trade study CSV exported to /tmp/tmp0zmy3fy1/compact_casing_trade_study.csv
+Trade study report exported to /tmp/tmpkxcpeh9f/compact_casing_redesign_report.md
+Trade study CSV exported to /tmp/tmpkxcpeh9f/compact_casing_trade_study.csv
+Comparison table generated: /tmp/tmpfqwajrjt/comparison.md
