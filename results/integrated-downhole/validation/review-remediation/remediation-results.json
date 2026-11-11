@@ -1,0 +1,93 @@
+{
+  "record_type": "Bounded review remediation: exact final-source full regression, STEP reconfirmation and governance approval provenance",
+  "reviewer_verdict_received": "REMEDIATION REQUIRED",
+  "terminal_state": "Review Required; independent Planner/Reviewer reassessment pending",
+  "repository": "faliqadlan/pertacoustic-3d-design",
+  "branch": "feat/trl5-integrated-downhole-concept",
+  "reviewed_and_tested_source_commit": "d9f69e81ff0882f17f9fa2425ef3df79d5d00f9d",
+  "reviewed_and_tested_tree": "000c641534b52e570d84e141e6cd214281103636",
+  "final_source_identity": "No implementation, test, geometry, visual, parameter or governance file was changed. The remediation commit adds evidence only; all previously tracked bytes remain identical to the exact tested commit. Its resulting SHA is supplied in the Git handoff to avoid a self-referential commit identifier.",
+  "source_hashes": "source-snapshot.json lists every tracked input at the tested revision with its SHA-256, byte count and Git blob identity; all were checked against the commit before execution and rehashed after verification.",
+  "tracked_files_verified_unchanged": 91,
+  "full_regression": {
+    "tested_commit": "d9f69e81ff0882f17f9fa2425ef3df79d5d00f9d",
+    "tested_tree": "000c641534b52e570d84e141e6cd214281103636",
+    "command": [
+      "/var/www/pertacoustic-3d-design/.venv/bin/python",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-v"
+    ],
+    "cwd": "/tmp/pertacoustic-trl5-Y7KZYy",
+    "environment_overrides": {
+      "PYTHONDONTWRITEBYTECODE": "1",
+      "MPLCONFIGDIR": "/tmp/pertacoustic-trl5-mpl"
+    },
+    "exit_code": 0,
+    "wall_time_s": 58.792840439999964,
+    "tracked_changes_during_tests": [],
+    "head_after": "d9f69e81ff0882f17f9fa2425ef3df79d5d00f9d",
+    "test_count": 81,
+    "unittest_reported_duration_s": 53.473,
+    "actual_summary": "Ran 81 tests in 53.473s\n\nOK",
+    "log": "unittest-final-source.log",
+    "provenance": "Observed local execution, not CI"
+  },
+  "step_reconfirmation": {
+    "status": "PASS",
+    "detail": "step-recheck.json",
+    "log": "step-recheck.log",
+    "export_count": 8,
+    "method": "Preserved published files: SHA-256 manifest checks and independent STEP reimport; exact final source: fresh-directory geometry generation, eight export/reimport checks and comparison with published artifacts.",
+    "published_artifact_manifest_entries_verified": 17,
+    "geometry": {
+      "status": "PASS — NOMINAL CONCEPT GEOMETRY ONLY",
+      "part_count": 36,
+      "solid_count": 81,
+      "maximum_od_mm": 44.45,
+      "overall_length_mm": 863.0,
+      "all_pair_count": 630,
+      "boolean_pairs_after_bbox_pruning": 100,
+      "maximum_prohibited_interference_mm3": 0.0,
+      "nominal_boundary_uncovered_volume_mm3": 0.0
+    },
+    "geometry_or_published_artifact_changes": []
+  },
+  "governance_authorization": {
+    "detail": "approval-provenance.json",
+    "source": "Explicit approval question and immediately following human yes in the current conversation",
+    "new_governance_changes": [],
+    "limitation": "No stable conversation message ID, transcript URL or independently signed approval artifact is exposed by the runtime. This record transcribes observable turns; the Reviewer should confirm them against the original conversation. No separate human or institutional approval is inferred."
+  },
+  "preservation": {
+    "status": "PASS",
+    "all_previously_tracked_bytes_identical_to_tested_commit": true,
+    "existing_geometry_and_images_preserved": true,
+    "historical_files_preserved": true,
+    "rejected_draft_and_planning_artifacts": "Remain untracked and excluded from this remediation commit."
+  },
+  "scope": {
+    "implementation_changes": [],
+    "test_source_changes": [],
+    "geometry_changes": [],
+    "governance_changes": [],
+    "evidence_files_added": [
+      "approval-provenance.json",
+      "remediation-results.json",
+      "source-snapshot.json",
+      "step-recheck.json",
+      "step-recheck.log",
+      "unittest-final-source.log"
+    ]
+  },
+  "earlier_evidence": "The original validation/test_results.json remains unchanged as historical staged-run evidence. This remediation closes the full-suite gap for the exact final source, rather than relabeling that earlier intermediate run.",
+  "remaining_boundaries": [
+    "Independent Planner/Reviewer acceptance remains pending.",
+    "The approval turn pair must remain available to the Reviewer; this evidence file does not independently authenticate it.",
+    "Existing pressure, sealing, battery/thermal and acoustic qualification limitations remain unchanged and were not reopened or claimed resolved."
+  ],
+  "new_execution_blockers": []
+}

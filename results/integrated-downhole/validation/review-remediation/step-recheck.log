@@ -1,0 +1,133 @@
+{
+  "status": "PASS \u2014 NOMINAL CONCEPT GEOMETRY ONLY",
+  "length_mm": 863.0,
+  "od_mm": 44.45,
+  "parts": 36,
+  "step_exports": 8,
+  "figures": 0,
+  "output": "/tmp/pertacoustic-remediation-step-cgo0is5x"
+}
+{
+  "tested_commit": "d9f69e81ff0882f17f9fa2425ef3df79d5d00f9d",
+  "status": "PASS",
+  "method": "Preserved published files: SHA-256 manifest checks and independent STEP reimport; exact final source: fresh-directory geometry generation, eight export/reimport checks and comparison with published artifacts.",
+  "published_artifact_manifest_entries_verified": 17,
+  "fresh_output_directory": "/tmp/pertacoustic-remediation-step-cgo0is5x",
+  "geometry": {
+    "status": "PASS \u2014 NOMINAL CONCEPT GEOMETRY ONLY",
+    "part_count": 36,
+    "solid_count": 81,
+    "maximum_od_mm": 44.45,
+    "overall_length_mm": 863.0,
+    "all_pair_count": 630,
+    "boolean_pairs_after_bbox_pruning": 100,
+    "maximum_prohibited_interference_mm3": 0.0,
+    "nominal_boundary_uncovered_volume_mm3": 0.0
+  },
+  "source_files_sha256": {
+    "cosmo/integrated_downhole.py": "a259eb9a57ef208f8cb4236ad39b0379ab93a1b4471600ebdd6a99299e2821d1",
+    "cosmo/integrated_report.py": "98c7b6d09f6535032176358433e443e2dc468bffc731051c8fcb54e0d16764ec",
+    "cosmo/compact_casing.py": "748489ffaa9ff738ab259c9e7e6d29b2f2509a17e4a46d4d48cf05e360bf7c6e",
+    "cosmo/material_library.json": "c41a74b60d57894388880441609482112583fd6d760cfedfa03fea76db4da565"
+  },
+  "exports": [
+    {
+      "path": "results/integrated-downhole/cad/integrated_complete.step",
+      "sha256": "6ddef283835b4bf64397a5f5432f0939a3238f742c9dd842b4d35bd12b77e837",
+      "status": "PASS",
+      "units": "mm",
+      "valid_solid_count": 81,
+      "volume_mm3": 761871.8026852555,
+      "absolute_volume_error_vs_published_mm3": 0.0,
+      "max_bounds_error_vs_published_mm": 0.0,
+      "max_bounds_error_vs_fresh_mm": 0.0,
+      "fresh_source_export_round_trip": "PASS"
+    },
+    {
+      "path": "results/integrated-downhole/cad/integrated_sectional.step",
+      "sha256": "2219c367d6da25960d78b8861b4a357df98cfa5a076e479798102ccfae997421",
+      "status": "PASS",
+      "units": "mm",
+      "valid_solid_count": 80,
+      "volume_mm3": 479758.5893816351,
+      "absolute_volume_error_vs_published_mm3": 0.0,
+      "max_bounds_error_vs_published_mm": 0.0,
+      "max_bounds_error_vs_fresh_mm": 0.0,
+      "fresh_source_export_round_trip": "PASS"
+    },
+    {
+      "path": "results/integrated-downhole/cad/integrated_exploded.step",
+      "sha256": "7b63a8f44154b447beaac106110bb1b905470742c75cf37d31be471106ee5832",
+      "status": "PASS",
+      "units": "mm",
+      "valid_solid_count": 81,
+      "volume_mm3": 761871.8026852553,
+      "absolute_volume_error_vs_published_mm3": 0.0,
+      "max_bounds_error_vs_published_mm": 0.0,
+      "max_bounds_error_vs_fresh_mm": 0.0,
+      "fresh_source_export_round_trip": "PASS"
+    },
+    {
+      "path": "results/integrated-downhole/cad/module_wet_head.step",
+      "sha256": "8771939cc154cdd2d692eed182f82c66173ac8bb00c739c8148d80ce1feb186f",
+      "status": "PASS",
+      "units": "mm",
+      "valid_solid_count": 6,
+      "volume_mm3": 63689.2724586765,
+      "absolute_volume_error_vs_published_mm3": 0.0,
+      "max_bounds_error_vs_published_mm": 0.0,
+      "max_bounds_error_vs_fresh_mm": 0.0,
+      "fresh_source_export_round_trip": "PASS"
+    },
+    {
+      "path": "results/integrated-downhole/cad/module_sensor_bulkhead.step",
+      "sha256": "6c2fb9e23e030a3c1e5d8157af0318047f4f1461eed617becb221bddc850b35f",
+      "status": "PASS",
+      "units": "mm",
+      "valid_solid_count": 7,
+      "volume_mm3": 63417.34148447037,
+      "absolute_volume_error_vs_published_mm3": 0.0,
+      "max_bounds_error_vs_published_mm": 0.0,
+      "max_bounds_error_vs_fresh_mm": 0.0,
+      "fresh_source_export_round_trip": "PASS"
+    },
+    {
+      "path": "results/integrated-downhole/cad/module_electronics_cartridge.step",
+      "sha256": "e412d9d433d2caa3b7e3f01631389aa71ae002a3f3158b174193a85883860c2b",
+      "status": "PASS",
+      "units": "mm",
+      "valid_solid_count": 45,
+      "volume_mm3": 93662.56293920877,
+      "absolute_volume_error_vs_published_mm3": 0.0,
+      "max_bounds_error_vs_published_mm": 0.0,
+      "max_bounds_error_vs_fresh_mm": 0.0,
+      "fresh_source_export_round_trip": "PASS"
+    },
+    {
+      "path": "results/integrated-downhole/cad/module_battery_pack.step",
+      "sha256": "ffe4cffafd9930d670777091eb13c5a97b54738654c443c6b418560bebcb62a5",
+      "status": "PASS",
+      "units": "mm",
+      "valid_solid_count": 12,
+      "volume_mm3": 164709.64796758178,
+      "absolute_volume_error_vs_published_mm3": 0.0,
+      "max_bounds_error_vs_published_mm": 0.0,
+      "max_bounds_error_vs_fresh_mm": 0.0,
+      "fresh_source_export_round_trip": "PASS"
+    },
+    {
+      "path": "results/integrated-downhole/cad/module_pressure_housing.step",
+      "sha256": "0fbfbf94952cffd70b47328b5552dcec97468ca72da7bd255ee8ff26217d8767",
+      "status": "PASS",
+      "units": "mm",
+      "valid_solid_count": 11,
+      "volume_mm3": 376392.9778353181,
+      "absolute_volume_error_vs_published_mm3": 0.0,
+      "max_bounds_error_vs_published_mm": 0.0,
+      "max_bounds_error_vs_fresh_mm": 0.0,
+      "fresh_source_export_round_trip": "PASS"
+    }
+  ],
+  "geometry_or_published_artifact_changes": [],
+  "limits": "Nominal CAD geometry only; no new physical qualification or acoustic/thermal performance claims."
+}

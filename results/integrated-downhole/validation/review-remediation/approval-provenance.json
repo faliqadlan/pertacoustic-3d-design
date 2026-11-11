@@ -1,0 +1,50 @@
+{
+  "record_type": "Governance authorization evidence reconciliation; not a new approval or policy change",
+  "reviewed_revision": "d9f69e81ff0882f17f9fa2425ef3df79d5d00f9d",
+  "governance_exception_commit": "3424b6d1f4d1fb6fad891760914d6d2c319ab3ca",
+  "governance_files": [
+    ".agents/AGENTS.md",
+    ".agents/software-workflow.md",
+    ".agents/manifest.json"
+  ],
+  "governance_diff_from_exception_commit": [],
+  "evidence_source": {
+    "kind": "Current conversation, observed by the Executor",
+    "stable_message_id": null,
+    "transcript_url": null,
+    "independently_exported_transcript_available": false,
+    "limitation": "The runtime exposes conversation contents but no stable message identifiers, transcript URL or human-signed approval artifact. The following turn pair is an Executor transcription of those visible messages; independent review should consult the original conversation."
+  },
+  "observed_turn_sequence": [
+    {
+      "speaker": "assistant",
+      "context": "The immediately preceding response linked the unapplied governance amendment, described changes to two governing files and manifest versions, and asked for the separate policy approval required by the user.",
+      "approval_question_plain_text": "Do you authorize applying, committing, and pushing this scoped governance amendment? This is the separate policy approval boundary you requested. Once approved, I can proceed with implementation and delivery under your existing commit/push authorization."
+    },
+    {
+      "speaker": "user",
+      "response_verbatim": "yes",
+      "position": "The next human turn, directly answering the quoted approval question"
+    },
+    {
+      "speaker": "assistant",
+      "subsequent_action": "Applied the presented amendment and committed/pushed it as 3424b6d1f4d1fb6fad891760914d6d2c319ab3ca before CAD implementation."
+    }
+  ],
+  "scope_of_observed_approval": "The specific presented one-time prompt-contract governance amendment, including its application, local commit and feature-branch push. The affirmative answer is explicit in context; it is not inferred from a Git commit, later work, silence or the present remediation request.",
+  "not_established": [
+    "No separate PHE, supplier or institutional engineering sign-off is asserted.",
+    "No independent verification of an organizational authority role or human-signed approval record is claimed.",
+    "No approval of the rejected task Markdown or planning artifacts.",
+    "No implementation acceptance, merge, release or field qualification approval."
+  ],
+  "approval_timestamp": "Not available as stable conversation metadata; no timestamp invented.",
+  "proposed_patch_sha256": "e4651dc95a4e4b1a5e9f93e9849f87b8d5ab002e5462eb201662ccd4f1ff2fb9",
+  "proposed_patch_reverse_application_check": {
+    "exit_code": 0,
+    "meaning": "Current governance matches the presented patch; this is content-consistency evidence, not proof of human approval."
+  },
+  "current_remediation_authority": "The user request titled PertAcoustic — Bounded Review Remediation authorizes verification, provenance reconciliation, evidence-only commits and pushes to the existing feature branch, with no further governance changes.",
+  "remaining_review_boundary": "The original conversation turn pair remains the human-approval source. This file preserves its context for review but does not independently authenticate or replace it. Final acceptance is reserved to the independent Planner/Reviewer.",
+  "governance_changes_made_in_remediation": []
+}

@@ -1,0 +1,464 @@
+{
+  "tested_commit": "d9f69e81ff0882f17f9fa2425ef3df79d5d00f9d",
+  "tested_tree": "000c641534b52e570d84e141e6cd214281103636",
+  "tracked_file_count": 91,
+  "tracked_files": {
+    ".agents/.gitignore": {
+      "sha256": "3641704430427ac0f37bdd7768b592b3397fa521171dafb92301c229f6b009c5",
+      "bytes": 29,
+      "git_blob": "b26b1d2c4e8213817b63e09fdf6b48abab1c6a1f"
+    },
+    ".agents/AGENTS.md": {
+      "sha256": "7e4d23b24f0ad067c362e2c0ed70259c6f4152a41fcc9708065ea9eebd9d0593",
+      "bytes": 18405,
+      "git_blob": "3a9d68890cbe173d14ccc1dcbc763207a59d835b"
+    },
+    ".agents/context/README.md": {
+      "sha256": "0d54442977c4ff87c918ebbd0b63f248e710b147c9b25780ff892c73a455b4bd",
+      "bytes": 600,
+      "git_blob": "6ad9be371ba7443f2b14fef0b957dced09ac0744"
+    },
+    ".agents/context/biweekly-2/260619_PERTACOUSTIC_BIWEEKLY_2.pdf": {
+      "sha256": "a2c9320bd105ab3c7b194cba529d41e9852cef725d80e9a199ade594cdee2bf3",
+      "bytes": 4215780,
+      "git_blob": "d0712de0689dc5b0f386a43da76210badc9bcb12"
+    },
+    ".agents/context/biweekly-4/260720_PERTACOUSTIC_BIWEEKLY_4.pdf": {
+      "sha256": "68842b37408cb6773b49419a6eff1538b5d799598c8867612f94af260c4f88fc",
+      "bytes": 11196108,
+      "git_blob": "b26467030f0b9b4cfc860309c55403dc86283afe"
+    },
+    ".agents/context/biweekly-5/HTI-02-DHPC_D MECH OUTLINE_.pdf": {
+      "sha256": "6e647a82018a8eb70af11b10581d2eb9ad22f8b26c43164ba2f71f0242f7cb35",
+      "bytes": 632395,
+      "git_blob": "49c0edf72e5e5774f475fc9e4f7f9909d4b7cc72"
+    },
+    ".agents/context/biweekly-5/project.md": {
+      "sha256": "43aaeaeed847382f8121f9d72ce36b92f7cb9968628859c61bf385b3edfa08d1",
+      "bytes": 4629,
+      "git_blob": "2114ec01141cd1aece97025038528652d12b0e2c"
+    },
+    ".agents/context/project.md": {
+      "sha256": "1cb269fbc3bef91295f639cf67c158d2647fd09d260607fb174783ed1f4c24e2",
+      "bytes": 9891,
+      "git_blob": "a7827c64d970018d216ae4b71f866809dd508624"
+    },
+    ".agents/context/references/1043532984.pdf": {
+      "sha256": "add6667056e73bdcfc51dc8528cc2f8798c2bab9a5dd6d184fd698dcd74559e9",
+      "bytes": 3982444,
+      "git_blob": "9c74d17eb32e4c642bead9968a5aa15f93e89844"
+    },
+    ".agents/context/references/2604.05547v1.pdf": {
+      "sha256": "3115ee5f0f12889c8da45da8446f6a173d79346d4a4f66eb97ab7874e67ea5e3",
+      "bytes": 2352167,
+      "git_blob": "42eca2aa6d5c5a8c57dd58cd1744b4cd4ba5a5f4"
+    },
+    ".agents/context/references/FIND-specification-flyer.pdf": {
+      "sha256": "5763c96f01b8d06ed957d0b7821f624c20f06b64998884628f663b1897ea1f45",
+      "bytes": 521906,
+      "git_blob": "e46dc0b0da030c8bd15f64272f7dcb7b29c88ad5"
+    },
+    ".agents/context/references/Oil-_-Gas-5.3-Noise-Logging-Tool-1.pdf": {
+      "sha256": "939ac4cfb2b16fa65db1da57dd5cfd2c219c33c783c3de055fc969880abfe3a5",
+      "bytes": 139065,
+      "git_blob": "43133a7c0806e5d2525dfced56c6c6973c5afe11"
+    },
+    ".agents/manifest.json": {
+      "sha256": "b883ebf5262f119e90b8566e57114c15de0293dcd1c77b13d5dc0986a6286128",
+      "bytes": 3457,
+      "git_blob": "6cef0e91f1fcc776c68a8a93ef0cc813920230eb"
+    },
+    ".agents/prompts/plan-create-task.md": {
+      "sha256": "b805690a83e8df7e8ec6b3f02ff5913f7bd1cd186365c4ea4c94a43b028518e7",
+      "bytes": 42542,
+      "git_blob": "83e6109a2dc059a6096f670680f1712a78474def"
+    },
+    ".agents/rules/antigravity-code-agent-workflow.md": {
+      "sha256": "7cbfb56d0fb02a44c2b2ad2b27c2de4625e24b3773829daac6d2db5587c5186f",
+      "bytes": 10373,
+      "git_blob": "6af5b7607432fbf33612e9abe3cb685724e08f7f"
+    },
+    ".agents/software-workflow.md": {
+      "sha256": "09db8f2f6e332a9ac7e1c3616820ef0a702639bff207b2785d622096f3ded650",
+      "bytes": 66340,
+      "git_blob": "0dd6ad7e92345b3ad54fdcc8d5b7f6ef76e5a1b7"
+    },
+    ".agents/tasks/_template.md": {
+      "sha256": "eece67459fc2241d68f1bb5bf580b2bfb7a3260209e0f6447680b88b55e158b0",
+      "bytes": 13907,
+      "git_blob": "4804ff247adfacc56f981c30411b1de1bf3acc8c"
+    },
+    ".agents/tasks/compact-downhole-casing-redesign.md": {
+      "sha256": "d6bd79180c87a0da7f66d3c92375b8da8d463778946fe3995a026cba18ce1515",
+      "bytes": 28404,
+      "git_blob": "ab00e84c6771118ed29a29156340baa13508d694"
+    },
+    ".gitignore": {
+      "sha256": "59f1a4d27a3f2abd1645517557f79e594cb5702402dba4e461109989b72c19ba",
+      "bytes": 539,
+      "git_blob": "f5ed7e3c1a586732a4f2822c69927bb8935f6892"
+    },
+    ".vscode/settings.json": {
+      "sha256": "ef4cd1fc62cd9a5bb80e2b289f1a9e933fe5012ce4d1f897c725397a7b387c6a",
+      "bytes": 74,
+      "git_blob": "3e15c408b24e5e79f526b2137f2e62fc59f48ba3"
+    },
+    "AGENTS.md": {
+      "sha256": "eff3c44d340c0a69b5fc0ae3dedc1750f83729b22dfdf4123bd45e953ad73327",
+      "bytes": 11443,
+      "git_blob": "09ad62fa7459e19c020db296afe75c8d5712e4b4"
+    },
+    "cosmo/__init__.py": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "cosmo/biweekly5.py": {
+      "sha256": "6880f4c40d77eaf1fcc6fcf0be9c5b205437e8a22e71b5da5ac1397fd3ecfa93",
+      "bytes": 63299,
+      "git_blob": "13e1959767b7420f43850ac378882c5e71e4d92f"
+    },
+    "cosmo/ccx/calculix_2.22_4win/README_Install": {
+      "sha256": "c124273005ecdf41d25c501d691ff21be8e8d0c5114e9c21d51c20d64432d70e",
+      "bytes": 4690,
+      "git_blob": "50f60447361c13b415b163729d5e9bb7d8d3071d"
+    },
+    "cosmo/ccx/calculix_2.22_4win/ccx_static.exe": {
+      "sha256": "a326dfb2efe888e35e2195da263761c0b646b10e452b8998f36ea38da612a277",
+      "bytes": 48542267,
+      "git_blob": "6b9c61aacd4ed928590b5d7407b40c167e30fd94"
+    },
+    "cosmo/compact_casing.py": {
+      "sha256": "748489ffaa9ff738ab259c9e7e6d29b2f2509a17e4a46d4d48cf05e360bf7c6e",
+      "bytes": 124083,
+      "git_blob": "9bcd8a7a0f49d2f5ae4f1b1667cba630a2e12fa2"
+    },
+    "cosmo/core/__init__.py": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "cosmo/core/cad_generator.py": {
+      "sha256": "1e7ba75e66335b94c551578559f1f1a215c2f5afdb18626cc1698feadd218a09",
+      "bytes": 2277,
+      "git_blob": "509abe02eaa609f4d24bb0d144b02a6f100f56d7"
+    },
+    "cosmo/core/mesh_generator.py": {
+      "sha256": "bfb9cb9f395a352c9b4b3528dae4ef106e5111004b12df9936f968ba62f0cc7d",
+      "bytes": 3022,
+      "git_blob": "5d263b8cddc1565fc45be691ffcb7e9e088bce9a"
+    },
+    "cosmo/core/plot_results.py": {
+      "sha256": "efbf729e7215fbcf615b1b0e979307710ab456c7ab3ae38651545940febd0935",
+      "bytes": 3902,
+      "git_blob": "93feace14d1a5f8803837e73d8f22761681de586"
+    },
+    "cosmo/core/result_extractor.py": {
+      "sha256": "e05a544d68991e65f517bb3795eb871735a264850e2d0909c41e962695eb364c",
+      "bytes": 4078,
+      "git_blob": "d33778713dc56ae2856f47738bab3d5e1819a2b3"
+    },
+    "cosmo/core/results_compiler.py": {
+      "sha256": "794cdf9a283cb6c222fbdf4b350c829d0b0a52d2e91f2c73433c3ba0433d024e",
+      "bytes": 1700,
+      "git_blob": "1dcbfa22d48b35a2a1892175f5fea24014dcc964"
+    },
+    "cosmo/core/solver_interface.py": {
+      "sha256": "145d9fbe37776b288740f717fd74944dbc8309cf2641634a65f5d9f5588d417b",
+      "bytes": 7179,
+      "git_blob": "f096f751ae20127ea7c3b3c86b0ed0585b1ef10f"
+    },
+    "cosmo/cosmo_runner.py": {
+      "sha256": "c348df9890cfb350490fb0739f6bb2ce51163b41a4ea842e6c4c30b958885845",
+      "bytes": 2693,
+      "git_blob": "8f7e3b4b2e3e6426ab0b69bc2971adb5402732f8"
+    },
+    "cosmo/integrated_downhole.py": {
+      "sha256": "a259eb9a57ef208f8cb4236ad39b0379ab93a1b4471600ebdd6a99299e2821d1",
+      "bytes": 49456,
+      "git_blob": "b23a8983340ae2e67233ce0f8dbbaadb42222c09"
+    },
+    "cosmo/integrated_report.py": {
+      "sha256": "98c7b6d09f6535032176358433e443e2dc468bffc731051c8fcb54e0d16764ec",
+      "bytes": 21047,
+      "git_blob": "0e4cf7b93e8ee05f5108a245eb91d0e416183c3c"
+    },
+    "cosmo/material_library.json": {
+      "sha256": "c41a74b60d57894388880441609482112583fd6d760cfedfa03fea76db4da565",
+      "bytes": 12975,
+      "git_blob": "0ba7467558d035c566bb21411f9380f34291ab41"
+    },
+    "cosmo/optimization/__init__.py": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "cosmo/optimization/optimizer.py": {
+      "sha256": "3d7ab759cd3dbbb86984da7c8a56a2cdbd377b20a65ac936e5df56a1364e8614",
+      "bytes": 6265,
+      "git_blob": "c276abe7de0e68e7c4289f72ff40b5119b299599"
+    },
+    "pyproject.toml": {
+      "sha256": "99aa342fee14c51c1ae6cb0a57c1588afb72b42ef2830f1710933474324dfcfe",
+      "bytes": 343,
+      "git_blob": "c0b99c7bb03abffb8beee762b5cf8ed30428fadc"
+    },
+    "results/biweekly-5/biweekly-5.md": {
+      "sha256": "d4bdff314625ebee8f44aa471be18590a5d3e3bb88ee83b1a7abf50fe4087977",
+      "bytes": 13375,
+      "git_blob": "9749e03f4e473f39dfb032cf002e3bcf15c0b8be"
+    },
+    "results/biweekly-5/cad/hti_casing_analysis.step": {
+      "sha256": "3b01897056cdffc68c939dea919cb4d08f0a33a82b19945ff135aae82678050e",
+      "bytes": 47881,
+      "git_blob": "c23669a58bdd09ae0844fdd1c38bb0138dfcda00"
+    },
+    "results/biweekly-5/cad/hti_casing_detailed.step": {
+      "sha256": "f2512ce5dd36324beef24f9596704ddf8cece92373e6cafbe469f927369ef02e",
+      "bytes": 332026,
+      "git_blob": "05b18ee432cb93428a3ef3029956cdfad236c978"
+    },
+    "results/biweekly-5/figures/cad_assembly.png": {
+      "sha256": "7eb4d33ce60b156be85341aa206e19ce9597ee4877c94371421c2fa7f7863deb",
+      "bytes": 964982,
+      "git_blob": "97c6725b9698ba4498a42ae6bbbbf5eefe325115"
+    },
+    "results/biweekly-5/figures/longitudinal_section.png": {
+      "sha256": "7751affcc9d0eb07cf0f63c4dc2bdc85395d33257470af64e1d8674644762c72",
+      "bytes": 66741,
+      "git_blob": "8eda8a1ea06a99bdbcc6600079f3ed79addbf572"
+    },
+    "results/biweekly-5/figures/structural_comparison.png": {
+      "sha256": "679b2c217e24e81e6a67540b08add080d3ea23286e97d59561a1d2e056409af1",
+      "bytes": 35992,
+      "git_blob": "57347f088af47dbec6729d8ebbbffcffb25e0011"
+    },
+    "results/biweekly-5/figures/thermal_history.png": {
+      "sha256": "a1b41fd6bf8e58ec14c8f2f8ad18f6914b130be42754c3ce24f5da38ba0c3d97",
+      "bytes": 68467,
+      "git_blob": "ae1ec35cd8a94e239394a911eea8b4f0ede865dd"
+    },
+    "results/biweekly-5/figures/thermal_tradeoff.png": {
+      "sha256": "82ea7dcbbd647a15c5b1caaed618c367e6e5ac2e6f6ff1383f5edc4ccafa4a4d",
+      "bytes": 75877,
+      "git_blob": "33c77cac8be19a8f6399f3dbdd4295ad3b521007"
+    },
+    "results/biweekly-5/input_spec.json": {
+      "sha256": "ce570b312c9c1783ed3207ac05fe0bf429d8e7b9b2e12b42b8c6e7198931a6e1",
+      "bytes": 4159,
+      "git_blob": "da943398f6e31d00e7c4854d56fa4a2b6bd10346"
+    },
+    "results/biweekly-5/mesh_convergence.csv": {
+      "sha256": "0b62bce3a3620c860a0d87450e77369d854d06244fb2f8a5634be776d79c5112",
+      "bytes": 867,
+      "git_blob": "9293082b7120af3d20c287e62ef6009bb8bd9d10"
+    },
+    "results/biweekly-5/structural_fea_results.csv": {
+      "sha256": "dbfa827558dc7c31be487bb0e26866e022b78e37af73ba125fe10b2eb6d07a23",
+      "bytes": 318,
+      "git_blob": "0c9b10d8c319f0ad9ae1ac8348d7a259a610ac97"
+    },
+    "results/biweekly-5/summary.json": {
+      "sha256": "49331e0944851148ac24cd504e604d21fe9ac936125d500c9dde772880bac9e8",
+      "bytes": 3748,
+      "git_blob": "a2490f16e042ba4f17b3d53e7e336ce324894659"
+    },
+    "results/biweekly-5/thermal_results.csv": {
+      "sha256": "2f8a9ae3c26f150a0202a9a85324f39dd1a2aaff118dabcef18f67e58d7c4eae",
+      "bytes": 1702,
+      "git_blob": "d12ccfa87a35f09668ffe703e220a60686920b9f"
+    },
+    "results/compact-casing/compact_casing_id_od_envelope.csv": {
+      "sha256": "440455c7b1f1da4ff77586b68009ac416fe02cbdc0c7efaeccc0461f040134f4",
+      "bytes": 2653,
+      "git_blob": "bbfab051cd1003953bd5f0d5845469be1d55317f"
+    },
+    "results/compact-casing/compact_casing_redesign_report.md": {
+      "sha256": "afd00a265f6dc8a0e5c07cad21052b568ecb653a28a39357056743c04ff535e4",
+      "bytes": 29012,
+      "git_blob": "196d892e83abce0c807cb8c458ec8f2fbf5a0ef9"
+    },
+    "results/compact-casing/compact_casing_trade_study.csv": {
+      "sha256": "9c02e62caa7a01a992b34e1c447baaf5208e0a20920d711767794f49ba333332",
+      "bytes": 6597,
+      "git_blob": "ff112db76b8612d70e20efd558dc978880e4b1fa"
+    },
+    "results/compact-casing/figures/compact_cad_assembly.png": {
+      "sha256": "b17b4c5eef8317ecbdaa12913c51f79af8b501edce6517432473351d4922902c",
+      "bytes": 1316843,
+      "git_blob": "ad457c7d6bb5a5d23dcae47993ad5da0a4f263b2"
+    },
+    "results/compact-casing/figures/compact_longitudinal_section.png": {
+      "sha256": "28e1cf971c919dd7d737fadffef871d9cc0ad910a8fa9bec54d91e3bfd604181",
+      "bytes": 96554,
+      "git_blob": "844dacfe2043a9fd0ea79955704e65d5ec7349dc"
+    },
+    "results/compact-casing/figures/compact_thermal_trade_study.png": {
+      "sha256": "4fd98f69058b2a8ff64a61168ad7420ba52fdb72597cebc498b84c43cccffd49",
+      "bytes": 250544,
+      "git_blob": "d92ea19b37d2ccb6087e803d5cb751122648a0c0"
+    },
+    "results/compact-casing/figures/compact_transverse_pcm1808_section.png": {
+      "sha256": "6ca930ffb955c5543e4d8b73253346976770326209c5c82051316a51d9347f2a",
+      "bytes": 247503,
+      "git_blob": "4fb5ab63c21da3f410badadfe8f694ee1dee40f5"
+    },
+    "results/hti-02-dhpc-d-20260716/comparison_table.md": {
+      "sha256": "60465ddcd8c2d37637d4b4fc85bc5949d1be55dc31506d0ca4c487af5d52028a",
+      "bytes": 237,
+      "git_blob": "707078af598a736fdaf2b20c74b5b4dedc1a8461"
+    },
+    "results/hti-02-dhpc-d-20260716/iteration_01/summary.json": {
+      "sha256": "903e76b53c156321d89fec9cc66af52edf7adc31868e1bd38be5b3814268bca9",
+      "bytes": 360,
+      "git_blob": "907bf6bd01472c0594027e5c9f51cdde1f33dc94"
+    },
+    "results/hti-02-dhpc-d-20260716/optimization_log.json": {
+      "sha256": "faa731ee0b2445321d71e29fe95c7685c9c90945998382e20d9e5aefcf2ad7b7",
+      "bytes": 846,
+      "git_blob": "25505f7d2cbe0f12e4880f4658476275e2b1e03b"
+    },
+    "results/integrated-downhole/artifact_manifest.json": {
+      "sha256": "54c2a84d1f2e20c6d037b68871747918f48b87b7ad76fa6da5e2f754f1f4f2a3",
+      "bytes": 2835,
+      "git_blob": "ae2d9fd473f7675de9e7e06bb6acb95c43cd01ae"
+    },
+    "results/integrated-downhole/cad/integrated_complete.step": {
+      "sha256": "6ddef283835b4bf64397a5f5432f0939a3238f742c9dd842b4d35bd12b77e837",
+      "bytes": 1959676,
+      "git_blob": "0a457f460a785e736a58958710a34cbcd1669790"
+    },
+    "results/integrated-downhole/cad/integrated_exploded.step": {
+      "sha256": "7b63a8f44154b447beaac106110bb1b905470742c75cf37d31be471106ee5832",
+      "bytes": 1931047,
+      "git_blob": "eb6b1c837f97540ab8b93c69740ad10f22b846c6"
+    },
+    "results/integrated-downhole/cad/integrated_sectional.step": {
+      "sha256": "2219c367d6da25960d78b8861b4a357df98cfa5a076e479798102ccfae997421",
+      "bytes": 2131725,
+      "git_blob": "220c7fbf6c41d74597c9eacf9b24db8ebdee2b0f"
+    },
+    "results/integrated-downhole/cad/module_battery_pack.step": {
+      "sha256": "ffe4cffafd9930d670777091eb13c5a97b54738654c443c6b418560bebcb62a5",
+      "bytes": 176043,
+      "git_blob": "85ccf7c3bb0fc79da682d684cc587bef6f1a8286"
+    },
+    "results/integrated-downhole/cad/module_electronics_cartridge.step": {
+      "sha256": "e412d9d433d2caa3b7e3f01631389aa71ae002a3f3158b174193a85883860c2b",
+      "bytes": 1078672,
+      "git_blob": "25a3459e622612ddae1617b7ebf9d4fdaded8e87"
+    },
+    "results/integrated-downhole/cad/module_pressure_housing.step": {
+      "sha256": "0fbfbf94952cffd70b47328b5552dcec97468ca72da7bd255ee8ff26217d8767",
+      "bytes": 204571,
+      "git_blob": "850ded982e3d212594ebed8fc9bb81ec5a2923a0"
+    },
+    "results/integrated-downhole/cad/module_sensor_bulkhead.step": {
+      "sha256": "6c2fb9e23e030a3c1e5d8157af0318047f4f1461eed617becb221bddc850b35f",
+      "bytes": 105012,
+      "git_blob": "bd9944b314f06d2231d32e9fbdb4119b87ec6d58"
+    },
+    "results/integrated-downhole/cad/module_wet_head.step": {
+      "sha256": "8771939cc154cdd2d692eed182f82c66173ac8bb00c739c8148d80ce1feb186f",
+      "bytes": 359885,
+      "git_blob": "cf4c20a10c57c299fa4aa60cd94edc663988d5e7"
+    },
+    "results/integrated-downhole/design_report.md": {
+      "sha256": "72e581d21b0cc42bd1b3604645c4b62d2337a30d72bc0747f851cfe788a010fa",
+      "bytes": 19979,
+      "git_blob": "f4cad773b9a6f3e8757da735103744805f9cc575"
+    },
+    "results/integrated-downhole/figures/annotated_longitudinal_section.png": {
+      "sha256": "cbc88f309995d0ebfd29190db813463833b8d2296f392f6d03676bf511699c5d",
+      "bytes": 188442,
+      "git_blob": "d78a688b59e82e6ae06ee7990c3886e185f4783f"
+    },
+    "results/integrated-downhole/figures/integrated_complete.png": {
+      "sha256": "255fc8657d8791f8656f78fa3bd7f23a7f1b662e91278c9d9ba70858f9338402",
+      "bytes": 221202,
+      "git_blob": "8325c78392d1e38c75ac15f702c3cc6d7475eab7"
+    },
+    "results/integrated-downhole/figures/integrated_exploded.png": {
+      "sha256": "5f5d9ca496c7090d8957bad13330c8c94f079a1b4c8197557138009e449f8344",
+      "bytes": 323259,
+      "git_blob": "3b96b43d4a963ca46219cdcb38545962e2b673e5"
+    },
+    "results/integrated-downhole/figures/integrated_orthographic.png": {
+      "sha256": "9d2bfa3e7c4e234b2623022df1a53665ff5819fc3ec63afe0199529239609b84",
+      "bytes": 174916,
+      "git_blob": "fe53142b9a5583e4470aa2962138983baadfa5c0"
+    },
+    "results/integrated-downhole/figures/integrated_sectional.png": {
+      "sha256": "b787b573c3843ba2329e3c39c90dbe84f2b63d35074a8f39f29e67bc8996df0c",
+      "bytes": 228668,
+      "git_blob": "e76bc9e6358a3f827af629eec36a82297f9e0c21"
+    },
+    "results/integrated-downhole/figures/integration_details.png": {
+      "sha256": "0a28e8fb924e6bc9922df41d5e81b03deebf520983a72008a3ba92ff39a97f4a",
+      "bytes": 329518,
+      "git_blob": "d53bf5528b34f46889045b14025ae57882b3caa6"
+    },
+    "results/integrated-downhole/parameters.json": {
+      "sha256": "9f89fdbf46b2798c67e26dc9619dd9813b94b33e6e6d8194a2e7ef71278c3be9",
+      "bytes": 264,
+      "git_blob": "bebcd1b512165d43dfc6932e4fb3e16133f02cab"
+    },
+    "results/integrated-downhole/validation/checks.log": {
+      "sha256": "a4f492f8792c1b0fc5ddddf7fbe4cb109a221bfe6904817fff4877f52062735c",
+      "bytes": 378,
+      "git_blob": "ca9c591b30bf62ec2fac6e76fa27703b4d8dc617"
+    },
+    "results/integrated-downhole/validation/focused-final.log": {
+      "sha256": "ef7df5ba95f70f1a6d4264b0f7fc2264104cc1a4d68714223d8e1630b9c6f523",
+      "bytes": 2636,
+      "git_blob": "15c0bf1622f46f9b077d7057f70d9702146d1a6c"
+    },
+    "results/integrated-downhole/validation/generation.log": {
+      "sha256": "3e2f6813ec9a089e440495cc510cc95cb3838153b901bc5b7b6d23180927fea2",
+      "bytes": 225,
+      "git_blob": "1a36c2ca91eea28974d68580cab071b22f5b570b"
+    },
+    "results/integrated-downhole/validation/reproduction.log": {
+      "sha256": "0302192dd501fd366b53fee311d9c9938f85712d3f218865de60e2e1489e6ea0",
+      "bytes": 218,
+      "git_blob": "f04222b6e76add481bf5c61d27a592251e7731eb"
+    },
+    "results/integrated-downhole/validation/test_results.json": {
+      "sha256": "83508e85a27dee918abc51a614861b272e5590088269d39043af21d2cdb22773",
+      "bytes": 5440,
+      "git_blob": "98c75c2eafcb9913fe171ec84fce0ed483dcd04a"
+    },
+    "results/integrated-downhole/validation/unittest.log": {
+      "sha256": "0b35b8c6fa887e84938c33b9e9b3ee2d213c66a7309415b109db48bbc77d050e",
+      "bytes": 18932,
+      "git_blob": "e4f2b83539fe7aa64973db17bd0a224ba155b24e"
+    },
+    "results/integrated-downhole/verification.json": {
+      "sha256": "85d5725fa1cde1082182f76102ed9332288b03895df1fafc6ed386ae20e1f60c",
+      "bytes": 35912,
+      "git_blob": "7f7e60fb09f7f869991d7f9120ac2ddc04828480"
+    },
+    "tests/test_biweekly5.py": {
+      "sha256": "41bab1a4af6813add6532e8c22293c198776fdfcff2bca6ef27c056b4c7a28c7",
+      "bytes": 6973,
+      "git_blob": "caf6fdb21b09919047f3bff5bd620d46cf9b384c"
+    },
+    "tests/test_compact_casing.py": {
+      "sha256": "bf39ef890b4c08980fb23cbf417b98b71a63cd655e21b365a255b6af1e30e65a",
+      "bytes": 52281,
+      "git_blob": "4dc3e8ee995ad1e3fe6e65b4bc9b8129811a4674"
+    },
+    "tests/test_integrated_downhole.py": {
+      "sha256": "4abf51dd1e6cfb3487e1fe4efaff507038cc001ac2b5f9fc56dba415f626bcb6",
+      "bytes": 9644,
+      "git_blob": "71859da56c6e012c3a79f20c16f678dd930a72e0"
+    },
+    "tests/test_results_compiler.py": {
+      "sha256": "e647002c888e216898435e0f4f1ae478502d417406e7e99ce9ee7501d033dcd4",
+      "bytes": 1182,
+      "git_blob": "5c73d4b54a64436a5869ac1473e85a17b1f0be69"
+    }
+  },
+  "python": "3.11.16",
+  "preflight": "Every tracked working file matches the exact reviewed commit byte for byte; only previously rejected untracked Draft/planning files present."
+}
