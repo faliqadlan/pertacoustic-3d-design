@@ -1,0 +1,432 @@
+{
+  "status": "PASS — documentation and bounded interoperability assessment; independent review pending",
+  "starting_revision": "c91c20c83a26d8d61e5e23b99a1fce28cad27c19",
+  "branch": "feat/trl5-integrated-downhole-concept",
+  "workspace": "/var/www/pertacoustic-3d-design",
+  "human_request": {
+    "title": "PertAcoustic — CCL Integration Assessment and README Completion",
+    "sha256": "f54800514f827c5bb9f6d285d1db3f05a0089d3dd133409936ac1a65a0599b16",
+    "scope": "Explicit bounded documentation/assessment follow-up under the existing scoped prompt contract; no final CCL selection, geometry changes or new governance policy authorized."
+  },
+  "readme": {
+    "substantive": true,
+    "required_sections_present": [
+      "Project overview",
+      "Project status",
+      "Engineering requirements",
+      "System architecture",
+      "Current CAD baseline",
+      "Visual gallery",
+      "Repository structure",
+      "Setup and reproduction",
+      "Available deliverables",
+      "CCL and depth correlation",
+      "Engineering limitations",
+      "References"
+    ],
+    "characters": 14500,
+    "embedded_existing_images": 3,
+    "relative_file_and_anchor_links_checked": 36,
+    "links": [
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/design_report.md",
+        "resolved_repository_path": "results/integrated-downhole/design_report.md"
+      },
+      {
+        "document": "README.md",
+        "target": "#available-deliverables",
+        "resolved_repository_path": "README.md"
+      },
+      {
+        "document": "README.md",
+        "target": "docs/ccl-integration-assessment.md",
+        "resolved_repository_path": "docs/ccl-integration-assessment.md"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/validation/review-remediation/remediation-results.json",
+        "resolved_repository_path": "results/integrated-downhole/validation/review-remediation/remediation-results.json"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/validation/review-remediation/unittest-final-source.log",
+        "resolved_repository_path": "results/integrated-downhole/validation/review-remediation/unittest-final-source.log"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/figures/integrated_complete.png",
+        "resolved_repository_path": "results/integrated-downhole/figures/integrated_complete.png"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/figures/integrated_sectional.png",
+        "resolved_repository_path": "results/integrated-downhole/figures/integrated_sectional.png"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/figures/integrated_exploded.png",
+        "resolved_repository_path": "results/integrated-downhole/figures/integrated_exploded.png"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/figures/annotated_longitudinal_section.png",
+        "resolved_repository_path": "results/integrated-downhole/figures/annotated_longitudinal_section.png"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/figures/integrated_orthographic.png",
+        "resolved_repository_path": "results/integrated-downhole/figures/integrated_orthographic.png"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/figures/integration_details.png",
+        "resolved_repository_path": "results/integrated-downhole/figures/integration_details.png"
+      },
+      {
+        "document": "README.md",
+        "target": "pyproject.toml",
+        "resolved_repository_path": "pyproject.toml"
+      },
+      {
+        "document": "README.md",
+        "target": "cosmo/integrated_downhole.py",
+        "resolved_repository_path": "cosmo/integrated_downhole.py"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/parameters.json",
+        "resolved_repository_path": "results/integrated-downhole/parameters.json"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/cad/integrated_complete.step",
+        "resolved_repository_path": "results/integrated-downhole/cad/integrated_complete.step"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/cad/integrated_sectional.step",
+        "resolved_repository_path": "results/integrated-downhole/cad/integrated_sectional.step"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/cad/integrated_exploded.step",
+        "resolved_repository_path": "results/integrated-downhole/cad/integrated_exploded.step"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/cad/module_wet_head.step",
+        "resolved_repository_path": "results/integrated-downhole/cad/module_wet_head.step"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/cad/module_sensor_bulkhead.step",
+        "resolved_repository_path": "results/integrated-downhole/cad/module_sensor_bulkhead.step"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/cad/module_electronics_cartridge.step",
+        "resolved_repository_path": "results/integrated-downhole/cad/module_electronics_cartridge.step"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/cad/module_battery_pack.step",
+        "resolved_repository_path": "results/integrated-downhole/cad/module_battery_pack.step"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/cad/module_pressure_housing.step",
+        "resolved_repository_path": "results/integrated-downhole/cad/module_pressure_housing.step"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/design_report.md",
+        "resolved_repository_path": "results/integrated-downhole/design_report.md"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/verification.json",
+        "resolved_repository_path": "results/integrated-downhole/verification.json"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/artifact_manifest.json",
+        "resolved_repository_path": "results/integrated-downhole/artifact_manifest.json"
+      },
+      {
+        "document": "README.md",
+        "target": "docs/ccl-integration-assessment.md",
+        "resolved_repository_path": "docs/ccl-integration-assessment.md"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/validation/ccl-readme-checks.json",
+        "resolved_repository_path": "results/integrated-downhole/validation/ccl-readme-checks.json"
+      },
+      {
+        "document": "README.md",
+        "target": "results/integrated-downhole/design_report.md",
+        "resolved_repository_path": "results/integrated-downhole/design_report.md"
+      },
+      {
+        "document": "README.md",
+        "target": "docs/ccl-integration-assessment.md",
+        "resolved_repository_path": "docs/ccl-integration-assessment.md"
+      },
+      {
+        "document": "docs/ccl-integration-assessment.md",
+        "target": "../README.md",
+        "resolved_repository_path": "README.md"
+      },
+      {
+        "document": "docs/ccl-integration-assessment.md",
+        "target": "../results/integrated-downhole/parameters.json",
+        "resolved_repository_path": "results/integrated-downhole/parameters.json"
+      },
+      {
+        "document": "docs/ccl-integration-assessment.md",
+        "target": "../results/integrated-downhole/verification.json",
+        "resolved_repository_path": "results/integrated-downhole/verification.json"
+      },
+      {
+        "document": "docs/ccl-integration-assessment.md",
+        "target": "../results/integrated-downhole/design_report.md",
+        "resolved_repository_path": "results/integrated-downhole/design_report.md"
+      },
+      {
+        "document": ".agents/context/README.md",
+        "target": "../../README.md",
+        "resolved_repository_path": "README.md"
+      },
+      {
+        "document": ".agents/context/README.md",
+        "target": "project.md",
+        "resolved_repository_path": ".agents/context/project.md"
+      },
+      {
+        "document": ".agents/context/README.md",
+        "target": "../../docs/ccl-integration-assessment.md",
+        "resolved_repository_path": "docs/ccl-integration-assessment.md"
+      }
+    ]
+  },
+  "document_sha256": {
+    "README.md": "54fac28099f5771767f71549360a5a0b0c0fa205d05e82e4b8bb5d70741322e5",
+    "docs/ccl-integration-assessment.md": "f08ce8c7e6c5cd7402eae8ed03aefefa35ce2326c2e61604b7f96f15ef5b88bf",
+    ".agents/context/project.md": "2dfd8889cd8b198b3dfef6756931828a578c5c81675b43647a8b08e01f314abf",
+    ".agents/context/README.md": "8ce9975d5a1afde85812e46621827c8e1a3107ddbefa2ac7c73a5ea02e48b27e"
+  },
+  "implemented_commands_checked": [
+    {
+      "command": ".venv/bin/python --version",
+      "observed": "Python 3.11.16",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/python -m cosmo.integrated_downhole --help",
+      "observed_options": [
+        "--output",
+        "--parameters",
+        "--no-figures"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/python -c 'from cosmo.integrated_downhole import build_design, verify_design; print(verify_design(build_design())[\"status\"])'",
+      "observed": "PASS — NOMINAL CONCEPT GEOMETRY ONLY",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/python -m cosmo.integrated_downhole --parameters results/integrated-downhole/parameters.json --output /tmp/pertacoustic-ccl-readme-reproduction --no-figures",
+      "exit_code": 0,
+      "fresh_step_exports_reimported": 8,
+      "geometry_compared_with_published_baseline": "PASS",
+      "figures_generated": 0
+    }
+  ],
+  "environment": {
+    "python": "3.11.16",
+    "cadquery": "2.8.0",
+    "numpy": "2.4.6",
+    "matplotlib": "3.11.1",
+    "vtk": "9.6.2",
+    "gmsh": "4.15.2",
+    "dependency_imports": "cadquery, numpy, matplotlib, vtk, gmsh imported successfully",
+    "dependency_installation_performed": false,
+    "fresh_install_instructions": "Conventional editable setup derived from pyproject.toml, not a newly performed installation; versions documented as observed, not minimum requirements."
+  },
+  "regression_suite": {
+    "fresh_execution_performed": false,
+    "reason": "Documentation/context and interoperability assessment only; implementation, dependency declarations, tests and all prior CAD artifacts are unchanged. Targeted link, command, geometry and preservation checks were used.",
+    "existing_exact_final_source_result": {
+      "test_count": 81,
+      "exit_code": 0,
+      "tested_source_commit": "d9f69e81ff0882f17f9fa2425ef3df79d5d00f9d",
+      "evidence": "results/integrated-downhole/validation/review-remediation/remediation-results.json"
+    }
+  },
+  "preservation": {
+    "prior_tracked_files": 97,
+    "only_existing_files_changed": [
+      ".agents/context/README.md",
+      ".agents/context/project.md"
+    ],
+    "other_prior_tracked_files_byte_identical": 95,
+    "published_artifact_hashes_verified": 17,
+    "source_files_sha256": {
+      "cosmo/integrated_downhole.py": "a259eb9a57ef208f8cb4236ad39b0379ab93a1b4471600ebdd6a99299e2821d1",
+      "cosmo/integrated_report.py": "98c7b6d09f6535032176358433e443e2dc468bffc731051c8fcb54e0d16764ec",
+      "cosmo/compact_casing.py": "748489ffaa9ff738ab259c9e7e6d29b2f2509a17e4a46d4d48cf05e360bf7c6e",
+      "cosmo/material_library.json": "c41a74b60d57894388880441609482112583fd6d760cfedfa03fea76db4da565"
+    },
+    "governance_policies_unchanged": true,
+    "historical_files_unchanged": true,
+    "CAD_STEP_parameters_images_and_report_unchanged": true
+  },
+  "meeting_and_calculations": {
+    "observations_status": "Unconfirmed meeting-note summary; not approved equipment specifications",
+    "ALFA_required": false,
+    "final_configuration_selected": false,
+    "calculations": {
+      "meeting_CCL_simple_subtotal_mm": 1563,
+      "unallocated_difference_from_2000_mm_before_net_interfaces": 437,
+      "Sondex_example_simple_subtotal_mm": 1348,
+      "Welltec_OD_range_converted_mm": [
+        53.974999999999994,
+        79.375
+      ],
+      "Welltec_length_range_converted_mm": [
+        274.32,
+        457.20000000000005
+      ],
+      "hydrophone_envelope_midpoint_z_mm": 76.45,
+      "uppermost_extent_to_envelope_midpoint_mm": 786.55,
+      "illustrative_20ppm_7200s_drift_s": 0.14400000000000002,
+      "illustrative_clock_only_depth_error_m_at_0_1_mps": 0.014400000000000003
+    },
+    "offset_limit": "Geometric sensor midpoint and uppermost CAD extent are not verified acoustic/connector datums; manufacturer measure-point coordinate has no established datum in the consulted sheet."
+  },
+  "research": {
+    "consulted_date": "2026-11-11",
+    "sources_used": [
+      "https://dam.bakerhughes.com/m/1a4960ecd80f51df/original/Sondex-casing-collar-locator-CCL-spec.pdf",
+      "https://www.hightechincusa.com/products/hydrophones/hti02dhpc.html",
+      "https://www.weatherford.com/drilling-and-evaluation/wireline-products/cased-hole-formation-evaluation/memory-logging-tool/",
+      "https://www.weatherford.com/drilling-and-evaluation/wireline-products/telemetry-systems/geothermal-depth-logger-and-encoder/",
+      "https://www.welltec.com/products-services/intervention/casing-collar-locator-ccl"
+    ],
+    "method": "Official manufacturer pages/specification sheet consulted with web tools; quantitative examples kept distinct from PHE requirements. No manufacturer document or internal meeting image was added.",
+    "CCL_sheet_datum": "Sondex CCL201 table gives 174.45 mm but does not establish datum/direction; left unresolved.",
+    "repository_visibility": {
+      "observed": "public",
+      "source": "GitHub connected get_repo metadata",
+      "date": "2026-11-11"
+    }
+  },
+  "readme_workflow": {
+    "repository_generate_readme_implementation_found": false,
+    "generate_readme_executable_available": false,
+    "method": "Verified/refreshed supporting context; authored root README directly; replaced inherited context README placeholder with a pointer to avoid duplicate content."
+  },
+  "open_decisions": [
+    "PHE connected versus separate CCL arrangement",
+    "Applicability of 2 m and diameter constraints to whole toolstring",
+    "Exact CCL model, dimensions and measurement datum",
+    "Actual mechanical, load, power/data and deployment interfaces",
+    "Relevant acoustic-run time–depth records, reference logs, clock synchronization and depth datum",
+    "Hydrophone-to-CCL reference offset, sign, applied corrections and uncertainty"
+  ],
+  "not_claimed": [
+    "Fresh regression-suite execution",
+    "Fresh dependency installation",
+    "CCL hardware/firmware integration",
+    "Full toolstring fit verification",
+    "Approval of meeting-note dimensions",
+    "Pressure/thermal/acoustic/battery qualification",
+    "TRL 5 achievement",
+    "Independent implementation acceptance"
+  ],
+  "generator_observed_stdout": {
+    "status": "PASS — NOMINAL CONCEPT GEOMETRY ONLY",
+    "length_mm": 863.0,
+    "od_mm": 44.45,
+    "parts": 36,
+    "step_exports": 8,
+    "figures": 0,
+    "output": "/tmp/pertacoustic-ccl-readme-reproduction"
+  },
+  "geometry_reconfirmed": {
+    "overall_length_mm": 863.0,
+    "maximum_od_mm": 44.45,
+    "shell_wall_mm": 3.5,
+    "shell_bore_mm": 37.45,
+    "part_count": 36,
+    "solid_count": 81,
+    "maximum_prohibited_interference_mm3": 0.0
+  },
+  "fresh_step_checks": [
+    {
+      "file": "integrated_complete.step",
+      "status": "PASS",
+      "units": "mm",
+      "solid_count": 81,
+      "volume_relative_error": 1.5942509411091532e-09
+    },
+    {
+      "file": "integrated_sectional.step",
+      "status": "PASS",
+      "units": "mm",
+      "solid_count": 80,
+      "volume_relative_error": 2.2496038649086465e-09
+    },
+    {
+      "file": "integrated_exploded.step",
+      "status": "PASS",
+      "units": "mm",
+      "solid_count": 81,
+      "volume_relative_error": 1.5942509411091539e-09
+    },
+    {
+      "file": "module_wet_head.step",
+      "status": "PASS",
+      "units": "mm",
+      "solid_count": 6,
+      "volume_relative_error": 1.437182325427543e-09
+    },
+    {
+      "file": "module_sensor_bulkhead.step",
+      "status": "PASS",
+      "units": "mm",
+      "solid_count": 7,
+      "volume_relative_error": 1.755389754461229e-14
+    },
+    {
+      "file": "module_electronics_cartridge.step",
+      "status": "PASS",
+      "units": "mm",
+      "solid_count": 45,
+      "volume_relative_error": 1.0658061805481196e-13
+    },
+    {
+      "file": "module_battery_pack.step",
+      "status": "PASS",
+      "units": "mm",
+      "solid_count": 12,
+      "volume_relative_error": 6.818564305931608e-09
+    },
+    {
+      "file": "module_pressure_housing.step",
+      "status": "PASS",
+      "units": "mm",
+      "solid_count": 11,
+      "volume_relative_error": 1.9794685436941926e-14
+    }
+  ],
+  "intended_changed_files": [
+    "README.md",
+    "docs/ccl-integration-assessment.md",
+    ".agents/context/project.md",
+    ".agents/context/README.md",
+    "results/integrated-downhole/validation/ccl-readme-checks.json"
+  ]
+}
